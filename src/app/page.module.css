@@ -1,0 +1,51 @@
+.main {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 96px 0;
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+  margin-bottom: 40px;
+}
+
+.title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(38px, 6vw, 76px);
+  line-height: 1.04;
+  letter-spacing: -0.018em;
+  max-width: 16ch;
+  margin-bottom: 34px;
+}
+
+.title em {
+  font-style: italic;
+  color: var(--teal-deep);
+}
+
+.lede {
+  font-size: clamp(18px, 2vw, 21px);
+  color: var(--ink-soft);
+  max-width: 52ch;
+  line-height: 1.55;
+  margin-bottom: 40px;
+}
+
+.mail {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink);
+  border-bottom: 2px solid var(--teal);
+  padding-bottom: 3px;
+}
+
+.mail:hover {
+  color: var(--teal);
+}
