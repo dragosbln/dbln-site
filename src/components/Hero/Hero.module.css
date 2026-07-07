@@ -1,0 +1,142 @@
+.hero {
+  padding: 96px 0 64px;
+  border-bottom: 1px solid var(--line);
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 64px 0 48px;
+  }
+}
+
+.eyebrow {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 0 4px var(--accent-wash);
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+}
+
+.title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(38px, 6vw, 76px);
+  line-height: 1.04;
+  letter-spacing: -0.018em;
+  max-width: 16ch;
+  margin-bottom: 34px;
+}
+
+.title em {
+  font-style: italic;
+  color: var(--teal-deep);
+}
+
+.lede {
+  font-size: clamp(18px, 2vw, 21px);
+  color: var(--ink-soft);
+  max-width: 52ch;
+  line-height: 1.55;
+  margin-bottom: 40px;
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.primary {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 14px 26px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+
+.primary:hover {
+  background: var(--teal-deep);
+  transform: translateY(-1px);
+}
+
+.ghost {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink-soft);
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.ghost:hover {
+  color: var(--teal);
+}
+
+.meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 64px;
+}
+
+.metaItem {
+  background: var(--paper);
+  padding: 22px 24px;
+}
+
+.metaItem dt {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 8px;
+}
+
+.metaItem dd {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.metaItem dd small {
+  display: block;
+  font-weight: 400;
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin-top: 3px;
+}
+
+@media (max-width: 680px) {
+  .meta {
+    grid-template-columns: 1fr;
+  }
+}

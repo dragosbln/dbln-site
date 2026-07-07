@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Newsreader, Hanken_Grotesk, Spline_Sans_Mono } from "next/font/google";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 import JsonLd from "@/components/JsonLd";
 import { site } from "@/content/site";
 import { personSchema, webSiteSchema } from "@/lib/schema";
@@ -68,7 +70,9 @@ export default function RootLayout({
         <a className="skip-link" href="#main">
           Skip to content
         </a>
+        <Header />
         {children}
+        <Footer />
         <JsonLd data={personSchema} />
         <JsonLd data={webSiteSchema} />
       </body>

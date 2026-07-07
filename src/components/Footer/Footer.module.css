@@ -1,0 +1,40 @@
+.footer {
+  background: var(--ink);
+  color: rgba(255, 255, 255, 0.5);
+  padding: 40px 0;
+}
+
+.inner {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .inner {
+    padding: 0 20px;
+  }
+}
+
+.socials {
+  display: flex;
+  gap: 22px;
+  list-style: none;
+}
+
+.socials a {
+  color: rgba(255, 255, 255, 0.6);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.socials a:hover {
+  color: var(--teal-bright);
+}
