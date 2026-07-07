@@ -16,6 +16,15 @@ export type SectionIntro = {
   num: string;
   title: string;
   aside?: string;
+  /** Optional link appended after the aside text. */
+  asideLink?: NavItem;
+};
+
+export type PageHero = {
+  eyebrow: string;
+  /** Rich text. */
+  title: string;
+  lede: string;
 };
 
 export type Hero = {
@@ -73,7 +82,36 @@ export type Article = {
   tags: string[];
 };
 
-export type WorkSection = SectionIntro & { items: WorkItem[] };
+export type CaseOutcome = {
+  /** Short figure, e.g. "150k+" or "OAuth". */
+  stat: string;
+  label: string;
+};
+
+export type CaseStudy = {
+  /** Anchor id, jump-nav target and diagram-registry key. */
+  id: string;
+  name: string;
+  /** "Sector · qualifier" mono kicker. */
+  sector: string;
+  period: string;
+  role: string;
+  engagement: string;
+  tagline: string;
+  /** Rich text. The spine is fixed: situation → decision → approach. */
+  situation: string;
+  /** Rich text. */
+  decision: string;
+  /** Rich text. */
+  approach: string;
+  outcomes: CaseOutcome[];
+  proof: Testimonial | null;
+  stack: string[];
+  /** True when src/components/CaseDiagram has a diagram for this id. */
+  diagram: boolean;
+};
+
+export type WorkSection = SectionIntro & { items: WorkItem[]; cta?: NavItem };
 export type EngagementsSection = SectionIntro & { items: Engagement[] };
 export type TestimonialsSection = SectionIntro & { items: Testimonial[] };
 export type AgenticSection = SectionIntro & {

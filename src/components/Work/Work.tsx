@@ -1,3 +1,5 @@
+import Link from "next/link";
+import ArrowIcon from "@/components/ArrowIcon";
 import Reveal from "@/components/Reveal";
 import SectionHead from "@/components/SectionHead";
 import { work } from "@/content/site";
@@ -13,6 +15,7 @@ export default function Work() {
           title={work.title}
           id="work-title"
           aside={work.aside}
+          asideLink={work.asideLink}
         />
         <ul className={styles.list}>
           {work.items.map((item) => (
@@ -33,6 +36,11 @@ export default function Work() {
             </Reveal>
           ))}
         </ul>
+        {work.cta ? (
+          <Link className={styles.allCta} href={work.cta.href}>
+            {work.cta.label} <ArrowIcon />
+          </Link>
+        ) : null}
       </div>
     </section>
   );

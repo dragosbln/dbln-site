@@ -18,6 +18,7 @@ export function GET() {
 ## Pages
 
 - [Home](${site.url}/): positioning, selected work, engagement formats, testimonials, writing
+- [Work](${site.url}/work): six case studies in depth (situation, the expensive-to-reverse decision, approach, outcomes) — Pie Insurance, Bullseye Web3 Studio, Parentool, Glede, Reach Finance, Equinet
 
 ## Profiles
 

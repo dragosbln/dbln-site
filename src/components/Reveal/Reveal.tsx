@@ -37,6 +37,12 @@ export default function Reveal({
       return;
     }
 
+    // 12% visibility for typical blocks; long elements (full case studies)
+    // might never reach 12%, so cap the requirement at a quarter viewport.
+    const threshold = Math.min(
+      0.12,
+      (window.innerHeight * 0.25) / Math.max(el.offsetHeight, 1),
+    );
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -46,7 +52,7 @@ export default function Reveal({
           }
         }
       },
-      { threshold: 0.12 },
+      { threshold },
     );
     io.observe(el);
     return () => io.disconnect();

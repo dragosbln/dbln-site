@@ -26,6 +26,16 @@
   font-size: 15px;
 }
 
+.asideLink {
+  color: var(--teal);
+  border-bottom: 1px solid color-mix(in srgb, var(--teal) 40%, transparent);
+  white-space: nowrap;
+}
+
+.asideLink:hover {
+  border-bottom-color: var(--teal);
+}
+
 @media (max-width: 760px) {
   .aside {
     display: none;
