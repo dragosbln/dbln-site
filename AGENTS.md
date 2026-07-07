@@ -49,9 +49,10 @@ implementation for all of them is the landing page.
 5. Structured data: add the matching schema.org object (e.g. `Article`,
    `BreadcrumbList`) in `src/lib/schema.ts`, rendered with `<JsonLd>` from
    that page.
-6. Resolve the `TODO(work)` / `TODO(blog)` markers in `src/content/site.ts`
-   and `src/components/Writing/Writing.tsx` — they link the landing page to
-   the new routes.
+6. Resolve the `TODO(blog)` markers in `src/content/site.ts` and
+   `src/components/Writing/Writing.tsx` — they link the landing page to the
+   new routes. (`/work` is done; use it as the reference: PageHero + CaseNav +
+   CaseArticle + Contact-with-content, diagrams in the CaseDiagram registry.)
 
 ## Future chatbot ("Ask Dragos")
 

@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  turbopack: {
+    // Pin the root so a stray lockfile in a parent directory can't shift
+    // module resolution (breaks the dev server with RSC manifest errors).
+    root: __dirname,
+  },
 };
 
 export default nextConfig;

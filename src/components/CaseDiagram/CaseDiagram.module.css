@@ -1,0 +1,168 @@
+.figure {
+  margin: 32px 0 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper-2);
+  padding: 22px 22px 16px;
+  max-width: 640px;
+}
+
+.figure svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.figure figcaption {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  margin-top: 14px;
+  text-align: center;
+}
+
+/* Shared diagram vocabulary (dg-*): dashed "legacy" = retired / deliberately
+   not built; teal "key" = the live, important part; "flow" = animated dash. */
+
+.figure :global(.dg-node) rect {
+  fill: var(--paper);
+  stroke: var(--line);
+  stroke-width: 1.5;
+}
+
+.figure :global(.dg-node.key) rect {
+  stroke: var(--teal);
+  stroke-width: 2;
+}
+
+.figure :global(.dg-node.legacy) rect {
+  fill: transparent;
+  stroke: var(--ink-faint);
+  stroke-dasharray: 4 4;
+}
+
+.figure :global(.dg-node .t) {
+  fill: var(--ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.figure :global(.dg-node .s) {
+  fill: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 9.5px;
+}
+
+.figure :global(.dg-node.legacy .t) {
+  fill: var(--ink-faint);
+}
+
+.figure :global(.dg-edge) {
+  stroke: var(--ink-faint);
+  stroke-width: 1.4;
+  fill: none;
+}
+
+.figure :global(.dg-edge.legacy) {
+  stroke: var(--ink-faint);
+  stroke-dasharray: 4 4;
+  opacity: 0.6;
+}
+
+.figure :global(.dg-flow) {
+  stroke: var(--teal);
+  stroke-width: 2.4;
+  fill: none;
+  stroke-dasharray: 5 11;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .figure :global(.dg-flow.run) {
+    animation: dgdash 1s linear infinite;
+  }
+}
+
+@keyframes dgdash {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+
+.figure :global(.dg-band) {
+  fill: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+
+.figure :global(.dg-band.live) {
+  fill: var(--teal-deep);
+}
+
+.figure :global(.dg-step) circle {
+  fill: var(--paper);
+  stroke: var(--teal);
+  stroke-width: 1.4;
+}
+
+.figure :global(.dg-step) text {
+  fill: var(--teal-deep);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+
+.figure :global(.dg-note) {
+  fill: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 9.5px;
+}
+
+.figure :global(.dg-cell) rect {
+  fill: var(--accent-wash);
+}
+
+.figure :global(.dg-cell) text {
+  fill: var(--teal-deep);
+  font-family: var(--mono);
+  font-size: 9px;
+  text-anchor: middle;
+}
+
+.figure :global(.dg-cell.ghost) rect {
+  fill: none;
+  stroke: var(--line);
+  stroke-dasharray: 3 3;
+}
+
+.figure :global(.dg-cell.ghost) text {
+  fill: var(--ink-faint);
+}
+
+.figure :global(.dg-chip) rect {
+  fill: var(--paper);
+  stroke: var(--teal);
+  stroke-width: 1.2;
+}
+
+.figure :global(.dg-chip) text {
+  fill: var(--ink);
+  font-family: var(--mono);
+  font-size: 9px;
+  text-anchor: middle;
+}
+
+.figure :global(.dg-chip.plain) rect {
+  fill: var(--accent-wash);
+  stroke: var(--line);
+}
+
+.figure :global(.dg-wire) {
+  stroke: var(--line);
+  stroke-width: 1;
+  fill: none;
+}

@@ -77,13 +77,12 @@ export const hero: Hero = {
   ],
 };
 
-// TODO(work): when the /work case-studies page ships, link the aside
-// ("Full case studies") and add a "Read all six case studies" CTA below the
-// list — see claude_websie/directions/brief.html for the intended markup.
 export const work: WorkSection = {
   num: "01",
   title: "Selected work",
   aside: "A few engagements where the decision mattered more than the keystrokes.",
+  asideLink: { label: "Full case studies", href: "/work" },
+  cta: { label: "Read all six case studies, in depth", href: "/work" },
   items: [
     {
       period: "2025—26",

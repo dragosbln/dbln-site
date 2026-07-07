@@ -71,6 +71,23 @@
   padding: 3px 9px;
 }
 
+.allCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 42px;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink);
+  border-bottom: 2px solid var(--teal);
+  padding-bottom: 4px;
+  transition: color 0.2s;
+}
+
+.allCta:hover {
+  color: var(--teal);
+}
+
 @media (max-width: 760px) {
   .row {
     grid-template-columns: 1fr;
