@@ -64,6 +64,21 @@
   color: var(--teal);
 }
 
+.go {
+  margin-top: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+}
+
+.card:hover .go {
+  color: var(--teal);
+}
+
 @media (max-width: 820px) {
   .grid {
     grid-template-columns: 1fr;

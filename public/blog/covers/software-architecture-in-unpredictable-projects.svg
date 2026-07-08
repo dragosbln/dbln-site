@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+<defs>
+  <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse">
+    <path d="M34 0H0V34" fill="none" stroke="#d2cdc2" stroke-width="1" opacity="0.5"></path>
+  </pattern>
+</defs>
+<rect width="1200" height="630" fill="#f1eee7"></rect>
+<rect width="1200" height="630" fill="url(#grid)"></rect>
+<rect x="28" y="28" width="1144" height="574" fill="none" stroke="#d2cdc2" stroke-width="1.5"></rect>
+
+<g stroke="#17191c" stroke-width="2">
+  <path d="M28 60 H52 M60 28 V52"></path>
+  <path d="M1172 570 H1148 M1140 602 V578"></path>
+</g>
+<text x="60" y="78" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="15" letter-spacing="3" fill="#4a4d52">FIG.04 — EXTREMES</text>
+<g>
+  <line x1="160" y1="331" x2="1040" y2="331" stroke="#17191c" stroke-width="2"></line>
+  <g stroke="#17191c" stroke-width="2"><path d="M160 315 V347"></path><path d="M1040 315 V347"></path><path d="M600 320 V342"></path></g>
+  
+  <rect x="210" y="200" width="150" height="262" rx="10" fill="#17191c"></rect>
+  <line x1="210" y1="285" x2="360" y2="285" stroke="#f1eee7" stroke-width="2" opacity="0.4"></line>
+  <line x1="210" y1="375" x2="360" y2="375" stroke="#f1eee7" stroke-width="2" opacity="0.4"></line>
+  <text x="285" y="500" text-anchor="middle" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="15" letter-spacing="2" fill="#4a4d52">MONOLITH</text>
+  
+  <g>
+    <rect x="830" y="200" width="38" height="38" rx="7" fill="#e8e4da" stroke="#d2cdc2" stroke-width="1.5"></rect><rect x="882" y="200" width="38" height="38" rx="7" fill="#e8e4da" stroke="#d2cdc2" stroke-width="1.5"></rect><rect x="934" y="200" width="38" height="38" rx="7" fill="#e8e4da" stroke="#d2cdc2" stroke-width="1.5"></rect><rect x="986" y="200" width="38" height="38" rx="7" fill="#e8e4da" stroke="#d2cdc2" stroke-width="1.5"></rect><rect x="830" y="252" width="38" height="38" rx="7" fill="#e8e4da" stroke="#d2cdc2" stroke-width="1.5"></rect><rect x="882" y="252" width="38" height="38" rx="7" fill="#e8e4da" stroke="#d2cdc2" stroke-width="1.5"></rect><rect x="934" y="252" width="38" height="38" rx="7" fill="#0c7b72" stroke="#0a5b55" stroke-width="3"></rect><rect x="986" y="252" width="38" height="38" rx="7" fill="#e8e4da" stroke="#d2cdc2" stroke-width="1.5"></rect><rect x="830" y="304" width="38" height="38" rx="7" fill="#e8e4da" stroke="#d2cdc2" stroke-width="1.5"></rect><rect x="882" y="304" width="38" height="38" rx="7" fill="#e8e4da" stroke="#d2cdc2" stroke-width="1.5"></rect><rect x="934" y="304" width="38" height="38" rx="7" fill="#e8e4da" stroke="#d2cdc2" stroke-width="1.5"></rect><rect x="986" y="304" width="38" height="38" rx="7" fill="#e8e4da" stroke="#d2cdc2" stroke-width="1.5"></rect><rect x="830" y="356" width="38" height="38" rx="7" fill="#e8e4da" stroke="#d2cdc2" stroke-width="1.5"></rect><rect x="882" y="356" width="38" height="38" rx="7" fill="#e8e4da" stroke="#d2cdc2" stroke-width="1.5"></rect><rect x="934" y="356" width="38" height="38" rx="7" fill="#e8e4da" stroke="#d2cdc2" stroke-width="1.5"></rect><rect x="986" y="356" width="38" height="38" rx="7" fill="#e8e4da" stroke="#d2cdc2" stroke-width="1.5"></rect>
+  </g>
+  <text x="935" y="500" text-anchor="middle" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="15" letter-spacing="2" fill="#4a4d52">DISTRIBUTED</text>
+  
+  <circle cx="600" cy="331" r="15" fill="#f1eee7" stroke="#0c7b72" stroke-width="4"></circle>
+  <circle cx="600" cy="331" r="5" fill="#0c7b72"></circle>
+  <text x="600" y="290" text-anchor="middle" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="14" letter-spacing="2" fill="#0a5b55">DEFENSIBLE</text>
+</g>
+</svg>

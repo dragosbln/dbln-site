@@ -67,6 +67,14 @@ export default function RootLayout({
       className={`${serif.variable} ${sans.variable} ${mono.variable}`}
     >
       <body>
+        {/* React hoists this into <head> on every page — page-level
+            `alternates` metadata would shallow-override a layout-level one. */}
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title={`${site.name} — Writing`}
+          href="/feed.xml"
+        />
         <a className="skip-link" href="#main">
           Skip to content
         </a>

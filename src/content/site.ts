@@ -23,7 +23,7 @@ export const site = {
   title: "Dragos Bilaniuc — Independent Software Architect & Fractional CTO",
   description:
     "I help teams get the expensive-to-reverse decisions right, then build them. Eight years of architecture and platform work across insurance, Web3 and health-tech: auth, data, system boundaries.",
-  email: "hello@dbln.me",
+  email: "dragos@dbln.me",
   location: "Cluj-Napoca, Romania",
   socials: {
     devto: "https://dev.to/dragosbln",
@@ -200,38 +200,14 @@ export const agentic: AgenticSection = {
   ],
 };
 
-// TODO(blog): when the /blog page ships, move articles into a shared posts
-// manifest (src/content/posts.ts, from claude_websie/blog/posts.js), link
-// each card to /blog/<slug> and link the aside ("Read the blog").
+// Articles themselves live in src/content/posts/*.md; the landing section
+// shows the newest `featuredCount` of them (src/lib/posts.ts).
 export const writing: WritingSection = {
   num: "05",
   title: "Writing",
   aside: "Architecture decisions, written up in full.",
-  articles: [
-    {
-      slug: "keep-the-steering-wheel",
-      title: "Keep the steering wheel: 3 ways to future-proof your auth",
-      date: "2026-06-09",
-      readTime: 11,
-      tags: ["architecture", "security", "auth"],
-    },
-    {
-      slug: "securing-auth-large-scale",
-      title:
-        "Securing auth in a large-scale production system — and why three standard architectures didn't survive a closer look",
-      date: "2026-05-14",
-      readTime: 16,
-      tags: ["architecture", "aws", "nextjs"],
-    },
-    {
-      slug: "sketching-out-the-extremes",
-      title:
-        "Sketching out the extremes: designing architectures for highly unpredictable projects",
-      date: "2024-08-18",
-      readTime: 5,
-      tags: ["architecture", "microservices"],
-    },
-  ],
+  asideLink: { label: "Read the blog", href: "/blog" },
+  featuredCount: 3,
 };
 
 export const contact: Contact = {

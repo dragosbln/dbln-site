@@ -1,4 +1,5 @@
 import { site } from "@/content/site";
+import type { Post } from "@/content/types";
 
 /**
  * schema.org JSON-LD objects, rendered by <JsonLd /> in the root layout.
@@ -49,6 +50,50 @@ export const workBreadcrumbSchema = {
     { "@type": "ListItem", position: 2, name: "Work", item: `${site.url}/work` },
   ],
 };
+
+export const blogBreadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: `${site.url}/` },
+    { "@type": "ListItem", position: 2, name: "Writing", item: `${site.url}/blog` },
+  ],
+};
+
+export function postBreadcrumbSchema(post: Post) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${site.url}/` },
+      { "@type": "ListItem", position: 2, name: "Writing", item: `${site.url}/blog` },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: post.title,
+        item: `${site.url}/blog/${post.slug}`,
+      },
+    ],
+  };
+}
+
+export function techArticleSchema(post: Post) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: post.title,
+    description: post.excerpt,
+    url: `${site.url}/blog/${post.slug}`,
+    datePublished: post.date,
+    keywords: post.tags.join(", "),
+    image: `${site.url}${post.cover}`,
+    inLanguage: "en",
+    author: { "@id": `${site.url}/#person` },
+    publisher: { "@id": `${site.url}/#person` },
+    isPartOf: { "@id": `${site.url}/#website` },
+    ...(post.devto ? { sameAs: [post.devto] } : {}),
+  };
+}
 
 export const webSiteSchema = {
   "@context": "https://schema.org",

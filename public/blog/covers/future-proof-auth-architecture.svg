@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+<defs>
+  <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse">
+    <path d="M34 0H0V34" fill="none" stroke="#d2cdc2" stroke-width="1" opacity="0.5"></path>
+  </pattern>
+</defs>
+<rect width="1200" height="630" fill="#f1eee7"></rect>
+<rect width="1200" height="630" fill="url(#grid)"></rect>
+<rect x="28" y="28" width="1144" height="574" fill="none" stroke="#d2cdc2" stroke-width="1.5"></rect>
+
+<g stroke="#17191c" stroke-width="2">
+  <path d="M28 60 H52 M60 28 V52"></path>
+  <path d="M1172 570 H1148 M1140 602 V578"></path>
+</g>
+<text x="60" y="78" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="15" letter-spacing="3" fill="#4a4d52">FIG.01 — CONTROL</text>
+<g transform="translate(600,331)">
+  <circle r="210" fill="none" stroke="#d2cdc2" stroke-width="1.5"></circle>
+  <circle r="168" fill="none" stroke="#17191c" stroke-width="2"></circle>
+  <circle r="120" fill="none" stroke="#0c7b72" stroke-width="10"></circle>
+  <circle r="120" fill="none" stroke="#0a5b55" stroke-width="2" stroke-dasharray="3 9"></circle>
+  <circle r="58" fill="#e8e4da" stroke="#17191c" stroke-width="2"></circle>
+  <circle r="14" fill="#0c7b72"></circle>
+  <g stroke="#17191c" stroke-width="2">
+    <path d="M0 -168 V-58"></path><path d="M0 168 V58"></path>
+    <path d="M-168 0 H-58"></path><path d="M168 0 H58"></path>
+    <path d="M-119 -119 L-41 -41" opacity="0.5"></path><path d="M119 119 L41 41" opacity="0.5"></path>
+    <path d="M119 -119 L41 -41" opacity="0.5"></path><path d="M-119 119 L-41 41" opacity="0.5"></path>
+  </g>
+  <g fill="#0c7b72">
+    <circle cx="0" cy="-120" r="9"></circle><circle cx="120" cy="0" r="9"></circle>
+    <circle cx="0" cy="120" r="9"></circle><circle cx="-120" cy="0" r="9"></circle>
+  </g>
+</g>
+</svg>
