@@ -16,6 +16,14 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Recipes
 
+## Article diagrams (animated figures)
+
+Never draw article diagrams freehand — use the `article-diagram` skill
+(`.claude/skills/article-diagram/`). It carries the dg-* grammar
+(`src/styles/diagram.css` + `references/grammar.md`), six canonical exemplars,
+a validator and a live workbench. Brief → static → motion → validate, with a
+user checkpoint at each stage.
+
 Follow these exactly — they encode decisions already made. The reference
 implementation for all of them is the landing page.
 

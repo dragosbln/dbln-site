@@ -45,3 +45,6 @@ next-env.d.ts
 
 # generated markdown twins (scripts/export-post-markdown.mjs)
 /public/blog/*.md
+
+# diagram workbench (generated review page)
+/diagram-workbench.html

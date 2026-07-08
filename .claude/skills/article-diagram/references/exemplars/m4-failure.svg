@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 380" role="img" aria-label="Failure diagram inside a browser page. A token cookie stored non-HttpOnly sits at the top, marked in teal as the load-bearing credential. Two readers sit below it: legitimate app code on the left, which reads document.cookie to attach an Authorization header for the API, and an injected XSS script on the right, which performs the identical document.cookie read and exfiltrates the token to an attacker origin, marked with a red cross. A red pulse alternates between the two read edges — first the legitimate read, then the malicious one — showing they are the same operation.">
+        <title>The read that shouldn’t be possible</title>
+        <desc>Non-HttpOnly token cookie: the legitimate document.cookie read and the XSS exfiltration are the identical operation.</desc>
+        <defs>
+          <marker id="f4-ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L8 4 L0 8 Z" fill="#8a8c8f"/>
+          </marker>
+          <marker id="f4-ah-r" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L8 4 L0 8 Z" fill="#a83a2e"/>
+          </marker>
+          <marker id="f4-ah-rp" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="4.5" markerHeight="4.5" orient="auto">
+            <path d="M0 0 L8 4 L0 8 Z" fill="#a83a2e"/>
+          </marker>
+        </defs>
+
+        <!-- browser page container -->
+        <text class="dg-band" x="28" y="22">browser page</text>
+        <rect x="12" y="30" width="416" height="230" rx="10" fill="none" stroke="#d9d5cb" stroke-width="1"/>
+
+        <!-- token cookie (key = the credential) -->
+        <g class="dg-node key">
+          <rect x="135" y="48" width="170" height="54" rx="8"/>
+          <text class="t" x="220" y="71">token cookie</text>
+          <text class="s" x="220" y="88">non-HttpOnly</text>
+        </g>
+
+        <!-- read edges -->
+        <path class="dg-edge" d="M195 102 C 195 140, 110 145, 110 178" marker-end="url(#f4-ah)"/>
+        <path class="dg-edge" d="M245 102 C 245 140, 330 145, 330 178" marker-end="url(#f4-ah)"/>
+        <text class="dg-note" x="220" y="140" text-anchor="middle">document.cookie</text>
+        <text class="dg-note" x="220" y="152" text-anchor="middle">the same read</text>
+
+        <!-- readers -->
+        <g class="dg-node">
+          <rect x="20" y="182" width="180" height="54" rx="8"/>
+          <text class="t" x="110" y="205">App code</text>
+          <text class="s" x="110" y="222">attaches Authorization</text>
+        </g>
+        <g class="dg-node fail">
+          <rect x="240" y="182" width="180" height="54" rx="8"/>
+          <text class="t" x="330" y="205">Injected script</text>
+          <text class="s" x="330" y="222">XSS · same page</text>
+        </g>
+
+        <!-- legit output -->
+        <path class="dg-edge" d="M110 236 V 300" marker-end="url(#f4-ah)"/>
+        <text class="dg-note" x="120" y="272">Authorization: Bearer</text>
+        <g class="dg-chip plain">
+          <rect x="68" y="306" width="84" height="26" rx="13"/>
+          <text x="110" y="322" text-anchor="middle">API</text>
+        </g>
+
+        <!-- exfil output -->
+        <path class="dg-edge fail" d="M330 236 V 296" marker-end="url(#f4-ah-r)"/>
+        <line x1="322" y1="308" x2="338" y2="324" stroke="#a83a2e" stroke-width="2.5"/>
+        <line x1="338" y1="308" x2="322" y2="324" stroke="#a83a2e" stroke-width="2.5"/>
+        <text class="dg-note" x="330" y="348" text-anchor="middle">attacker origin</text>
+
+        <!-- pulse beats: legit read, then the identical malicious read -->
+        <g class="dg-pulse" style="--i: 0;">
+          <path class="hl" d="M195 102 C 195 140, 110 145, 110 178" marker-end="url(#f4-ah-rp)"/>
+          <rect class="outline" x="131" y="44" width="178" height="62" rx="10"/>
+        </g>
+        <g class="dg-pulse" style="--i: 1;">
+          <path class="hl" d="M245 102 C 245 140, 330 145, 330 178" marker-end="url(#f4-ah-rp)"/>
+          <path class="hl" d="M330 236 V 296" marker-end="url(#f4-ah-rp)"/>
+          <rect class="outline" x="131" y="44" width="178" height="62" rx="10"/>
+        </g>
+      </svg>

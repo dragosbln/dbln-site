@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 440" role="img" aria-label="Movement diagram. Three call sites — checkout, profile, admin — depend on an app-owned AuthPort interface, which connects down into a dashed adapter socket that starts empty. On the right, three adapter implementations wait on standby, stacked: CognitoAdapter, OktaAdapter and FirebaseAdapter. One at a time, each box slides left into the socket, holds there, then returns to the stack — showing that any implementation can occupy the same seam whenever we like. The call sites and the AuthPort seam never move.">
+        <title>The adapter swap</title>
+        <desc>Vendor migration as box movement: three interchangeable adapters take turns occupying the same AuthPort socket while the call sites stay fixed.</desc>
+        <defs>
+          <marker id="f6-ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L8 4 L0 8 Z" fill="#8a8c8f"/>
+          </marker>
+        </defs>
+
+        <text class="dg-band" x="20" y="20">call sites · never move</text>
+
+        <!-- call sites (fixed) -->
+        <g class="dg-node">
+          <rect x="20" y="32" width="128" height="44" rx="8"/>
+          <text class="t" x="84" y="59">checkout</text>
+        </g>
+        <g class="dg-node">
+          <rect x="156" y="32" width="128" height="44" rx="8"/>
+          <text class="t" x="220" y="59">profile</text>
+        </g>
+        <g class="dg-node">
+          <rect x="292" y="32" width="128" height="44" rx="8"/>
+          <text class="t" x="356" y="59">admin</text>
+        </g>
+
+        <!-- edges into the port (fixed) -->
+        <path class="dg-edge" d="M84 76 C 84 110, 158 120, 172 146" marker-end="url(#f6-ah)"/>
+        <path class="dg-edge" d="M220 76 V 146" marker-end="url(#f6-ah)"/>
+        <path class="dg-edge" d="M356 76 C 356 110, 282 120, 268 146" marker-end="url(#f6-ah)"/>
+
+        <!-- the seam (fixed) -->
+        <g class="dg-node key">
+          <rect x="135" y="150" width="170" height="54" rx="8"/>
+          <text class="t" x="220" y="173">AuthPort</text>
+          <text class="s" x="220" y="190">interface · seam holds</text>
+        </g>
+
+        <!-- edge down into the socket (fixed) -->
+        <path class="dg-edge" d="M220 204 C 220 228, 135 226, 135 240" marker-end="url(#f6-ah)"/>
+
+        <!-- the socket (fixed, dashed slot — empty until claimed) -->
+        <rect x="56" y="244" width="158" height="52" rx="10" fill="none" stroke="#d9d5cb" stroke-dasharray="3 3" stroke-width="1.2"/>
+        <text class="dg-note" x="135" y="318" text-anchor="middle">the socket ·</text>
+        <text class="dg-note" x="135" y="330" text-anchor="middle">any adapter fits</text>
+        <text class="dg-band" x="325" y="236" text-anchor="middle">standby</text>
+
+        <!-- the movers: whole groups translate into the socket, one at a time -->
+        <g class="dg-visit" style="--i: 0; --dx: -190px; --dy: 0px;">
+          <g class="dg-node">
+            <rect x="250" y="248" width="150" height="44" rx="8"/>
+            <text class="t" x="325" y="267">CognitoAdapter</text>
+            <text class="s" x="325" y="283">implements AuthPort</text>
+          </g>
+        </g>
+        <g class="dg-visit" style="--i: 1; --dx: -190px; --dy: -54px;">
+          <g class="dg-node">
+            <rect x="250" y="302" width="150" height="44" rx="8"/>
+            <text class="t" x="325" y="321">OktaAdapter</text>
+            <text class="s" x="325" y="337">implements AuthPort</text>
+          </g>
+        </g>
+        <g class="dg-visit" style="--i: 2; --dx: -190px; --dy: -108px;">
+          <g class="dg-node">
+            <rect x="250" y="356" width="150" height="44" rx="8"/>
+            <text class="t" x="325" y="375">FirebaseAdapter</text>
+            <text class="s" x="325" y="391">implements AuthPort</text>
+          </g>
+        </g>
+
+        <text class="dg-note" x="220" y="424" text-anchor="middle">the seam never moves; any implementation can claim the socket</text>
+      </svg>
