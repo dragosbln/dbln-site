@@ -111,7 +111,7 @@ A variant that escapes Vercel by introducing a dedicated AWS-native proxy. The b
 
 This is essentially the architecture that **Better Auth** promotes when it's wired up to an external OAuth provider like Cognito: a server-side session store with the provider's tokens held inside it, and the browser carrying only an opaque session reference. Better Auth also supports a stateless variant — where the session is encrypted directly into the cookie and the DB lookup disappears — which trades the database hot path for cookie-size and key-rotation problems. We'll focus on the DB-backed shape, as it's the one most production deployments converge on.
 
-![Path 2 — Token Broker with Session DB](/blog/securing-auth-large-scale-production-system/path-2-token-broker.png)
+![fig. Path 2 — every authenticated call round-trips through a session store you now own and operate; that DB lookup sits on the hot path of all traffic.](/blog/securing-auth-large-scale-production-system/path-2-token-broker.svg)
 
 **The architectural appeal.** Full session control — you can revoke individual sessions, track devices, enforce idle timeouts, support multiple identity providers without each one polluting the cookie payload. Vercel cost goes away. The downstream contract is preserved.
 

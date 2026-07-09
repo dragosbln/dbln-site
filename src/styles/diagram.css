@@ -152,6 +152,10 @@
 }
 .dg-pulse .hl { stroke: var(--red); stroke-width: 2.4; fill: none; }
 .dg-pulse .outline { fill: none; stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 4 4; }
+/* live pulse — same beat, teal instead of red: highlight a load-bearing node
+   rather than mark a failure. */
+.dg-pulse.live .hl,
+.dg-pulse.live .outline { stroke: var(--teal); }
 
 /* accumulation — dg-stall: dashes run, freeze mid-cycle, resume (offsets are
    multiples of the dash period 16, so the loop is seamless); dg-meter: a bar
