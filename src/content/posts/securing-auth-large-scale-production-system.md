@@ -18,7 +18,7 @@ The finding: a penetration test flags that our Cognito tokens — ID, access, re
 
 Here's what that looks like in flow form — the current client-side API call pattern, with the moment of vulnerability highlighted:
 
-![Current Implementation — Direct Client-to-Backend with JS-Accessible Tokens](/blog/securing-auth-large-scale-production-system/current-implementation.png)
+![fig. every call carries the token in the clear from the browser; the one JS-readable read is the whole exposure.](/blog/securing-auth-large-scale-production-system/current-implementation.svg)
 
 Three things worth noticing before we go further. First, this flow is cheap — the client calls the backend directly, no proxy layer in the path, every component doing the minimum it has to. Second, the entire vulnerability is concentrated in the single step where browser-side code reads the token out of document.cookie to attach it to the outbound request. Third, every alternative we'll walk through changes the shape of that single moment — and in doing so, ripples through every other component on the diagram.
 
