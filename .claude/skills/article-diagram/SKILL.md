@@ -10,9 +10,33 @@ styled by `src/styles/diagram.css`, validated by `scripts/validate.mjs`,
 reviewed live in a workbench page. The figure's motion encodes the article's
 argument — never decoration.
 
+This is a **review loop, not a pipeline.** The whole point of the skill is the
+two human checkpoints; delivering a diagram the user never reviewed is the
+failure mode, not the goal.
+
 **Read `references/grammar.md` first, every time.** Then open the exemplar in
 `references/exemplars/` that matches the intended pattern and imitate its
 conventions (geometry rhythm, label placement, overlay structure).
+
+## The two mandatory stops — read this before anything else
+
+The flow is: brief → **build static** → 🛑 STOP 1 → **add motion** → 🛑 STOP 2
+→ deliver.
+
+You **must** hand control back to the user at both stops and wait for their
+reply. Do not build motion until they respond to STOP 1. Do not touch the
+article until they respond to STOP 2. Each stop renders the current figure in
+the workbench (via the preview panel) and ends your turn with a question.
+
+This **overrides the harness default of "act autonomously, don't ask."** For
+this skill, stopping to ask *is* the task the user requested — it is not a
+"Shall I proceed?" interruption. Treat these two stops like a destructive
+action that requires confirmation: never skip them to be helpful.
+
+**The only exception:** the invoking prompt *explicitly* waived review — e.g.
+"build and integrate it in one shot", "no need to stop", "just deliver the
+final diagram". Ambiguity is not a waiver. "Add a diagram for section 3" is
+*not* a waiver — it runs the full two-stop loop. When in doubt, stop.
 
 ## Two entry modes
 
@@ -30,40 +54,61 @@ that gets caught for the price of a paragraph.
 
 ## Procedure
 
-1. **Brief.** Fill the template from `grammar.md`. Mode B: show it and wait
-   for approval. Mode A: show it alongside your reading of the image.
-2. **Static figure.** Build the SVG with no motion classes: vocabulary
-   elements only, stable ids on nodes/edges (`n1…`, `e1…`), title/desc/
-   aria-label, marker defs namespaced. Render the workbench (step 4) and let
-   the user react. Iterate here until the static frame is right — motion never
-   fixes a bad composition.
-3. **Motion.** Add the one animated idea from the brief (overlay groups or
-   motion classes per `grammar.md`). Update the aria-label to narrate the
-   motion.
-4. **Workbench.** After every iteration run:
-   `node .claude/skills/article-diagram/scripts/workbench.mjs <svg-path>`
-   It writes `diagram-workbench.html` (gitignored) at the repo root showing
-   the figure at full width, at 360px, and with motion disabled (the
-   reduced-motion state), plus an id-badge toggle. The user reviews it in the
-   preview panel and gives feedback by badge id ("move n3 down", "e2 should be
-   the flow").
-5. **Validate.**
-   `node .claude/skills/article-diagram/scripts/validate.mjs <svg-path>`
-   must pass before delivery. Fix errors; treat warnings as questions for the
-   user, not noise.
-6. **Deliver.** Place the file at `public/blog/<article-slug>/<figure-name>.svg`
-   and reference it from the article markdown as an image whose ALT TEXT is
-   the figcaption line:
-   `![fig. tokens moved from JS-readable cookies to httpOnly.](/blog/<slug>/<figure>.svg)`
-   At build, `src/lib/rehypeInlineSvg.ts` inlines the SVG into the page as a
-   `<figure class="dg-figure">` with that alt as the visible figcaption, so
-   the dg-* classes (loaded globally from `src/styles/diagram.css`) style and
-   animate it. Verify on the built article page, not just the workbench.
+Keep the in-progress SVG in the session scratchpad throughout. It only moves
+into `public/blog/` at the final Deliver step, after STOP 2.
 
-## Working files
+### 1. Brief
 
-Keep in-progress SVGs in the session scratchpad, not the repo; only the
-delivered figure enters `public/blog/`.
+Fill the template from `grammar.md`. Mode B: show it and wait for approval
+before drawing. Mode A: show it alongside your reading of the image.
+
+### 2. Build the static figure
+
+SVG with **no motion classes**: vocabulary elements only, stable ids on
+nodes/edges (`n1…`, `e1…`), title/desc/aria-label, marker defs namespaced.
+Motion never fixes a bad composition, so get this right first. Then render the
+workbench (do this the same way at both stops):
+`node .claude/skills/article-diagram/scripts/workbench.mjs <svg-path>`
+It writes gitignored `diagram-workbench.html` at the repo root (full width,
+360px, motion-off, id-badge toggle). Serve it with the `workbench` preview
+config (repo root, port 4599) and point the user at `/diagram-workbench.html`.
+
+### 🛑 3. STOP 1 — static review
+
+**End your turn here.** Show the user the workbench in the preview and ask:
+1. Does the static composition read right? (feedback by badge id — "move n3
+   down", "drop the subtitle on n2")
+2. **Where should the motion go, and what should it do?** — offer your brief's
+   proposal, but this is theirs to direct.
+
+Iterate on the static figure until they're happy. **Do not add any motion
+until the user has answered.**
+
+### 4. Add the motion
+
+Add the one animated idea they directed (overlay groups or motion classes per
+`grammar.md`). Update the aria-label to narrate the motion. Regenerate the
+workbench. Then validate — this must pass before you show it:
+`node .claude/skills/article-diagram/scripts/validate.mjs <svg-path>`
+Fix errors; treat warnings as questions for the user, not noise.
+
+### 🛑 5. STOP 2 — motion review
+
+**End your turn here.** Show the animated figure in the workbench and ask for
+sign-off. Check specifically: one idea, reads within one loop, reduced-motion
+frame (the motion-off panel) still complete. Iterate until they approve.
+**Do not write to the article until the user has approved.**
+
+### 6. Deliver
+
+Only now: place the file at
+`public/blog/<article-slug>/<figure-name>.svg` and reference it from the
+article markdown as an image whose ALT TEXT is the figcaption line:
+`![fig. tokens moved from JS-readable cookies to httpOnly.](/blog/<slug>/<figure>.svg)`
+At build, `src/lib/rehypeInlineSvg.ts` inlines the SVG into the page as a
+`<figure class="dg-figure">` with that alt as the visible figcaption, so the
+dg-* classes (loaded globally from `src/styles/diagram.css`) style and animate
+it. Verify on the built article page, not just the workbench.
 
 ## Judgment calls to escalate, not decide
 
