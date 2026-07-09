@@ -100,8 +100,10 @@ N ghost alternatives as `dg-edge legacy`.
   legend lines.
 - `transform-box: fill-box; transform-origin: left center;` for scaleX meters.
 - Class-styled SVG has NO styling as a bare `<img>` — these figures only work
-  inlined into a page that loads `diagram.css` (the workbench does this; the
-  article pipeline inlines at build).
+  inlined into a page that loads `diagram.css`. The workbench inlines it, and
+  the article pipeline (`src/lib/rehypeInlineSvg.ts`) inlines any
+  `![caption](/blog/**.svg)` reference at build, turning the alt text into
+  the figcaption. Never reference a dg-* SVG from outside that pipeline.
 
 ## The brief (fill before drawing anything)
 

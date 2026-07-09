@@ -33,8 +33,6 @@ const FAMILIES = [
   [/\bdg-visit\b/, "movement"],
 ];
 
-const VOID_OK = new Set(["path", "rect", "circle", "line", "text", "ellipse", "polyline", "polygon", "use"]);
-
 function check(file) {
   const errors = [];
   const warnings = [];

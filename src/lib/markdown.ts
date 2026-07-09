@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
+import rehypeInlineSvg from "./rehypeInlineSvg";
 
 /**
  * Code-block theme: the design's dark block (#1b1d20) with the token palette
@@ -37,7 +38,8 @@ const dblnCodeTheme = {
 
 /**
  * Markdown → HTML at build time. Headings get ids (deep-linkable, and the
- * anchors article cross-links rely on); code blocks are highlighted by shiki.
+ * anchors article cross-links rely on); code blocks are highlighted by shiki;
+ * site-local .svg images are inlined as dg-figure diagrams (rehypeInlineSvg).
  */
 export async function markdownToHtml(markdown: string): Promise<string> {
   const file = await unified()
@@ -45,6 +47,7 @@ export async function markdownToHtml(markdown: string): Promise<string> {
     .use(remarkGfm)
     .use(remarkRehype)
     .use(rehypeSlug)
+    .use(rehypeInlineSvg)
     .use(rehypeShiki, { theme: dblnCodeTheme })
     .use(rehypeStringify)
     .process(markdown);

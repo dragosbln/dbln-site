@@ -16,6 +16,32 @@
      - dash offsets in multiples of the dash period (5+11=16)
    ============================================================ */
 
+/* ---------- article figure shell ----------
+   rehypeInlineSvg wraps every inlined diagram in this; the markdown
+   image's alt text becomes the figcaption. */
+.dg-figure {
+  margin: 32px 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper-2);
+  padding: 22px 22px 16px;
+}
+
+.dg-figure svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.dg-figure figcaption {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  margin-top: 14px;
+  text-align: center;
+}
+
 /* ---------- static vocabulary ---------- */
 .dg-node rect { fill: var(--paper); stroke: var(--line); stroke-width: 1.5; }
 .dg-node.key rect { stroke: var(--teal); stroke-width: 2; }

@@ -52,10 +52,13 @@ that gets caught for the price of a paragraph.
    must pass before delivery. Fix errors; treat warnings as questions for the
    user, not noise.
 6. **Deliver.** Place the file at `public/blog/<article-slug>/<figure-name>.svg`
-   and reference it from the article markdown like an image, with the caption
-   as an em-line under it (until the inline-SVG pipeline lands, note to the
-   user that the animation appears once that pipeline renders it inline — a
-   bare <img> cannot style dg-* classes).
+   and reference it from the article markdown as an image whose ALT TEXT is
+   the figcaption line:
+   `![fig. tokens moved from JS-readable cookies to httpOnly.](/blog/<slug>/<figure>.svg)`
+   At build, `src/lib/rehypeInlineSvg.ts` inlines the SVG into the page as a
+   `<figure class="dg-figure">` with that alt as the visible figcaption, so
+   the dg-* classes (loaded globally from `src/styles/diagram.css`) style and
+   animate it. Verify on the built article page, not just the workbench.
 
 ## Working files
 

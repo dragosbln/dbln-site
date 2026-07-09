@@ -10,6 +10,10 @@
   --teal-deep: #0a5b55;
   --teal-bright: #6ee7da;
   --accent-wash: #e4efec;
+  /* failure accent — diagram system only (see src/styles/diagram.css) */
+  --red: #a83a2e;
+  --red-deep: #7e2b21;
+  --red-wash: #f5e3de;
   --serif: var(--font-serif), Georgia, serif;
   --sans: var(--font-sans), system-ui, sans-serif;
   --mono: var(--font-mono), ui-monospace, monospace;

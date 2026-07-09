@@ -6,6 +6,7 @@ import JsonLd from "@/components/JsonLd";
 import { site } from "@/content/site";
 import { personSchema, webSiteSchema } from "@/lib/schema";
 import "./globals.css";
+import "@/styles/diagram.css";
 
 const serif = Newsreader({
   subsets: ["latin"],
