@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ArrowIcon from "@/components/ArrowIcon";
+import DiagramLightbox from "@/components/DiagramLightbox";
 import ShareButton from "@/components/ShareButton";
 import type { Post, PostWithBody } from "@/content/types";
 import { formatMonthYear } from "@/lib/format";
@@ -50,6 +51,7 @@ export default function ArticleView({ post, html, related }: ArticleViewProps) {
           className={styles.prose}
           dangerouslySetInnerHTML={{ __html: html }}
         />
+        {html.includes("dg-figure") ? <DiagramLightbox /> : null}
         <div className={styles.engage}>
           <ShareButton />
         </div>

@@ -50,10 +50,42 @@ function isInlinableImg(node: RootContent | ElementContent): node is Element {
   );
 }
 
+/** Landscape when the viewBox is wider than tall. */
+function isWide(svg: Element): boolean {
+  const viewBox = svg.properties?.viewBox;
+  if (typeof viewBox !== "string") return false;
+  const [, , width, height] = viewBox.split(/\s+/).map(Number);
+  return width > height;
+}
+
 function buildFigure(img: Element, cache: Map<string, Element>): Element {
   const src = img.properties.src as string;
   const alt = typeof img.properties.alt === "string" ? img.properties.alt : "";
-  const children: ElementContent[] = [loadSvg(src, cache)];
+  const svg = loadSvg(src, cache);
+
+  const children: ElementContent[] = [
+    // horizontal scroller: on narrow screens, wide diagrams keep a legible
+    // minimum width and pan instead of shrinking (diagram.css .dg-scroll)
+    {
+      type: "element",
+      tagName: "div",
+      properties: { className: ["dg-scroll"] },
+      children: [svg],
+    },
+    // expand-to-lightbox control; hidden until DiagramLightbox wires it up,
+    // so a no-JS page shows no dead button
+    {
+      type: "element",
+      tagName: "button",
+      properties: {
+        type: "button",
+        className: ["dg-expand"],
+        hidden: true,
+        ariaHasPopup: "dialog",
+      },
+      children: [{ type: "text", value: "expand ⤢" }],
+    },
+  ];
   if (alt) {
     children.push({
       type: "element",
@@ -65,7 +97,9 @@ function buildFigure(img: Element, cache: Map<string, Element>): Element {
   return {
     type: "element",
     tagName: "figure",
-    properties: { className: ["dg-figure"] },
+    properties: {
+      className: isWide(svg) ? ["dg-figure", "dg-wide"] : ["dg-figure"],
+    },
     children,
   };
 }

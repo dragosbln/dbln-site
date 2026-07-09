@@ -7,10 +7,22 @@ them, not your training data.
 
 ## Canvas
 
-- `viewBox="0 0 440 H"` — height as the composition needs. 440 is the mobile
-  contract: at a 360px phone column the SVG renders ~296px wide (0.67 scale),
-  and the text sizes below are tuned to survive exactly that.
-- Prefer vertical composition (stack, don't spread). Generous negative space.
+- **Landscape by default**: `viewBox="0 0 680 H"` (600–720 acceptable), height
+  as the composition needs. Compose the way architectures naturally read —
+  left to right, side by side — with generous negative space. Never contort a
+  layout to fit a portrait frame.
+- Portrait (`viewBox="0 0 440 H"`) only when the subject is genuinely vertical
+  (a top-to-bottom pipeline, a stack). It's the exception; name the reason in
+  the brief.
+- Phone legibility is the pipeline's job, not the composition's: in articles,
+  wide figures keep a 560px minimum width inside a horizontal scroller, and
+  every figure gets an expand button opening a full-size lightbox (rotated 90°
+  on portrait phones — the reader turns the phone). The reader gets the
+  overview inline, the detail expanded. Keep the text floor below anyway: the
+  inline view should still read as an overview.
+- The six `m*` exemplars are portrait-composed (they predate the landscape
+  default) — canonical for vocabulary and motion, not for canvas shape.
+  `l1-flow-landscape.svg` shows the default canvas.
 - Root element: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 H"
   role="img" aria-label="…">` followed by `<title>` and `<desc>`.
 - The aria-label is a full paragraph narrating the diagram INCLUDING what the

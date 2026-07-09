@@ -72,3 +72,5 @@ delivered figure enters `public/blog/`.
   sketches are artifacts — neither should be redrawn into the system.
 - Any urge to use a second teal or second red idea. The answer is almost
   always to cut, but the user decides.
+- Portrait canvas. Landscape is the default; choosing portrait is a
+  composition call — name the reason in the brief and let the user confirm.

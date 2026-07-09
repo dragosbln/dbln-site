@@ -63,7 +63,9 @@ function check(file) {
   if (!/role="img"/.test(root)) errors.push('root <svg> missing role="img"');
   const vb = root.match(/viewBox="0 0 (\d+(?:\.\d+)?) (\d+(?:\.\d+)?)"/);
   if (!vb) errors.push("missing/nonstandard viewBox");
-  else if (Number(vb[1]) !== 440) warnings.push(`viewBox width ${vb[1]} (articles standardize on 440 for mobile legibility)`);
+  else if (Number(vb[1]) < 440 || Number(vb[1]) > 720) {
+    warnings.push(`viewBox width ${vb[1]} — landscape 600–720 is the default; portrait 440 when the composition warrants`);
+  }
   const aria = root.match(/aria-label="([^"]*)"/);
   if (!aria) errors.push("missing aria-label");
   else if (aria[1].length < 80) errors.push("aria-label too short — narrate the full diagram, motion included");

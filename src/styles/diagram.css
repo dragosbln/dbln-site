@@ -18,8 +18,10 @@
 
 /* ---------- article figure shell ----------
    rehypeInlineSvg wraps every inlined diagram in this; the markdown
-   image's alt text becomes the figcaption. */
+   image's alt text becomes the figcaption. Figures get .dg-wide when the
+   viewBox is landscape; DiagramLightbox un-hides the expand button. */
 .dg-figure {
+  position: relative;
   margin: 32px 0;
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -40,6 +42,40 @@
   color: var(--ink-faint);
   margin-top: 14px;
   text-align: center;
+}
+
+/* wide diagrams keep a legible minimum width on narrow screens and pan
+   horizontally instead of shrinking into illegibility */
+.dg-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dg-figure.dg-wide .dg-scroll svg {
+  min-width: 560px;
+}
+
+.dg-expand {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition:
+    border-color 0.18s,
+    color 0.18s;
+}
+
+.dg-expand:hover {
+  border-color: var(--teal);
+  color: var(--teal);
 }
 
 /* ---------- static vocabulary ---------- */

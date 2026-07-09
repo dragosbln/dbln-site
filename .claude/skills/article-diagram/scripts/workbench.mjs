@@ -19,6 +19,13 @@ const outPath = outIdx !== -1 ? args[outIdx + 1] : "diagram-workbench.html";
 
 const svg = fs.readFileSync(svgPath, "utf8");
 const diagramCss = fs.readFileSync(path.join(process.cwd(), "src/styles/diagram.css"), "utf8");
+
+// landscape figures get .dg-wide, same as rehypeInlineSvg does in production
+const vbMatch = svg.match(/viewBox="0 0 (\d+(?:\.\d+)?) (\d+(?:\.\d+)?)"/);
+const wide = vbMatch ? Number(vbMatch[1]) > Number(vbMatch[2]) : false;
+const figClass = wide ? "dg-figure dg-wide" : "dg-figure";
+const figure = (extra = "") =>
+  `<figure class="${figClass}${extra}"><div class="dg-scroll">${svg}</div></figure>`;
 // the tokens the diagram css depends on, mirrored from globals.css
 const tokens = `:root {
   --paper: #f6f4ef; --paper-2: #efece4; --ink: #17191c; --ink-soft: #4a4d52;
@@ -48,9 +55,6 @@ h1 { font-family: var(--serif); font-weight: 500; font-size: 24px; margin: 0 0 4
 .controls { font-family: var(--mono); font-size: 12px; color: var(--ink-soft); margin-bottom: 20px; }
 h2 { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
   color: var(--teal-deep); margin: 36px 0 10px; font-weight: 500; }
-.figure { border: 1px solid var(--line); border-radius: 14px; background: var(--paper-2);
-  padding: 22px 22px 16px; margin: 0; }
-.figure svg { width: 100%; height: auto; display: block; }
 .phone { width: 360px; max-width: 100%; }
 .rm * { animation: none !important; }
 .badge { font-family: var(--mono); font-size: 9px; fill: #fff; }
@@ -64,14 +68,14 @@ ${diagramCss}
   <div class="sub">${path.basename(svgPath)} · give feedback by badge id ("move n3 down", "e2 becomes the flow")</div>
   <div class="controls"><label><input type="checkbox" id="badges"> show element ids</label></div>
 
-  <h2>Full width</h2>
-  <figure class="figure" id="main">${svg}</figure>
+  <h2>Full width${wide ? " · landscape" : " · portrait"}</h2>
+  <div id="main">${figure()}</div>
 
-  <h2>At 360px</h2>
-  <div class="phone"><figure class="figure">${svg}</figure></div>
+  <h2>Phone (360px${wide ? " · horizontal pan, as in production" : ""})</h2>
+  <div class="phone">${figure()}</div>
 
   <h2>Motion off (reduced-motion state)</h2>
-  <figure class="figure rm">${svg}</figure>
+  ${figure(" rm")}
 </div>
 <script>
 document.getElementById("badges").addEventListener("change", (e) => {
