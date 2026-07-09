@@ -89,7 +89,7 @@ The pattern most commonly recommended in the Next.js ecosystem, and the one AWS 
 
 **The shape:** All client-side API calls stop going directly to the backend. Instead, they hit Next.js route handlers (or Server Actions). Those handlers read tokens from HttpOnly cookies — which they can, because they're server-side — and forward the request to the backend with the `Authorization: Bearer` header attached.
 
-![Path 1 — Next.js BFF Proxy](/blog/securing-auth-large-scale-production-system/path-1-bff-proxy.png)
+![fig. Path 1 puts the Next.js BFF in the path of every call — the fix, and the whole cost and lock-in surface.](/blog/securing-auth-large-scale-production-system/path-1-bff-proxy.svg)
 
 **The architectural appeal.** Clean. Well-documented. Vendor-blessed. The pattern most public material recommends. Tokens never touch the client; the downstream contract doesn't change; the API Gateway's existing JWT authorizer keeps working.
 
