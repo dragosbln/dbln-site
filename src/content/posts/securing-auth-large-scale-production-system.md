@@ -137,7 +137,7 @@ The cleanest path *if you control the gateway*. Skip the BFF entirely. Configure
 
 **The shape:** HttpOnly cookie carries the Cognito JWT directly. The Lambda authorizer reads the cookie, validates the JWT against Cognito's JWKS endpoint (a library like [`aws-jwt-verify`](https://github.com/awslabs/aws-jwt-verify) handles the signature and claims validation cleanly), and tells the gateway to inject the token into the `Authorization` header for the downstream call.
 
-![Path 3 — API Gateway Lambda Authorizer](/blog/securing-auth-large-scale-production-system/path-3-gateway-authorizer.png)
+![fig. Path 3 — the gateway's Lambda authorizer reads the cookie, verifies it (JWKS, cached), and re-injects the Bearer header the downstream services already expect. No BFF, no session store.](/blog/securing-auth-large-scale-production-system/path-3-gateway-authorizer.svg)
 
 On the architecture level, this is the most elegant of the four paths. No BFF. No session DB. No Vercel cost increase. Tokens never reach JS. Downstream services keep their existing JWT-from-header contract because the gateway re-injects it. Lambda authorizer responses are cached by API Gateway (default 300s), so the validation cost amortizes.
 
