@@ -78,6 +78,8 @@ teal already means success/live. No other colors, no gradients, no shadows.
 | `dg-pulse` + `--i` | failure — red overlay pulse; `--i` picks the beat so paths can alternate | 6s, one 3s beat per index | m4-failure |
 | `dg-stall` + `dg-meter` | accumulation — flow freezes while a meter fills on the same clock | 6s linear | m5-accumulation |
 | `dg-visit` + `--i --dx --dy` | movement — whole groups take turns occupying a slot | 9s = 3×3s beats | m6-movement |
+| `dg-pulse live` | highlight pulse — same beat as `dg-pulse`, teal: emphasize a load-bearing node, never a failure | 6s | (variant) |
+| `dg-appear staged` / `dg-recede staged` | staged transition — previewing a change NOT yet made: at rest and reduced-motion the BEFORE shows; the crossfade previews the after, then returns. Both states need static dashed remnants. | 6s | (variant) |
 
 Convergence (N inputs → 1 operation → N results, e.g. single-flight refresh)
 needs no new class: it is `dg-flow run` on the single shared edge with the

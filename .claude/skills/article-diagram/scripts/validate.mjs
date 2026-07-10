@@ -19,7 +19,7 @@ const CLASSES = new Set([
   "dg-node", "key", "legacy", "fail", "t", "s",
   "dg-edge", "dg-flow", "run", "dg-step", "dg-band", "live", "dg-note",
   "dg-cell", "ghost", "dg-chip", "plain", "dg-wire",
-  "dg-seq", "hl", "ring", "dg-appear", "dg-recede", "dg-pulse", "outline",
+  "dg-seq", "hl", "ring", "dg-appear", "dg-recede", "staged", "dg-pulse", "outline",
   "dg-stall", "dg-meter", "dg-visit",
 ]);
 

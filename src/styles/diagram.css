@@ -138,6 +138,12 @@
 @keyframes dgappear { 0%, 15% { opacity: 0; } 30%, 70% { opacity: 1; } 85%, 100% { opacity: 0; } }
 @keyframes dgrecede { 0%, 15% { opacity: 1; } 30%, 70% { opacity: 0; } 85%, 100% { opacity: 1; } }
 
+/* staged transition — previewing a change not yet made. At rest and under
+   reduced motion the BEFORE state shows; the crossfade previews the staged
+   AFTER, then returns. Pair with static dashed remnants for both states. */
+.dg-recede.staged { opacity: 1; }
+.dg-appear.staged { opacity: 0; }
+
 /* failure pulse — red overlay on a fail edge/node; --i picks the beat
    (6s cycle, one 3s beat per index) so two paths can alternate the
    identical pulse. Reduced motion: overlays hidden, one static red idea. */

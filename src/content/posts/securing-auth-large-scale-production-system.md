@@ -172,7 +172,7 @@ The "boring" option. Presented last because it only earns its place after the fi
 Keep the current non-HttpOnly cookie storage. Mitigate the XSS surface via the usual hardening (strict CSP, short-lived access tokens, careful XSS posture in dependencies). Document the risk acceptance explicitly. Define what triggers the eventual migration. *Do the foundation work now* that makes the eventual migration cheap when the trigger fires.
 
 
-![Path 4 — Conscious Deferral with Foundation Work](/blog/securing-auth-large-scale-production-system/path-4-deferral.png)
+![fig. Path 4 — the login substrate moved now, so HttpOnly becomes a config flip once the authorizer is prepared. The risky read stays live, documented and triggered.](/blog/securing-auth-large-scale-production-system/path-4-deferral.svg)
 
 This is not "do nothing." It's a substantial decision with substantial work attached.
 
