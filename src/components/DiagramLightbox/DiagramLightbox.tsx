@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import CloseIcon from "@/components/CloseIcon";
+import { suffixSvgIds } from "@/lib/svgIds";
 import styles from "./DiagramLightbox.module.css";
 
 /**
@@ -93,7 +95,7 @@ export default function DiagramLightbox() {
         onClick={close}
         aria-label="Close expanded diagram"
       >
-        ×
+        <CloseIcon size={14} />
       </button>
       <div
         ref={bodyRef}
@@ -104,24 +106,11 @@ export default function DiagramLightbox() {
 }
 
 /**
- * Clone the SVG for the modal with all ids suffixed (and url(#…) references
- * updated) so marker definitions don't collide with the inline original.
+ * Clone the SVG for the modal with all ids suffixed (via suffixSvgIds) so
+ * marker definitions don't collide with the inline original.
  */
 function cloneForModal(svg: SVGSVGElement, suffix: string): SVGSVGElement {
   const clone = svg.cloneNode(true) as SVGSVGElement;
-  clone.querySelectorAll("[id]").forEach((el) => {
-    el.id = `${el.id}${suffix}`;
-  });
-  clone.querySelectorAll("*").forEach((el) => {
-    for (const name of el.getAttributeNames()) {
-      const value = el.getAttribute(name);
-      if (value && value.includes("url(#")) {
-        el.setAttribute(
-          name,
-          value.replace(/url\(#([^)]+)\)/g, `url(#$1${suffix})`),
-        );
-      }
-    }
-  });
+  suffixSvgIds(clone, suffix);
   return clone;
 }

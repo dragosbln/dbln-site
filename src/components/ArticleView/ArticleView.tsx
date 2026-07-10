@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ArrowIcon from "@/components/ArrowIcon";
+import ArticlePeek from "@/components/ArticlePeek";
 import DiagramLightbox from "@/components/DiagramLightbox";
 import ShareButton from "@/components/ShareButton";
 import type { Post, PostWithBody } from "@/content/types";
@@ -47,11 +48,9 @@ export default function ArticleView({ post, html, related }: ArticleViewProps) {
       </figure>
       <div className="wrap">
         <hr className={styles.rule} />
-        <div
-          className={styles.prose}
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
+        <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />
         {html.includes("dg-figure") ? <DiagramLightbox /> : null}
+        {html.includes('href="/blog/') ? <ArticlePeek /> : null}
         <div className={styles.engage}>
           <ShareButton />
         </div>

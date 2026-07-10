@@ -1,0 +1,238 @@
+/* ============================================================
+   Article prose — styles for markdown-rendered HTML (.prose) and the
+   compact variant used by the cross-reference peek (.prose--peek).
+   Global for the same reason as diagram.css: this markup is generated
+   from markdown at build time and can't carry CSS-module classes.
+   ============================================================ */
+
+.prose {
+  max-width: var(--prose, 700px);
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+
+.prose p {
+  font-size: 19px;
+  line-height: 1.68;
+  color: #2a2d31;
+  margin: 26px 0;
+  text-wrap: pretty;
+}
+
+.prose h2 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 31px;
+  line-height: 1.18;
+  letter-spacing: -0.012em;
+  margin: 56px 0 18px;
+}
+
+.prose h3 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+  margin: 42px 0 14px;
+}
+
+.prose h4 {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin: 34px 0 10px;
+}
+
+.prose a {
+  color: var(--teal-deep);
+  border-bottom: 1px solid color-mix(in srgb, var(--teal) 40%, transparent);
+  transition: border-color 0.2s;
+}
+
+.prose a:hover {
+  border-color: var(--teal);
+}
+
+.prose strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 26px;
+  margin: 24px 0;
+}
+
+.prose li {
+  font-size: 19px;
+  line-height: 1.62;
+  color: #2a2d31;
+  margin: 8px 0;
+  padding-left: 6px;
+}
+
+.prose li::marker {
+  color: var(--teal);
+}
+
+.prose blockquote {
+  border-left: 3px solid var(--teal);
+  padding: 6px 0 6px 26px;
+  margin: 34px 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 24px;
+  line-height: 1.42;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+
+.prose blockquote p {
+  font-size: inherit;
+  font-style: inherit;
+  color: inherit;
+  margin: 8px 0;
+}
+
+.prose blockquote li {
+  font-size: 19px;
+}
+
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 48px auto;
+}
+
+.prose code {
+  font-family: var(--mono);
+  font-size: 0.86em;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 1px 6px;
+}
+
+/* Code blocks: colors are inlined at build by shiki (dbln-dark theme in
+   src/lib/markdown.ts); this handles the container only. */
+.prose pre {
+  border-radius: 12px;
+  padding: 22px 24px;
+  overflow-x: auto;
+  margin: 30px 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  border: 1px solid #2a2d31;
+}
+
+.prose pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+.prose img {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  margin: 32px auto;
+  display: block;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 30px 0;
+  font-size: 16px;
+  display: block;
+  overflow-x: auto;
+}
+
+.prose th,
+.prose td {
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.prose th {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* ---------- compact variant for the cross-reference peek ---------- */
+
+.prose--peek {
+  max-width: none;
+  padding-bottom: 0;
+}
+
+.prose--peek p,
+.prose--peek li {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.prose--peek p {
+  margin: 14px 0;
+}
+
+.prose--peek h2 {
+  font-size: 21px;
+  margin: 24px 0 10px;
+}
+
+.prose--peek h3 {
+  font-size: 17px;
+  margin: 20px 0 8px;
+}
+
+.prose--peek h4 {
+  font-size: 14px;
+  margin: 18px 0 8px;
+}
+
+.prose--peek ul,
+.prose--peek ol {
+  margin: 14px 0;
+}
+
+.prose--peek blockquote {
+  font-size: 17px;
+  margin: 18px 0;
+  padding-left: 18px;
+}
+
+.prose--peek blockquote li {
+  font-size: 15px;
+}
+
+.prose--peek pre {
+  font-size: 12.5px;
+  padding: 14px 16px;
+  margin: 16px 0;
+}
+
+.prose--peek img,
+.prose--peek .dg-figure {
+  margin: 16px 0;
+}
+
+.prose--peek table {
+  font-size: 13px;
+}
+
+.prose--peek hr {
+  margin: 20px auto;
+}
+
+.prose--peek > :first-child {
+  margin-top: 0;
+}

@@ -8,7 +8,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 - **Static export.** `next.config.ts` sets `output: "export"`. Nothing may rely on a server at runtime: no dynamic route handlers, no `cookies()`/`headers()`, no middleware. Route handlers must be `force-static` GET.
 - **Components.** One folder per component: `src/components/<Name>/` containing `<Name>.tsx`, `<Name>.module.css` (if styled), and an `index.ts` barrel (`export { default } from "./<Name>";`). Import other components via `@/components/<Name>`; import a component's own CSS relatively (`./<Name>.module.css`).
-- **Styling.** CSS Modules only — no inline `style={{}}`, no styled-jsx, no Tailwind. `src/app/globals.css` holds only design tokens, the reset, and the `.wrap` / `.section` / `.reveal` utilities. Everything else lives in the owning component's module.
+- **Styling.** CSS Modules only — no inline `style={{}}`, no styled-jsx, no Tailwind. `src/app/globals.css` holds only design tokens, the reset, and the `.wrap` / `.section` / `.reveal` utilities. Everything else lives in the owning component's module. Two exceptions, both global because the markup is generated from markdown at build and can't carry hashed module classes: `src/styles/prose.css` (`.prose`, plus the `.prose--peek` compact variant) and `src/styles/diagram.css` (`dg-*`).
 - **Content.** All copy, links, and identity data live in `src/content/site.ts`. Components render content; they don't contain it.
 - **Server-first.** Components are React Server Components by default. Add `"use client"` only at interactive leaves (e.g. scroll reveal), never on whole sections.
 - **SEO surfaces.** When adding a route, update `src/app/sitemap.ts` and the Pages list in `src/app/llms.txt/route.ts`, and give the page its own `metadata` export with a canonical. Keep JSON-LD in `src/lib/schema.ts` in sync with content changes.
@@ -84,6 +84,25 @@ To publish:
    `canonical_url` back to here.
 5. Code blocks are highlighted at build (shiki, css-variables theme mapped in
    `ArticleView.module.css`) — no client-side highlighting, ever.
+
+## Article cross-reference peeks
+
+Internal prose links (`/blog/<slug>` ± `#fragment`) show a hover popover with
+the referenced part of the target article — `src/components/ArticlePeek`.
+Rules if you touch it:
+- Progressive enhancement: the links stay real `<a href>`; **click always
+  navigates**. Hover (400ms intent) or keyboard focus opens the peek; the
+  pointer may cross into the panel (300ms grace). Not wired on touch
+  (`hover: none`) — links just navigate.
+- Content comes from fetching the target's own prerendered page and slicing it
+  (anchored heading + its section, or the intro when there's no fragment).
+  Never build a parallel excerpt store: the built HTML is the source of truth,
+  so a peek can't drift from the article.
+- The excerpt ends in an ellipsis when the article continues past it, and the
+  panel's footer CTA ("Read the full article") opens the full piece in a new
+  tab — one action, not duplicated in the header.
+- Cloned fragments are sanitized: ids stripped (SVG ids suffixed via
+  `src/lib/svgIds.ts`), `.dg-expand` removed, inner links forced to a new tab.
 
 ## Future chatbot ("Ask Dragos")
 

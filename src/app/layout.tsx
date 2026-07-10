@@ -7,6 +7,7 @@ import { site } from "@/content/site";
 import { personSchema, webSiteSchema } from "@/lib/schema";
 import "./globals.css";
 import "@/styles/diagram.css";
+import "@/styles/prose.css";
 
 const serif = Newsreader({
   subsets: ["latin"],
