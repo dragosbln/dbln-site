@@ -2,7 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import ArrowIcon from "@/components/ArrowIcon";
+import CheckIcon from "@/components/CheckIcon";
 import CloseIcon from "@/components/CloseIcon";
+import LinkIcon from "@/components/LinkIcon";
+import { useCopyToClipboard } from "@/lib/useCopyToClipboard";
 import { suffixSvgIds } from "@/lib/svgIds";
 import styles from "./ArticlePeek.module.css";
 
@@ -174,6 +177,8 @@ export default function ArticlePeek() {
     >
       <header className={styles.head}>
         <span className={styles.title}>{peek.title || "…"}</span>
+        {/* key resets the copied state each time the peek targets a new link */}
+        <CopyLinkButton key={peek.href} href={peek.href} />
         <button
           type="button"
           className={styles.close}
@@ -213,6 +218,28 @@ export default function ArticlePeek() {
         </a>
       </footer>
     </aside>
+  );
+}
+
+/** Copy the deep link to the peeked section (reuses the heading-copy hook). */
+function CopyLinkButton({ href }: { href: string }) {
+  const { copied, copy } = useCopyToClipboard();
+  return (
+    <button
+      type="button"
+      className={styles.copy}
+      data-copied={copied || undefined}
+      onClick={() => copy(location.origin + href)}
+      aria-label={
+        copied
+          ? "Link copied"
+          : href.includes("#")
+            ? "Copy link to this section"
+            : "Copy link to this article"
+      }
+    >
+      {copied ? <CheckIcon size={13} /> : <LinkIcon size={13} />}
+    </button>
   );
 }
 

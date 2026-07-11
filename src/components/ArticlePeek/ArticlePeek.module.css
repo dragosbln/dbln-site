@@ -53,6 +53,7 @@
   overflow: hidden;
 }
 
+.copy,
 .close {
   width: 28px;
   height: 28px;
@@ -69,6 +70,8 @@
     color 0.18s;
 }
 
+.copy:hover,
+.copy[data-copied],
 .close:hover {
   border-color: var(--teal);
   color: var(--teal);

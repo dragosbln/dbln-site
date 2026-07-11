@@ -2,6 +2,7 @@ import Link from "next/link";
 import ArrowIcon from "@/components/ArrowIcon";
 import ArticlePeek from "@/components/ArticlePeek";
 import DiagramLightbox from "@/components/DiagramLightbox";
+import HeadingAnchors from "@/components/HeadingAnchors";
 import ShareButton from "@/components/ShareButton";
 import type { Post, PostWithBody } from "@/content/types";
 import { formatMonthYear } from "@/lib/format";
@@ -49,6 +50,7 @@ export default function ArticleView({ post, html, related }: ArticleViewProps) {
       <div className="wrap">
         <hr className={styles.rule} />
         <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />
+        <HeadingAnchors />
         {html.includes("dg-figure") ? <DiagramLightbox /> : null}
         {html.includes('href="/blog/') ? <ArticlePeek /> : null}
         <div className={styles.engage}>

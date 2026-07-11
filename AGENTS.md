@@ -85,6 +85,16 @@ To publish:
 5. Code blocks are highlighted at build (shiki, css-variables theme mapped in
    `ArticleView.module.css`) — no client-side highlighting, ever.
 
+## Heading anchors (copy deep link)
+
+Every article heading gets a hover "copy link" button — `HeadingAnchors`
+(portals a `HeadingLink` into each `.prose h2/h3/h4[id]`; ids come from
+rehypeSlug at build, so deep links work with no JS). Copies the clean URL
+(strips a preview-only `.html`) and updates the address bar via
+`history.replaceState` (no scroll). Shared primitives: `useCopyToClipboard`
+hook + `LinkIcon`/`CheckIcon` — reused by the peek's "copy link to this
+section" button. Styles are global in `prose.css` (injected into prose).
+
 ## Article cross-reference peeks
 
 Internal prose links (`/blog/<slug>` ± `#fragment`) show a hover popover with
