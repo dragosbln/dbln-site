@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "workbench",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4599", "--directory", "/Users/dragosbilaniuc/Projects/dbln/dbln-site"],
+      "port": 4599
+    },
+    {
+      "name": "dbln-site-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "dbln-site-static",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4174", "--directory", "/Users/dragosbilaniuc/Projects/dbln/dbln-site/out"],
+      "port": 4174
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 390" role="img" aria-label="Vertical flow diagram. A browser sends a request to a serverless function on Vercel, which calls a backend that takes five seconds to answer. While the call to the backend is stalled — its traffic dashes frozen — a thin billing meter under the function node fills from left to right, because Vercel bills wall-clock time including time spent waiting. When the backend finally answers, the meter holds full, then the loop repeats.">
+        <title>Billed for the waiting</title>
+        <desc>Wall-clock billing: while the downstream call stalls, the function's billing meter keeps filling.</desc>
+        <defs>
+          <marker id="f5-ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L8 4 L0 8 Z" fill="#8a8c8f"/>
+          </marker>
+        </defs>
+
+        <!-- Browser -->
+        <g class="dg-node">
+          <rect x="135" y="32" width="170" height="50" rx="8"/>
+          <text class="t" x="220" y="53">Browser</text>
+          <text class="s" x="220" y="70">sends request</text>
+        </g>
+
+        <!-- request in: normal running flow -->
+        <path class="dg-edge" d="M220 82 V 136" marker-end="url(#f5-ah)"/>
+        <path class="dg-flow run" d="M220 82 V 136"/>
+
+        <!-- Function (key) -->
+        <g class="dg-node key">
+          <rect x="135" y="142" width="170" height="54" rx="8"/>
+          <text class="t" x="220" y="165">Serverless function</text>
+          <text class="s" x="220" y="182">wall-clock billed</text>
+        </g>
+
+        <!-- billing meter -->
+        <rect x="135" y="206" width="170" height="6" rx="3" fill="#d9d5cb"/>
+        <rect class="dg-meter" x="135" y="206" width="170" height="6" rx="3" fill="#0c7b72"/>
+        <text class="dg-note" x="313" y="213">billed time</text>
+
+        <!-- stalled call to backend -->
+        <path class="dg-edge" d="M220 224 V 296" marker-end="url(#f5-ah)"/>
+        <path class="dg-flow dg-stall" d="M220 224 V 296"/>
+        <text class="dg-note" x="234" y="258">waiting on the</text>
+        <text class="dg-note" x="234" y="270">response…</text>
+
+        <!-- Backend -->
+        <g class="dg-node">
+          <rect x="135" y="302" width="170" height="54" rx="8"/>
+          <text class="t" x="220" y="325">Backend</text>
+          <text class="s" x="220" y="342">hung · 5 s to answer</text>
+        </g>
+        <text class="dg-note" x="220" y="380" text-anchor="middle">5 s hung = 5 s billed, per request</text>
+      </svg>

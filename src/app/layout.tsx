@@ -6,6 +6,8 @@ import JsonLd from "@/components/JsonLd";
 import { site } from "@/content/site";
 import { personSchema, webSiteSchema } from "@/lib/schema";
 import "./globals.css";
+import "@/styles/diagram.css";
+import "@/styles/prose.css";
 
 const serif = Newsreader({
   subsets: ["latin"],
@@ -67,6 +69,14 @@ export default function RootLayout({
       className={`${serif.variable} ${sans.variable} ${mono.variable}`}
     >
       <body>
+        {/* React hoists this into <head> on every page — page-level
+            `alternates` metadata would shallow-override a layout-level one. */}
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title={`${site.name} — Writing`}
+          href="/feed.xml"
+        />
         <a className="skip-link" href="#main">
           Skip to content
         </a>

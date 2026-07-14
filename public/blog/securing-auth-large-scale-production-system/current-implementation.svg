@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 440" role="img" aria-label="Auth call flow across three swimlanes: BROWSER, AWS API GATEWAY and BACKEND. In the browser, a user triggers an API call, then browser-side code reads the idToken from document.cookie — marked in red as the vulnerable step, with a note that the cookies are non-HttpOnly and vulnerable to XSS exfiltration — then attaches it as an Authorization Bearer header. The call drops into the AWS API Gateway, where a JWT authorizer validates the token and forwards it to the backend. The backend executes business logic and builds the API response, which returns up to the browser to update the UI. Animated teal dashes stream along the whole round trip, showing the direct, cheap client-to-backend path with no proxy in between; a red outline periodically pulses around the Read idToken step, marking the single point where the token is exposed to JavaScript.">
+  <title>Current implementation: direct client-to-backend with JS-accessible tokens</title>
+  <desc>The auth round trip is direct and cheap; the whole vulnerability is the single browser-side read of the token from document.cookie.</desc>
+  <defs>
+    <marker id="ci-ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#8a8c8f"/>
+    </marker>
+  </defs>
+
+  <!-- swimlane separators -->
+  <line x1="10" y1="44"  x2="790" y2="44"  stroke="#d9d5cb" stroke-width="1"/>
+  <line x1="10" y1="196" x2="790" y2="196" stroke="#d9d5cb" stroke-width="1"/>
+  <line x1="10" y1="316" x2="790" y2="316" stroke="#d9d5cb" stroke-width="1"/>
+  <line x1="10" y1="436" x2="790" y2="436" stroke="#d9d5cb" stroke-width="1"/>
+
+  <!-- swimlane captions -->
+  <text class="dg-band" x="16" y="64">Browser</text>
+  <text class="dg-band" x="16" y="214">AWS API Gateway</text>
+  <text class="dg-band" x="16" y="334">Backend</text>
+
+  <!-- ===== BROWSER lane ===== -->
+  <g class="dg-node" id="n1">
+    <rect x="18" y="84" width="136" height="52" rx="8"/>
+    <text class="t" x="86" y="106">User triggers</text>
+    <text class="s" x="86" y="123">API call</text>
+  </g>
+
+  <g class="dg-node fail" id="n2">
+    <rect x="175" y="84" width="136" height="52" rx="8"/>
+    <text class="t" x="243" y="106">Read idToken</text>
+    <text class="s" x="243" y="123">document.cookie</text>
+  </g>
+
+  <g class="dg-node" id="n3">
+    <rect x="332" y="84" width="136" height="52" rx="8"/>
+    <text class="t" x="400" y="106">Attach auth</text>
+    <text class="s" x="400" y="123">Bearer header</text>
+  </g>
+
+  <g class="dg-node" id="n4">
+    <rect x="646" y="84" width="136" height="52" rx="8"/>
+    <text class="t" x="714" y="114">Update UI</text>
+  </g>
+
+  <!-- vulnerability note under the red read -->
+  <text class="dg-note" x="243" y="154" text-anchor="middle" fill="#a83a2e">vulnerable to XSS exfiltration —</text>
+  <text class="dg-note" x="243" y="168" text-anchor="middle" fill="#a83a2e">cookies are non-HttpOnly</text>
+
+  <!-- ===== AWS API GATEWAY lane ===== -->
+  <g class="dg-node" id="n5">
+    <rect x="332" y="240" width="136" height="52" rx="8"/>
+    <text class="t" x="400" y="262">JWT authorizer</text>
+    <text class="s" x="400" y="279">validates token</text>
+  </g>
+
+  <g class="dg-node" id="n6">
+    <rect x="489" y="240" width="136" height="52" rx="8"/>
+    <text class="t" x="557" y="262">Forward</text>
+    <text class="s" x="557" y="279">to backend</text>
+  </g>
+
+  <!-- ===== BACKEND lane ===== -->
+  <g class="dg-node" id="n7">
+    <rect x="489" y="360" width="136" height="52" rx="8"/>
+    <text class="t" x="557" y="382">Execute</text>
+    <text class="s" x="557" y="399">business logic</text>
+  </g>
+
+  <g class="dg-node" id="n8">
+    <rect x="646" y="360" width="136" height="52" rx="8"/>
+    <text class="t" x="714" y="382">Build</text>
+    <text class="s" x="714" y="399">API response</text>
+  </g>
+
+  <!-- ===== edges (request path down/right) ===== -->
+  <path class="dg-edge" id="e1" d="M154 110 H173" marker-end="url(#ci-ah)"/>
+  <path class="dg-edge" id="e2" d="M311 110 H330" marker-end="url(#ci-ah)"/>
+  <path class="dg-edge" id="e3" d="M400 136 V238" marker-end="url(#ci-ah)"/>
+  <path class="dg-edge" id="e4" d="M468 266 H487" marker-end="url(#ci-ah)"/>
+  <path class="dg-edge" id="e5" d="M557 292 V358" marker-end="url(#ci-ah)"/>
+  <path class="dg-edge" id="e6" d="M625 386 H644" marker-end="url(#ci-ah)"/>
+
+  <!-- response leg back up to the UI -->
+  <path class="dg-edge" id="e7" d="M714 360 V138" marker-end="url(#ci-ah)"/>
+  <text class="dg-note" x="704" y="250" text-anchor="end">response</text>
+
+  <!-- ===== motion: teal flow along the whole round trip (ambient traffic) ===== -->
+  <path class="dg-flow run" d="M154 110 H173"/>
+  <path class="dg-flow run" d="M311 110 H330"/>
+  <path class="dg-flow run" d="M400 136 V238"/>
+  <path class="dg-flow run" d="M468 266 H487"/>
+  <path class="dg-flow run" d="M557 292 V358"/>
+  <path class="dg-flow run" d="M625 386 H644"/>
+  <path class="dg-flow run" d="M714 360 V138"/>
+
+  <!-- ===== motion: red pulse on the one JS-readable step (the subject) ===== -->
+  <g class="dg-pulse" style="--i: 0;">
+    <rect class="outline" x="171" y="80" width="144" height="60" rx="10"/>
+  </g>
+</svg>

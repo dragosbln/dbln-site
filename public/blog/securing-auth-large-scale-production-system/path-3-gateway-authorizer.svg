@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 570" role="img" aria-label="Path 3, the API Gateway Lambda authorizer reading cookies, across four swimlanes: BROWSER, AWS API GATEWAY, LAMBDA AUTHORIZER and BACKEND SERVICE. A user triggers an API call; the browser sends it with the HttpOnly cookie, which carries the Cognito JWT directly. The gateway receives the request and invokes its Lambda authorizer — marked teal as the load-bearing piece. The authorizer extracts the token from the cookie and validates the JWT against Cognito's JWKS, a check that is cached rather than run per call. It then returns Allow and injects an Authorization Bearer header, which the gateway forwards to the backend. The backend executes business logic and builds a response that returns up the right side to update the UI. There is no BFF and no session store. Teal flow streams along the entire round trip, and the whole Lambda Authorizer swimlane is highlighted as the load-bearing layer where the cookie is validated and re-injected as the Bearer header the hundred-plus downstream services already expect.">
+  <title>Path 3: API Gateway Lambda authorizer — the cookie is validated and re-injected as a Bearer header</title>
+  <desc>No BFF, no session store. The gateway's Lambda authorizer reads the JWT from the cookie, validates it against Cognito JWKS (cached), and injects the Authorization Bearer header the downstream services already expect.</desc>
+  <defs>
+    <marker id="p3-ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#8a8c8f"/>
+    </marker>
+  </defs>
+
+  <!-- highlight the whole Lambda Authorizer swimlane -->
+  <rect x="10" y="308" width="780" height="132" fill="#e4efec"/>
+
+  <!-- swimlane separators -->
+  <line x1="10" y1="44"  x2="790" y2="44"  stroke="#d9d5cb" stroke-width="1"/>
+  <line x1="10" y1="176" x2="790" y2="176" stroke="#d9d5cb" stroke-width="1"/>
+  <line x1="10" y1="308" x2="790" y2="308" stroke="#d9d5cb" stroke-width="1"/>
+  <line x1="10" y1="440" x2="790" y2="440" stroke="#d9d5cb" stroke-width="1"/>
+  <line x1="10" y1="564" x2="790" y2="564" stroke="#d9d5cb" stroke-width="1"/>
+
+  <!-- swimlane captions -->
+  <text class="dg-band" x="16" y="64">Browser</text>
+  <text class="dg-band" x="16" y="196">AWS API Gateway</text>
+  <text class="dg-band live" x="16" y="328">Lambda Authorizer</text>
+  <text class="dg-band" x="16" y="460">Backend Service</text>
+
+  <!-- ===== BROWSER lane ===== -->
+  <g class="dg-node" id="n1">
+    <rect x="18" y="84" width="136" height="52" rx="8"/>
+    <text class="t" x="86" y="106">User triggers</text>
+    <text class="s" x="86" y="123">API call</text>
+  </g>
+
+  <g class="dg-node" id="n2">
+    <rect x="646" y="84" width="136" height="52" rx="8"/>
+    <text class="t" x="714" y="114">Update UI</text>
+  </g>
+
+  <!-- ===== AWS API GATEWAY lane ===== -->
+  <g class="dg-node" id="n3">
+    <rect x="18" y="216" width="136" height="52" rx="8"/>
+    <text class="t" x="86" y="238">Receive request</text>
+    <text class="s" x="86" y="255">w/ HttpOnly cookie</text>
+  </g>
+
+  <g class="dg-node" id="n4">
+    <rect x="175" y="216" width="136" height="52" rx="8"/>
+    <text class="t" x="243" y="238">Invoke Lambda</text>
+    <text class="s" x="243" y="255">authorizer</text>
+  </g>
+
+  <g class="dg-node" id="n5">
+    <rect x="489" y="216" width="136" height="52" rx="8"/>
+    <text class="t" x="557" y="238">Forward request</text>
+    <text class="s" x="557" y="255">w/ Bearer header</text>
+  </g>
+
+  <g class="dg-node" id="n6">
+    <rect x="646" y="216" width="136" height="52" rx="8"/>
+    <text class="t" x="714" y="238">Return response</text>
+    <text class="s" x="714" y="255">to browser</text>
+  </g>
+
+  <!-- ===== LAMBDA AUTHORIZER lane — the load-bearing clever piece ===== -->
+  <g class="dg-node key" id="n7">
+    <rect x="175" y="348" width="136" height="52" rx="8"/>
+    <text class="t" x="243" y="370">Read cookie JWT</text>
+    <text class="s" x="243" y="387">verify · cached</text>
+  </g>
+
+  <g class="dg-node key" id="n9">
+    <rect x="332" y="348" width="136" height="52" rx="8"/>
+    <text class="t" x="400" y="370">Allow + inject</text>
+    <text class="s" x="400" y="387">Bearer header</text>
+  </g>
+
+  <text class="dg-note" x="370" y="424" text-anchor="middle">no BFF, no session store</text>
+
+  <!-- ===== BACKEND SERVICE lane ===== -->
+  <g class="dg-node" id="n10">
+    <rect x="489" y="480" width="136" height="52" rx="8"/>
+    <text class="t" x="557" y="502">Execute</text>
+    <text class="s" x="557" y="519">business logic</text>
+  </g>
+
+  <g class="dg-node" id="n11">
+    <rect x="646" y="480" width="136" height="52" rx="8"/>
+    <text class="t" x="714" y="502">Build</text>
+    <text class="s" x="714" y="519">response</text>
+  </g>
+
+  <!-- ===== request arrival (static gray) ===== -->
+  <path class="dg-edge" id="e1" d="M86 136 V214"  marker-end="url(#p3-ah)"/>
+  <path class="dg-edge" id="e2" d="M154 242 H173" marker-end="url(#p3-ah)"/>
+
+  <!-- ===== forward + backend + response (static gray) ===== -->
+  <path class="dg-edge" id="e6" d="M557 268 V478" marker-end="url(#p3-ah)"/>
+  <path class="dg-edge" id="e7" d="M625 506 H644" marker-end="url(#p3-ah)"/>
+  <path class="dg-edge" id="e8" d="M714 480 V270" marker-end="url(#p3-ah)"/>
+  <path class="dg-edge" id="e9" d="M714 216 V138" marker-end="url(#p3-ah)"/>
+  <text class="dg-note" x="704" y="360" text-anchor="end">response</text>
+
+  <!-- ===== the one idea: cookie → validate → injected Bearer ===== -->
+  <path class="dg-edge" id="e3" d="M243 268 V346" marker-end="url(#p3-ah)"/>
+  <path class="dg-edge" id="e4" d="M311 374 H330" marker-end="url(#p3-ah)"/>
+  <path class="dg-edge" id="e5" d="M400 348 L555 269" marker-end="url(#p3-ah)"/>
+  <text class="dg-note" x="252" y="312">cookie</text>
+  <text class="dg-note" x="470" y="300">Bearer</text>
+
+  <!-- motion: teal flow along the whole round trip -->
+  <path class="dg-flow run" d="M86 136 V214"/>
+  <path class="dg-flow run" d="M154 242 H173"/>
+  <path class="dg-flow run" d="M243 268 V346"/>
+  <path class="dg-flow run" d="M311 374 H330"/>
+  <path class="dg-flow run" d="M400 348 L555 269"/>
+  <path class="dg-flow run" d="M557 268 V478"/>
+  <path class="dg-flow run" d="M625 506 H644"/>
+  <path class="dg-flow run" d="M714 480 V270"/>
+  <path class="dg-flow run" d="M714 216 V138"/>
+</svg>

@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 415" role="img" aria-label="Path 4, conscious deferral with foundation work. Top row, under LOGIN, NEW SUBSTRATE: the rebuilt login flow runs horizontally — the browser clicks Sign In, Cognito Managed Login authenticates with the OAuth code flow, and Amplify v6 stores the tokens with ssr true; the two substrate nodes are teal, work already done. Under it, the hinge: HttpOnly is just a config flip, once the authorizer is prepared. Below, the API call between a client app and the backend service exists in two states. Today, the live path: the client app reads the idToken from document.cookie — outlined red and pulsing, the documented risk — and the API Gateway validates the Bearer header that client code attached. Staged beneath it, dashed because it is not built yet: the browser attaches the HttpOnly cookie automatically and a Lambda authorizer translates the cookie into the Bearer header; an enabling edge labeled httpOnly: true sweeps from Amplify v6 around to the staged browser step — the config flip itself. The animation previews the flip: the risky top path dissolves to a dashed remnant while the staged bottom path becomes the active one, the enabling edge fading in with it and teal traffic streaming along the path, then the figure returns to today's state. The risk is accepted and signed, with triggers defined.">
+  <title>Path 4: defer with intent — the substrate is live; the secure API path is one config flip away</title>
+  <desc>Top: the rebuilt login substrate (Cognito Managed Login + Amplify v6 ssr:true), live today. Bottom: the API call crossfading between today's JS-readable cookie read (documented risk, red) and the staged HttpOnly path where a Lambda authorizer translates the cookie into the Bearer header.</desc>
+  <defs>
+    <marker id="p4-ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#8a8c8f"/>
+    </marker>
+  </defs>
+
+  <!-- ===== LOGIN ROW: the new substrate, live today ===== -->
+  <text class="dg-band live" x="30" y="44">Login · new substrate</text>
+
+  <g class="dg-node" id="n1">
+    <rect x="30" y="64" width="170" height="54" rx="8"/>
+    <text class="t" x="115" y="87">Browser</text>
+    <text class="s" x="115" y="104">click Sign In</text>
+  </g>
+
+  <g class="dg-node key" id="n2">
+    <rect x="315" y="64" width="170" height="54" rx="8"/>
+    <text class="t" x="400" y="87">Managed Login</text>
+    <text class="s" x="400" y="104">Cognito · OAuth code</text>
+  </g>
+
+  <g class="dg-node key" id="n3">
+    <rect x="600" y="64" width="170" height="54" rx="8"/>
+    <text class="t" x="685" y="87">Amplify v6</text>
+    <text class="s" x="685" y="104">tokens · ssr: true</text>
+  </g>
+
+  <path class="dg-edge" id="e1" d="M200 91 H 313" marker-end="url(#p4-ah)"/>
+  <path class="dg-edge" id="e2" d="M485 91 H 598" marker-end="url(#p4-ah)"/>
+
+  <!-- the hinge -->
+  <text class="dg-note" x="400" y="156" text-anchor="middle" fill="#0a5b55">HttpOnly is just a config flip, once the authorizer is prepared</text>
+
+  <!-- ===== API CALL: two states of the same path ===== -->
+  <text class="dg-band" x="30" y="182">API call</text>
+  <text class="dg-band" x="30" y="200" fill="#a83a2e">today · documented risk</text>
+  <text class="dg-band live" x="30" y="218">staged · HttpOnly</text>
+
+  <!-- persistent ends -->
+  <g class="dg-node" id="n4">
+    <rect x="30" y="252" width="170" height="54" rx="8"/>
+    <text class="t" x="115" y="275">Client App</text>
+    <text class="s" x="115" y="292">triggers API call</text>
+  </g>
+
+  <g class="dg-node" id="n5">
+    <rect x="600" y="252" width="170" height="54" rx="8"/>
+    <text class="t" x="685" y="275">Backend Service</text>
+    <text class="s" x="685" y="292">executes business logic</text>
+  </g>
+
+  <!-- ===== TODAY (top): dashed remnants under the solid live overlay ===== -->
+  <g class="dg-node legacy" id="n6">
+    <rect x="220" y="206" width="170" height="66" rx="8"/>
+    <text class="t" x="305" y="230">Client App</text>
+    <text class="s" x="305" y="247">read idToken from</text>
+    <text class="s" x="305" y="262">document.cookie</text>
+  </g>
+  <g class="dg-node legacy" id="n7">
+    <rect x="410" y="206" width="170" height="66" rx="8"/>
+    <text class="t" x="495" y="234">API Gateway</text>
+    <text class="s" x="495" y="251">validates Bearer header</text>
+  </g>
+  <path class="dg-edge legacy" id="e3" d="M200 264 L 218 245"/>
+  <path class="dg-edge legacy" id="e4" d="M390 239 H 408"/>
+  <path class="dg-edge legacy" id="e5" d="M580 241 L 598 262"/>
+
+  <!-- TODAY: the live overlay (visible at rest, dissolves during the preview) -->
+  <g class="dg-recede staged">
+    <path class="dg-edge" d="M200 264 L 218 245" marker-end="url(#p4-ah)"/>
+    <path class="dg-edge" d="M390 239 H 408" marker-end="url(#p4-ah)"/>
+    <path class="dg-edge" d="M580 241 L 598 262" marker-end="url(#p4-ah)"/>
+    <g class="dg-node fail">
+      <rect x="220" y="206" width="170" height="66" rx="8"/>
+      <text class="t" x="305" y="230">Client App</text>
+      <text class="s" x="305" y="247">read idToken from</text>
+      <text class="s" x="305" y="262">document.cookie</text>
+    </g>
+    <g class="dg-node">
+      <rect x="410" y="206" width="170" height="66" rx="8"/>
+      <text class="t" x="495" y="234">API Gateway</text>
+      <text class="s" x="495" y="251">validates Bearer header</text>
+    </g>
+    <g class="dg-pulse" style="--i: -0.2;">
+      <rect class="outline" x="216" y="202" width="178" height="74" rx="10"/>
+    </g>
+  </g>
+
+  <!-- ===== STAGED (bottom): dashed at rest ===== -->
+  <g class="dg-node legacy" id="n8">
+    <rect x="220" y="292" width="170" height="54" rx="8"/>
+    <text class="t" x="305" y="315">Browser</text>
+    <text class="s" x="305" y="332">attaches HttpOnly cookies</text>
+  </g>
+  <g class="dg-node legacy" id="n9">
+    <rect x="410" y="292" width="170" height="54" rx="8"/>
+    <text class="t" x="495" y="315">Lambda Authorizer</text>
+    <text class="s" x="495" y="332">cookie → Bearer header</text>
+  </g>
+  <path class="dg-edge legacy" id="e6" d="M200 294 L 218 315"/>
+  <path class="dg-edge legacy" id="e7" d="M390 319 H 408"/>
+  <path class="dg-edge legacy" id="e8" d="M580 317 L 598 296"/>
+
+  <!-- the enabling config: Amplify v6 → HttpOnly attachment (staged) -->
+  <path class="dg-edge legacy" id="e9" d="M 685 118 C 790 150, 792 240, 780 300 C 760 386, 460 396, 310 349"/>
+  <text class="dg-note" x="783" y="200" text-anchor="end">httpOnly: true</text>
+
+  <!-- STAGED: the preview overlay (appears mid-cycle, carries live traffic) -->
+  <g class="dg-appear staged">
+    <path class="dg-edge" d="M200 294 L 218 315" marker-end="url(#p4-ah)"/>
+    <path class="dg-edge" d="M390 319 H 408" marker-end="url(#p4-ah)"/>
+    <path class="dg-edge" d="M580 317 L 598 296" marker-end="url(#p4-ah)"/>
+    <g class="dg-node key">
+      <rect x="220" y="292" width="170" height="54" rx="8"/>
+      <text class="t" x="305" y="315">Browser</text>
+      <text class="s" x="305" y="332">attaches HttpOnly cookies</text>
+    </g>
+    <g class="dg-node key">
+      <rect x="410" y="292" width="170" height="54" rx="8"/>
+      <text class="t" x="495" y="315">Lambda Authorizer</text>
+      <text class="s" x="495" y="332">cookie → Bearer header</text>
+    </g>
+    <path class="dg-flow run" d="M200 294 L 218 315"/>
+    <path class="dg-flow run" d="M390 319 H 408"/>
+    <path class="dg-flow run" d="M580 317 L 598 296"/>
+    <path class="dg-edge" d="M 685 118 C 790 150, 792 240, 780 300 C 760 386, 460 396, 310 349" marker-end="url(#p4-ah)"/>
+  </g>
+
+  <!-- the deferral, in writing -->
+  <text class="dg-note" x="400" y="408" text-anchor="middle">risk accepted and signed · triggers defined</text>
+</svg>

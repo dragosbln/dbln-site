@@ -71,15 +71,26 @@ export type AgenticItem = {
   body: string;
 };
 
-export type Article = {
-  /** Future /blog/<slug> route segment. */
+export type Post = {
+  /** /blog/<slug> route segment; also the markdown filename in src/content/posts. */
   slug: string;
   title: string;
   /** ISO date, e.g. "2026-06-09". */
   date: string;
-  /** Minutes. */
+  /** Minutes — computed from word count by src/lib/posts.ts, not authored. */
   readTime: number;
   tags: string[];
+  excerpt: string;
+  /** Cover figure, e.g. "/blog/covers/<slug>.svg". */
+  cover: string;
+  coverAlt: string;
+  /** URL of the dev.to cross-post, when one exists. */
+  devto?: string;
+};
+
+export type PostWithBody = Post & {
+  /** Raw markdown body (no frontmatter). */
+  body: string;
 };
 
 export type CaseOutcome = {
@@ -119,7 +130,10 @@ export type AgenticSection = SectionIntro & {
   pull: string;
   items: AgenticItem[];
 };
-export type WritingSection = SectionIntro & { articles: Article[] };
+export type WritingSection = SectionIntro & {
+  /** How many of the newest posts the landing section shows. */
+  featuredCount: number;
+};
 
 export type Contact = {
   label: string;

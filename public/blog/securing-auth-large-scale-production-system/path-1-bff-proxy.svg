@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 570" role="img" aria-label="Path 1, the Next.js BFF proxy, across four swimlanes: BROWSER, NEXT.JS SERVER (BFF), AWS API GATEWAY and BACKEND SERVICE. A user triggers an API call in the browser. Instead of going direct, the call drops into the Next.js Server (BFF) lane — marked teal as the new load-bearing hop — where the server receives the request with the HttpOnly cookie, reads the token from the cookie server-side, and forwards the request with an Authorization Bearer header. From there the call drops to the AWS API Gateway, where a JWT authorizer validates the token and forwards it to the backend, which executes business logic and builds a response. The response returns up the right side through the BFF back to the browser to update the UI. Animated teal dashes stream along the whole round trip, dropping from the browser into the BFF lane and climbing back through it — showing that every client call now detours through the Next.js server rather than going direct.">
+  <title>Path 1: Next.js BFF proxy — every client call routes through the Next.js server</title>
+  <desc>The fix reads tokens server-side from HttpOnly cookies, but every client API call now detours through the Next.js/Vercel BFF, placing it in the critical path of all traffic.</desc>
+  <defs>
+    <marker id="p1-ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#8a8c8f"/>
+    </marker>
+  </defs>
+
+  <!-- swimlane separators -->
+  <line x1="10" y1="44"  x2="790" y2="44"  stroke="#d9d5cb" stroke-width="1"/>
+  <line x1="10" y1="176" x2="790" y2="176" stroke="#d9d5cb" stroke-width="1"/>
+  <line x1="10" y1="308" x2="790" y2="308" stroke="#d9d5cb" stroke-width="1"/>
+  <line x1="10" y1="440" x2="790" y2="440" stroke="#d9d5cb" stroke-width="1"/>
+  <line x1="10" y1="564" x2="790" y2="564" stroke="#d9d5cb" stroke-width="1"/>
+
+  <!-- swimlane captions -->
+  <text class="dg-band" x="16" y="64">Browser</text>
+  <text class="dg-band live" x="16" y="196">Next.js Server (BFF)</text>
+  <text class="dg-band" x="16" y="328">AWS API Gateway</text>
+  <text class="dg-band" x="16" y="460">Backend Service</text>
+
+  <!-- ===== BROWSER lane ===== -->
+  <g class="dg-node" id="n1">
+    <rect x="18" y="84" width="136" height="52" rx="8"/>
+    <text class="t" x="86" y="106">User triggers</text>
+    <text class="s" x="86" y="123">API call</text>
+  </g>
+
+  <g class="dg-node" id="n2">
+    <rect x="646" y="84" width="136" height="52" rx="8"/>
+    <text class="t" x="714" y="114">Update UI</text>
+  </g>
+
+  <!-- ===== NEXT.JS SERVER (BFF) lane — the load-bearing new hop ===== -->
+  <g class="dg-node key" id="n3">
+    <rect x="18" y="216" width="136" height="52" rx="8"/>
+    <text class="t" x="86" y="238">Receive request</text>
+    <text class="s" x="86" y="255">w/ HttpOnly cookie</text>
+  </g>
+
+  <g class="dg-node key" id="n4">
+    <rect x="175" y="216" width="136" height="52" rx="8"/>
+    <text class="t" x="243" y="238">Read token</text>
+    <text class="s" x="243" y="255">from cookie</text>
+  </g>
+
+  <g class="dg-node key" id="n5">
+    <rect x="332" y="216" width="136" height="52" rx="8"/>
+    <text class="t" x="400" y="238">Forward request</text>
+    <text class="s" x="400" y="255">w/ Bearer header</text>
+  </g>
+
+  <g class="dg-node" id="n6">
+    <rect x="646" y="216" width="136" height="52" rx="8"/>
+    <text class="t" x="714" y="238">Return response</text>
+    <text class="s" x="714" y="255">to browser</text>
+  </g>
+
+  <!-- ===== AWS API GATEWAY lane ===== -->
+  <g class="dg-node" id="n7">
+    <rect x="332" y="348" width="136" height="52" rx="8"/>
+    <text class="t" x="400" y="370">JWT authorizer</text>
+    <text class="s" x="400" y="387">validates token</text>
+  </g>
+
+  <g class="dg-node" id="n8">
+    <rect x="489" y="348" width="136" height="52" rx="8"/>
+    <text class="t" x="557" y="370">Forward</text>
+    <text class="s" x="557" y="387">to backend</text>
+  </g>
+
+  <!-- ===== BACKEND SERVICE lane ===== -->
+  <g class="dg-node" id="n9">
+    <rect x="489" y="480" width="136" height="52" rx="8"/>
+    <text class="t" x="557" y="502">Execute</text>
+    <text class="s" x="557" y="519">business logic</text>
+  </g>
+
+  <g class="dg-node" id="n10">
+    <rect x="646" y="480" width="136" height="52" rx="8"/>
+    <text class="t" x="714" y="502">Build</text>
+    <text class="s" x="714" y="519">response</text>
+  </g>
+
+  <!-- ===== edges (request path down/right) ===== -->
+  <path class="dg-edge" id="e1" d="M86 136 V214"  marker-end="url(#p1-ah)"/>
+  <path class="dg-edge" id="e2" d="M154 242 H173" marker-end="url(#p1-ah)"/>
+  <path class="dg-edge" id="e3" d="M311 242 H330" marker-end="url(#p1-ah)"/>
+  <path class="dg-edge" id="e4" d="M400 268 V346" marker-end="url(#p1-ah)"/>
+  <path class="dg-edge" id="e5" d="M468 374 H487" marker-end="url(#p1-ah)"/>
+  <path class="dg-edge" id="e6" d="M557 400 V478" marker-end="url(#p1-ah)"/>
+  <path class="dg-edge" id="e7" d="M625 506 H644" marker-end="url(#p1-ah)"/>
+
+  <!-- response leg back up the right side, through the BFF -->
+  <path class="dg-edge" id="e8" d="M714 480 V270" marker-end="url(#p1-ah)"/>
+  <path class="dg-edge" id="e9" d="M714 216 V138" marker-end="url(#p1-ah)"/>
+  <text class="dg-note" x="704" y="360" text-anchor="end">response</text>
+
+  <!-- ===== motion: teal flow along the whole round trip, detouring THROUGH the BFF ===== -->
+  <path class="dg-flow run" d="M86 136 V214"/>
+  <path class="dg-flow run" d="M154 242 H173"/>
+  <path class="dg-flow run" d="M311 242 H330"/>
+  <path class="dg-flow run" d="M400 268 V346"/>
+  <path class="dg-flow run" d="M468 374 H487"/>
+  <path class="dg-flow run" d="M557 400 V478"/>
+  <path class="dg-flow run" d="M625 506 H644"/>
+  <path class="dg-flow run" d="M714 480 V270"/>
+  <path class="dg-flow run" d="M714 216 V138"/>
+</svg>

@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 505" role="img" aria-label="Transition diagram between two architectures. Before: three call sites — checkout, profile, admin — each import the auth vendor directly, so the vendor's session types, errors and claim names spread to every call site along three direct spokes. After: the same call sites depend on an app-owned AuthPort interface; a single CognitoAdapter implements the port, and the vendor sits behind it, its types stopping at the boundary line. The diagram crossfades between the two states: the direct spokes recede to dashed remnants while the port, adapter and boundary draw in, hold, then reverse.">
+        <title>Facade to boundary</title>
+        <desc>Before/after crossfade: vendor spokes recede as the AuthPort seam and adapter appear.</desc>
+        <defs>
+          <marker id="f3-ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L8 4 L0 8 Z" fill="#8a8c8f"/>
+          </marker>
+        </defs>
+
+        <text class="dg-band" x="20" y="20">call sites</text>
+
+        <!-- state labels (crossfade) -->
+        <g class="dg-recede">
+          <text class="dg-band" x="420" y="12" text-anchor="end">before · leaky facade</text>
+        </g>
+        <g class="dg-appear">
+          <text class="dg-band live" x="420" y="26" text-anchor="end">after · port + adapter</text>
+        </g>
+
+        <!-- call sites (persist) -->
+        <g class="dg-node">
+          <rect x="20" y="32" width="128" height="44" rx="8"/>
+          <text class="t" x="84" y="59">checkout</text>
+        </g>
+        <g class="dg-node">
+          <rect x="156" y="32" width="128" height="44" rx="8"/>
+          <text class="t" x="220" y="59">profile</text>
+        </g>
+        <g class="dg-node">
+          <rect x="292" y="32" width="128" height="44" rx="8"/>
+          <text class="t" x="356" y="59">admin</text>
+        </g>
+
+        <!-- BEFORE: dashed remnants (static, always present under the solid spokes) -->
+        <path class="dg-edge legacy" d="M84 76 C 84 220, 130 340, 180 416"/>
+        <path class="dg-edge legacy" d="M220 76 V 416"/>
+        <path class="dg-edge legacy" d="M356 76 C 356 220, 310 340, 260 416"/>
+
+        <!-- BEFORE: solid spokes (recede) -->
+        <g class="dg-recede">
+          <path class="dg-edge" d="M84 76 C 84 220, 130 340, 180 416" marker-end="url(#f3-ah)"/>
+          <path class="dg-edge" d="M220 76 V 416" marker-end="url(#f3-ah)"/>
+          <path class="dg-edge" d="M356 76 C 356 220, 310 340, 260 416" marker-end="url(#f3-ah)"/>
+          <text class="dg-note" x="124" y="282">vendor types</text>
+          <text class="dg-note" x="124" y="296">spread to</text>
+          <text class="dg-note" x="124" y="310">every call site</text>
+        </g>
+
+        <!-- AFTER: port, adapter, boundary (appear) -->
+        <g class="dg-appear">
+          <path class="dg-edge" d="M84 76 C 84 140, 158 165, 172 206" marker-end="url(#f3-ah)"/>
+          <path class="dg-edge" d="M220 76 V 206" marker-end="url(#f3-ah)"/>
+          <path class="dg-edge" d="M356 76 C 356 140, 282 165, 268 206" marker-end="url(#f3-ah)"/>
+          <g class="dg-node key">
+            <rect x="135" y="210" width="170" height="54" rx="8"/>
+            <text class="t" x="220" y="233">AuthPort</text>
+            <text class="s" x="220" y="250">interface · app-owned</text>
+          </g>
+          <path class="dg-edge" d="M220 264 V 326" marker-end="url(#f3-ah)"/>
+          <line x1="20" y1="298" x2="123" y2="298" stroke="#0c7b72" stroke-width="1.2"/>
+          <line x1="317" y1="298" x2="420" y2="298" stroke="#0c7b72" stroke-width="1.2"/>
+          <text class="dg-note" x="322" y="290" fill="#0a5b55">types stop here</text>
+          <g class="dg-node">
+            <rect x="135" y="330" width="170" height="44" rx="8"/>
+            <text class="t" x="220" y="349">CognitoAdapter</text>
+            <text class="s" x="220" y="364">implements AuthPort</text>
+          </g>
+          <path class="dg-edge" d="M220 374 V 416" marker-end="url(#f3-ah)"/>
+        </g>
+
+        <!-- vendor (persists) -->
+        <g class="dg-node">
+          <rect x="135" y="420" width="170" height="54" rx="8"/>
+          <text class="t" x="220" y="443">Auth vendor</text>
+          <text class="s" x="220" y="460">Cognito SDK</text>
+        </g>
+        <text class="dg-band" x="20" y="450">vendor</text>
+      </svg>

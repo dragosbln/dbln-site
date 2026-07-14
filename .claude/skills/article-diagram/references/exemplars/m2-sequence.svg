@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 430" role="img" aria-label="Numbered sequence diagram of the OAuth 2.0 authorization-code flow. Step one: the browser app redirects sign-in to Cognito Managed Login. Step two: the code is exchanged and tokens are set as httpOnly cookies. Step three: API calls carry the cookie automatically to the gateway authorizer. Step four: the authorizer validates the cookie and injects an Authorization Bearer header for over one hundred services. Each numbered step lights up in teal, one at a time, in strict order.">
+        <title>The order is the protocol</title>
+        <desc>OAuth authorization-code flow as four ordered steps: redirect, cookie, carry, validate.</desc>
+        <defs>
+          <marker id="f2-ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L8 4 L0 8 Z" fill="#8a8c8f"/>
+          </marker>
+          <marker id="f2-ah-t" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="4.5" markerHeight="4.5" orient="auto">
+            <path d="M0 0 L8 4 L0 8 Z" fill="#0c7b72"/>
+          </marker>
+        </defs>
+
+        <!-- Browser app -->
+        <g class="dg-node">
+          <rect x="20" y="32" width="170" height="54" rx="8"/>
+          <text class="t" x="105" y="55">Browser app</text>
+          <text class="s" x="105" y="72">client</text>
+        </g>
+
+        <!-- Cognito -->
+        <g class="dg-node">
+          <rect x="250" y="32" width="170" height="54" rx="8"/>
+          <text class="t" x="335" y="55">Cognito</text>
+          <text class="s" x="335" y="72">Managed Login</text>
+        </g>
+
+        <!-- 1: redirect -->
+        <path class="dg-edge" d="M190 50 H 244" marker-end="url(#f2-ah)"/>
+        <text class="dg-note" x="200" y="26">redirect</text>
+
+        <!-- 2: code -> cookie -->
+        <path class="dg-edge" d="M250 72 H 196" marker-end="url(#f2-ah)"/>
+        <text class="dg-note" x="200" y="102">code →</text>
+        <text class="dg-note" x="200" y="114">cookie</text>
+
+        <!-- 3: call carries cookie -->
+        <path class="dg-edge" d="M105 86 V 197 H 244" marker-end="url(#f2-ah)"/>
+        <text class="dg-note" x="120" y="158">API call ·</text>
+        <text class="dg-note" x="120" y="172">cookie rides</text>
+
+        <!-- Gateway authorizer (key) -->
+        <g class="dg-node key">
+          <rect x="250" y="170" width="170" height="54" rx="8"/>
+          <text class="t" x="335" y="193">Gateway authorizer</text>
+          <text class="s" x="335" y="210">validates cookie</text>
+        </g>
+
+        <!-- 4: bearer to services -->
+        <path class="dg-edge" d="M335 224 V 310" marker-end="url(#f2-ah)"/>
+        <text class="dg-note" x="200" y="260">injects</text>
+        <text class="dg-note" x="200" y="274">Authorization:</text>
+        <text class="dg-note" x="200" y="288">Bearer</text>
+
+        <!-- services -->
+        <g class="dg-chip plain">
+          <rect x="251" y="316" width="84" height="26" rx="13"/>
+          <text x="293" y="332" text-anchor="middle">svc</text>
+        </g>
+        <g class="dg-chip plain">
+          <rect x="337" y="316" width="66" height="26" rx="13"/>
+          <text x="370" y="332" text-anchor="middle">×100+</text>
+        </g>
+
+        <!-- step markers -->
+        <g class="dg-step">
+          <circle cx="218" cy="50" r="8"/>
+          <text x="218" y="53" text-anchor="middle">1</text>
+        </g>
+        <g class="dg-step">
+          <circle cx="222" cy="72" r="8"/>
+          <text x="222" y="75" text-anchor="middle">2</text>
+        </g>
+        <g class="dg-step">
+          <circle cx="105" cy="140" r="8"/>
+          <text x="105" y="143" text-anchor="middle">3</text>
+        </g>
+        <g class="dg-step">
+          <circle cx="335" cy="266" r="8"/>
+          <text x="335" y="269" text-anchor="middle">4</text>
+        </g>
+
+        <!-- sequence highlight overlays (static first frame = base diagram) -->
+        <g class="dg-seq" style="--i: 0;">
+          <path class="hl" d="M190 50 H 204"/>
+          <path class="hl" d="M232 50 H 244" marker-end="url(#f2-ah-t)"/>
+          <circle class="ring" cx="218" cy="50" r="11"/>
+        </g>
+        <g class="dg-seq" style="--i: 1;">
+          <path class="hl" d="M250 72 H 236"/>
+          <path class="hl" d="M208 72 H 196" marker-end="url(#f2-ah-t)"/>
+          <circle class="ring" cx="222" cy="72" r="11"/>
+        </g>
+        <g class="dg-seq" style="--i: 2;">
+          <path class="hl" d="M105 86 V 126"/>
+          <path class="hl" d="M105 154 V 197 H 244" marker-end="url(#f2-ah-t)"/>
+          <circle class="ring" cx="105" cy="140" r="11"/>
+        </g>
+        <g class="dg-seq" style="--i: 3;">
+          <path class="hl" d="M335 224 V 252"/>
+          <path class="hl" d="M335 280 V 310" marker-end="url(#f2-ah-t)"/>
+          <circle class="ring" cx="335" cy="266" r="11"/>
+        </g>
+      </svg>

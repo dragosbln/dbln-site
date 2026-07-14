@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+<defs>
+  <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse">
+    <path d="M34 0H0V34" fill="none" stroke="#d2cdc2" stroke-width="1" opacity="0.5"></path>
+  </pattern>
+</defs>
+<rect width="1200" height="630" fill="#f1eee7"></rect>
+<rect width="1200" height="630" fill="url(#grid)"></rect>
+<rect x="28" y="28" width="1144" height="574" fill="none" stroke="#d2cdc2" stroke-width="1.5"></rect>
+
+<g stroke="#17191c" stroke-width="2">
+  <path d="M28 60 H52 M60 28 V52"></path>
+  <path d="M1172 570 H1148 M1140 602 V578"></path>
+</g>
+<text x="60" y="78" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="15" letter-spacing="3" fill="#4a4d52">FIG.05 — EVIDENCE</text>
+
+<!-- left panel: the audit report -->
+<text x="200" y="150" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="14" letter-spacing="2" fill="#4a4d52">CLAIMS</text>
+<rect x="200" y="168" width="320" height="300" rx="10" fill="none" stroke="#17191c" stroke-width="2"></rect>
+<g fill="#4a4d52">
+  <rect x="232" y="216" width="12" height="12"></rect>
+  <rect x="232" y="286" width="12" height="12"></rect>
+  <rect x="232" y="356" width="12" height="12"></rect>
+  <rect x="232" y="426" width="12" height="12"></rect>
+</g>
+<g stroke="#4a4d52" stroke-width="4" stroke-linecap="round">
+  <path d="M264 222 H452"></path>
+  <path d="M264 292 H420"></path>
+  <path d="M264 432 H436"></path>
+</g>
+<!-- the confidently-wrong claim: heavier ink, no anchor -->
+<g stroke="#17191c" stroke-width="4" stroke-linecap="round">
+  <path d="M264 362 H468"></path>
+</g>
+
+<!-- right panel: the codebase -->
+<text x="680" y="150" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="14" letter-spacing="2" fill="#0a5b55">EVIDENCE · FILE:LINE</text>
+<rect x="680" y="168" width="320" height="300" rx="10" fill="#e8e4da" stroke="#4a4d52" stroke-width="1.5"></rect>
+<g stroke="#d2cdc2" stroke-width="4" stroke-linecap="round">
+  <path d="M712 200 H900"></path>
+  <path d="M712 228 H856"></path>
+  <path d="M712 256 H928"></path>
+  <path d="M712 312 H872"></path>
+  <path d="M712 340 H944"></path>
+  <path d="M712 396 H836"></path>
+  <path d="M712 424 H912"></path>
+  <path d="M712 452 H880"></path>
+</g>
+
+<!-- pinned claims: ink tethers to their lines -->
+<g stroke="#4a4d52" stroke-width="1.5" fill="none">
+  <path d="M452 222 C560 222 600 228 712 228"></path>
+  <path d="M436 432 C560 432 600 424 712 424"></path>
+</g>
+<circle cx="712" cy="228" r="5" fill="#4a4d52"></circle>
+<circle cx="712" cy="424" r="5" fill="#4a4d52"></circle>
+
+<!-- THE TEAL: one claim pinned to its exact line of evidence -->
+<rect x="700" y="330" width="268" height="20" fill="#dfeae7" stroke="#0a5b55" stroke-width="1.5" stroke-dasharray="5 5"></rect>
+<path d="M420 292 C560 292 620 340 700 340" fill="none" stroke="#0c7b72" stroke-width="3.5"></path>
+<circle cx="700" cy="340" r="8" fill="#0c7b72"></circle>
+<circle cx="420" cy="292" r="6" fill="none" stroke="#0c7b72" stroke-width="3"></circle>
+
+<!-- the unpinned claim ends in air -->
+<path d="M468 362 H588" fill="none" stroke="#8a8c8f" stroke-width="1.5" stroke-dasharray="4 5"></path>
+<g stroke="#17191c" stroke-width="2.5" stroke-linecap="round">
+  <path d="M596 354 L612 370"></path>
+  <path d="M612 354 L596 370"></path>
+</g>
+</svg>

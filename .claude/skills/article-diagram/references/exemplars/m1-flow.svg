@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 450" role="img" aria-label="Flow diagram. The browser's client components send requests to Next.js route handlers on Vercel, which read HttpOnly cookies and forward each request with a Bearer header to the API Gateway, which fans out to over one hundred backend microservices. Animated teal dashes stream along the whole path — straight down to the route handlers, around a right angle to the gateway, then along a curve to the services. A dashed legacy edge shows the retired direct route from browser to gateway, which used to carry 65 to 70 percent of all API traffic.">
+        <title>All traffic through the proxy</title>
+        <desc>BFF pattern: client calls re-route through Next.js route handlers; the old direct browser-to-gateway edge is retired.</desc>
+        <defs>
+          <marker id="f1-ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L8 4 L0 8 Z" fill="#8a8c8f"/>
+          </marker>
+        </defs>
+
+        <text class="dg-band live" x="20" y="20">new path</text>
+        <text class="dg-band" x="420" y="20" text-anchor="end">retired</text>
+
+        <!-- Browser -->
+        <g class="dg-node">
+          <rect x="20" y="32" width="180" height="54" rx="8"/>
+          <text class="t" x="110" y="55">Browser</text>
+          <text class="s" x="110" y="72">client components</text>
+        </g>
+
+        <!-- new path edges: straight, then right-angle -->
+        <path class="dg-edge" d="M110 86 V 148" marker-end="url(#f1-ah)"/>
+        <path class="dg-edge" d="M110 210 V 299 H 236" marker-end="url(#f1-ah)"/>
+
+        <!-- Route handlers (key) -->
+        <g class="dg-node key">
+          <rect x="20" y="152" width="180" height="54" rx="8"/>
+          <text class="t" x="110" y="175">Next.js route handlers</text>
+          <text class="s" x="110" y="192">Vercel · cookie → Bearer</text>
+        </g>
+
+        <!-- Gateway -->
+        <g class="dg-node">
+          <rect x="240" y="272" width="180" height="54" rx="8"/>
+          <text class="t" x="330" y="295">API Gateway</text>
+          <text class="s" x="330" y="312">100+ services behind</text>
+        </g>
+
+        <!-- legacy direct edge -->
+        <path class="dg-edge legacy" d="M200 50 C 320 50, 330 130, 330 264" marker-end="url(#f1-ah)"/>
+        <text class="dg-note" x="344" y="150">was: 65–70%</text>
+        <text class="dg-note" x="344" y="163">direct</text>
+
+        <!-- curved edge to the services -->
+        <path class="dg-edge" d="M330 326 C 330 368, 170 356, 170 392" marker-end="url(#f1-ah)"/>
+
+        <!-- traffic overlay on the new path: straight / right-angle / curve -->
+        <path class="dg-flow run" d="M110 86 V 148"/>
+        <path class="dg-flow run" d="M110 210 V 299 H 236"/>
+        <path class="dg-flow run" d="M330 326 C 330 368, 170 356, 170 392"/>
+
+        <g class="dg-chip plain">
+          <rect x="42" y="396" width="84" height="26" rx="13"/>
+          <text x="84" y="412" text-anchor="middle">svc</text>
+        </g>
+        <g class="dg-chip plain">
+          <rect x="128" y="396" width="84" height="26" rx="13"/>
+          <text x="170" y="412" text-anchor="middle">svc</text>
+        </g>
+        <g class="dg-chip plain">
+          <rect x="214" y="396" width="84" height="26" rx="13"/>
+          <text x="256" y="412" text-anchor="middle">svc</text>
+        </g>
+        <text class="dg-note" x="308" y="413">×100+</text>
+      </svg>

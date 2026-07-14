@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 300" role="img" aria-label="Landscape flow diagram, the default canvas shape. A client on the left sends requests through a gateway in the middle, marked in teal as the live path, to a service on the right. Animated teal dashes stream left to right along both edges. A dashed retired edge arcs over the top, showing the old direct route from client to service that no longer carries traffic.">
+  <title>Landscape flow reference</title>
+  <desc>Default canvas: 680-wide landscape, left-to-right flow through a gateway; the retired direct edge is dashed.</desc>
+  <defs>
+    <marker id="l1-ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#8a8c8f"/>
+    </marker>
+  </defs>
+
+  <text class="dg-band live" x="20" y="26">the live path</text>
+  <text class="dg-band" x="660" y="26" text-anchor="end">retired</text>
+
+  <g class="dg-node" id="n1">
+    <rect x="20" y="130" width="170" height="54" rx="8"/>
+    <text class="t" x="105" y="153">Client</text>
+    <text class="s" x="105" y="170">browser</text>
+  </g>
+
+  <g class="dg-node key" id="n2">
+    <rect x="255" y="130" width="170" height="54" rx="8"/>
+    <text class="t" x="340" y="153">Gateway</text>
+    <text class="s" x="340" y="170">validates every call</text>
+  </g>
+
+  <g class="dg-node" id="n3">
+    <rect x="490" y="130" width="170" height="54" rx="8"/>
+    <text class="t" x="575" y="153">Service</text>
+    <text class="s" x="575" y="170">backend</text>
+  </g>
+
+  <path class="dg-edge" id="e1" d="M190 157 H 249" marker-end="url(#l1-ah)"/>
+  <path class="dg-edge" id="e2" d="M425 157 H 484" marker-end="url(#l1-ah)"/>
+  <path class="dg-edge legacy" id="e3" d="M105 130 C 105 58, 575 58, 575 124" marker-end="url(#l1-ah)"/>
+  <text class="dg-note" x="340" y="48" text-anchor="middle">was: direct, unvalidated</text>
+
+  <path class="dg-flow run" d="M190 157 H 249"/>
+  <path class="dg-flow run" d="M425 157 H 484"/>
+
+  <text class="dg-note" x="340" y="240" text-anchor="middle">every request passes the gateway; nothing bypasses it</text>
+</svg>
