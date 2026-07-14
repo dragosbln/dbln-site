@@ -17,14 +17,6 @@
     color 0.18s;
 }
 
-.share svg {
-  width: 17px;
-  height: 17px;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 2;
-}
-
 .share:hover {
   border-color: var(--teal);
   color: var(--teal-deep);

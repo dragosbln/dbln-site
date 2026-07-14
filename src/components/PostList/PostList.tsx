@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Post } from "@/content/types";
 import { formatMonthYear } from "@/lib/format";
+import { postPath } from "@/lib/urls";
 import styles from "./PostList.module.css";
 
 type SortMode = "new" | "old" | "short" | "long";
@@ -43,11 +44,22 @@ export default function PostList({ posts }: PostListProps) {
     }
   }, [posts]);
 
-  // Keep the URL shareable when exactly one tag is selected.
+  // Keep the URL shareable when exactly one tag is selected. The mount run
+  // is skipped: it would race the deep-link effect above and strip ?tag=
+  // before that effect's state lands. The hash is preserved.
+  const didMountUrlSync = useRef(false);
   useEffect(() => {
+    if (!didMountUrlSync.current) {
+      didMountUrlSync.current = true;
+      return;
+    }
     const query =
       activeTags.size === 1 ? `?tag=${encodeURIComponent([...activeTags][0])}` : "";
-    window.history.replaceState(null, "", window.location.pathname + query);
+    window.history.replaceState(
+      null,
+      "",
+      window.location.pathname + query + window.location.hash,
+    );
   }, [activeTags]);
 
   const toggleTag = (tag: string) => {
@@ -85,6 +97,7 @@ export default function PostList({ posts }: PostListProps) {
             <button
               type="button"
               className={activeTags.size === 0 ? `${styles.chip} ${styles.on}` : styles.chip}
+              aria-pressed={activeTags.size === 0}
               onClick={() => setActiveTags(new Set())}
             >
               All <span className={styles.count}>{posts.length}</span>
@@ -118,7 +131,8 @@ export default function PostList({ posts }: PostListProps) {
       </div>
       <div className={styles.posts}>
         <div className="wrap">
-          <p className={styles.countLine}>
+          {/* role=status announces the new result count on filter/sort */}
+          <p className={styles.countLine} role="status">
             {shown.length} {shown.length === 1 ? "article" : "articles"} — {selection}
           </p>
           {shown.length === 0 ? (
@@ -127,7 +141,7 @@ export default function PostList({ posts }: PostListProps) {
             <ul className={styles.list}>
               {shown.map((post) => (
                 <li key={post.slug}>
-                  <Link className={styles.row} href={`/blog/${post.slug}`}>
+                  <Link className={styles.row} href={postPath(post.slug)}>
                     <div className={styles.lead}>
                       <span className={styles.coverBox}>
                         {/* eslint-disable-next-line @next/next/no-img-element -- static export serves the SVG as-is */}

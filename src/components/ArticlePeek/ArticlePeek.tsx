@@ -40,8 +40,13 @@ const docCache = new Map<string, Promise<Document | null>>();
 export default function ArticlePeek() {
   const panelRef = useRef<HTMLElement>(null);
   const anchorRectRef = useRef<DOMRect | null>(null);
+  const anchorLinkRef = useRef<HTMLAnchorElement | null>(null);
   const openTimerRef = useRef<number | null>(null);
   const closeTimerRef = useRef<number | null>(null);
+  // Generation counter: bumped on every open intent and on close, so a slow
+  // fetch from an earlier hover can neither overwrite a newer peek nor
+  // resurrect a dismissed one.
+  const genRef = useRef(0);
   const [peek, setPeek] = useState<Peek | null>(null);
   const [position, setPosition] = useState<Position>(null);
 
@@ -53,7 +58,10 @@ export default function ArticlePeek() {
   };
 
   const closePeek = () => {
+    genRef.current++;
     clearTimers();
+    anchorLinkRef.current?.removeAttribute("aria-expanded");
+    anchorLinkRef.current = null;
     setPeek(null);
     setPosition(null);
   };
@@ -72,7 +80,7 @@ export default function ArticlePeek() {
   useEffect(() => {
     if (!window.matchMedia("(hover: hover)").matches) return;
 
-    const wired: { link: HTMLAnchorElement; enter: () => void; leave: () => void }[] = [];
+    const wired: { link: HTMLAnchorElement; enter: () => void; leave: (e: Event) => void }[] = [];
 
     document
       .querySelectorAll<HTMLAnchorElement>('.prose a[href^="/blog/"]')
@@ -87,16 +95,27 @@ export default function ArticlePeek() {
           void getArticleDoc(url.pathname); // prefetch during the intent delay
           openTimerRef.current = window.setTimeout(() => {
             anchorRectRef.current = link.getBoundingClientRect();
+            anchorLinkRef.current?.removeAttribute("aria-expanded");
+            anchorLinkRef.current = link;
+            link.setAttribute("aria-expanded", "true");
             setPosition(null); // re-measure for this anchor
-            openPeek(url.pathname, url.hash.slice(1), setPeek);
+            const gen = ++genRef.current;
+            openPeek(url.pathname, url.hash.slice(1), (p) => {
+              if (gen === genRef.current) setPeek(p);
+            });
           }, OPEN_DELAY);
         };
-        const leave = () => {
+        const leave = (e: Event) => {
           if (openTimerRef.current !== null) window.clearTimeout(openTimerRef.current);
           openTimerRef.current = null;
+          // Keyboard parity with the pointer grace: blur into the panel
+          // (Tab from the trigger) must not start the close timer.
+          const to = (e as FocusEvent).relatedTarget;
+          if (to instanceof Node && panelRef.current?.contains(to)) return;
           scheduleClose();
         };
 
+        link.setAttribute("aria-haspopup", "dialog");
         link.addEventListener("mouseenter", enter);
         link.addEventListener("mouseleave", leave);
         link.addEventListener("focus", enter);
@@ -107,6 +126,8 @@ export default function ArticlePeek() {
     return () => {
       clearTimers();
       wired.forEach(({ link, enter, leave }) => {
+        link.removeAttribute("aria-haspopup");
+        link.removeAttribute("aria-expanded");
         link.removeEventListener("mouseenter", enter);
         link.removeEventListener("mouseleave", leave);
         link.removeEventListener("focus", enter);
@@ -116,30 +137,66 @@ export default function ArticlePeek() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // dismiss: Esc, click outside, window scroll (the anchor moves away).
+  // dismiss: Esc, click outside, window scroll/resize (the anchor moves away).
   // Pointer grace on the panel uses native listeners rather than React's
   // onMouseEnter/onMouseLeave, which are synthesized from mouseover/mouseout.
+  // Focus mirrors the pointer grace (focusin/focusout) so keyboard users can
+  // Tab from the trigger into the panel and operate its controls.
   useEffect(() => {
     if (!peek) return;
     const panel = panelRef.current;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closePeek();
+      if (e.key === "Escape") {
+        // Esc with focus inside the panel returns focus to the trigger link.
+        if (panel?.contains(document.activeElement)) {
+          anchorLinkRef.current?.focus();
+        }
+        closePeek();
+      }
+      // Tab from the open trigger moves focus into the panel instead of
+      // blurring past it — the panel sits after the prose in DOM order and
+      // would otherwise close before focus could ever reach its controls.
+      if (
+        e.key === "Tab" &&
+        !e.shiftKey &&
+        panel &&
+        document.activeElement === anchorLinkRef.current
+      ) {
+        const first = panel.querySelector<HTMLElement>("button, a");
+        if (first) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
     const onPointerDown = (e: PointerEvent) => {
       if (panel && !panel.contains(e.target as Node)) closePeek();
     };
     const onScroll = () => closePeek();
+    const onFocusOut = (e: FocusEvent) => {
+      const to = e.relatedTarget;
+      if (to instanceof Node && panel?.contains(to)) return;
+      // Focus returning to the trigger keeps the peek open (Shift+Tab back).
+      if (to === anchorLinkRef.current) return;
+      scheduleClose();
+    };
     document.addEventListener("keydown", onKey);
     document.addEventListener("pointerdown", onPointerDown);
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     panel?.addEventListener("mouseenter", cancelClose);
     panel?.addEventListener("mouseleave", scheduleClose);
+    panel?.addEventListener("focusin", cancelClose);
+    panel?.addEventListener("focusout", onFocusOut);
     return () => {
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
       panel?.removeEventListener("mouseenter", cancelClose);
       panel?.removeEventListener("mouseleave", scheduleClose);
+      panel?.removeEventListener("focusin", cancelClose);
+      panel?.removeEventListener("focusout", onFocusOut);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [peek]);
@@ -283,7 +340,12 @@ function getArticleDoc(pathname: string): Promise<Document | null> {
         }
       };
       return (await tryFetch(pathname)) ?? (await tryFetch(`${pathname}.html`));
-    })();
+    })().then((doc) => {
+      // Cache successes only: a transient fetch failure must not pin
+      // "preview unavailable" on this article for the rest of the session.
+      if (!doc) docCache.delete(pathname);
+      return doc;
+    });
     docCache.set(pathname, cached);
   }
   return cached;

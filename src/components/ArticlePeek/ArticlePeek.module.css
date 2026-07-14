@@ -137,12 +137,15 @@
   padding: 16px 0;
 }
 
-/* phone: bottom sheet instead of an anchored popover */
+/* phone: bottom sheet instead of an anchored popover. No !important needed
+   to beat the inline top/left: the peek closes on resize (ArticlePeek.tsx)
+   and never measures a position at ≤640px, so a positioned panel can't
+   reach this breakpoint. */
 @media (max-width: 640px) {
   .panel {
     visibility: visible;
-    top: auto !important;
-    left: 0 !important;
+    top: auto;
+    left: 0;
     right: 0;
     bottom: 0;
     width: 100vw;
