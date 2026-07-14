@@ -10,7 +10,8 @@ export default function Header() {
         <Link className={styles.brand} href="/">
           <Logo className={styles.mark} />
           <span className={styles.name}>
-            {site.name} <span className={styles.co}>/ Luckylabs</span>
+            {site.name}{" "}
+            <span className={styles.co}>/ {site.companyShort}</span>
           </span>
         </Link>
         <nav className={styles.nav} aria-label="Main">

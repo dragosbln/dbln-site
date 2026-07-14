@@ -25,6 +25,8 @@ export type PageHero = {
   /** Rich text. */
   title: string;
   lede: string;
+  /** Plain-text page summary for <meta name="description">, og and feeds. */
+  metaDescription: string;
 };
 
 export type Hero = {
@@ -84,6 +86,8 @@ export type Post = {
   /** Cover figure, e.g. "/blog/covers/<slug>.svg". */
   cover: string;
   coverAlt: string;
+  /** ISO date of the last substantive revision, when one happened. */
+  updated?: string;
   /** URL of the dev.to cross-post, when one exists. */
   devto?: string;
 };
@@ -118,8 +122,12 @@ export type CaseStudy = {
   outcomes: CaseOutcome[];
   proof: Testimonial | null;
   stack: string[];
-  /** True when src/components/CaseDiagram has a diagram for this id. */
-  diagram: boolean;
+  /**
+   * Present when the case shows a diagram. The animated SVG is registered by
+   * `id` in src/components/CaseDiagram; the caption (outward-facing copy)
+   * lives here with the rest of the case content.
+   */
+  diagram?: { caption: string };
 };
 
 export type WorkSection = SectionIntro & { items: WorkItem[]; cta?: NavItem };
@@ -141,4 +149,12 @@ export type Contact = {
   title: string;
   body: string;
   cta: string;
+};
+
+export type NotFound = {
+  eyebrow: string;
+  /** Rich text. */
+  title: string;
+  lede: string;
+  links: NavItem[];
 };

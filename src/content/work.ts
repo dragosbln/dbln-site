@@ -4,14 +4,16 @@ import type { CaseStudy, Contact, PageHero } from "./types";
  * /work page content. Case studies follow a fixed spine:
  * situation → decision → approach → outcomes → proof.
  * Prose is rich text: **…** -> <strong> (src/lib/richText.tsx).
- * A case renders its diagram when `diagram: true` AND
- * src/components/CaseDiagram has an entry for its id.
+ * A case renders its diagram when it has a `diagram: { caption }` AND
+ * src/components/CaseDiagram registers an SVG for its id.
  */
 
 export const workHero: PageHero = {
   eyebrow: "Selected work",
   title: "The work, and the *decisions* behind it.",
   lede: "Six engagements across insurance, fintech, gaming, healthtech and field service. For each: the situation, the call that was expensive to reverse, how I approached it, and what it shipped. The numbers are real.",
+  metaDescription:
+    "Selected engagements in depth: the decision that mattered in each, and what it shipped. Insurance, fintech, gaming, healthtech.",
 };
 
 export const workCta: Contact = {
@@ -49,7 +51,10 @@ export const caseStudies: CaseStudy[] = [
       role: "Engineering Leader · Pie Insurance",
     },
     stack: ["TypeScript", "Node.js", "Next.js", "AWS Cognito", "OAuth", "Event-driven"],
-    diagram: true,
+    diagram: {
+      caption:
+        "fig. tokens moved from JS-readable cookies to httpOnly; auth from browser SRP to OAuth 2.0 on Managed Login.",
+    },
   },
   {
     id: "bullseye",
@@ -72,7 +77,10 @@ export const caseStudies: CaseStudy[] = [
     ],
     proof: null,
     stack: ["Node.js", "NestJS", "Express", "GCP", "MongoDB", "Event-driven", "CI/CD", "Blockchain"],
-    diagram: true,
+    diagram: {
+      caption:
+        "fig. one blueprint per module, a database per module, events in between; the rest deliberately left out.",
+    },
   },
   {
     id: "parentool",
@@ -101,7 +109,10 @@ export const caseStudies: CaseStudy[] = [
       role: "Founder · Parentool",
     },
     stack: ["React Native", "Node.js", "Firebase", "Cloud", "Software Architecture"],
-    diagram: true,
+    diagram: {
+      caption:
+        "fig. Firebase direct for the everyday; Cloud Functions as the gate for paid ops and the OpenAI chatbot.",
+    },
   },
   {
     id: "glede",
@@ -129,7 +140,10 @@ export const caseStudies: CaseStudy[] = [
       role: "Co-Founder & CTO · Glede",
     },
     stack: ["React Native", "Node.js", "Firebase", "GCP", "Software Architecture"],
-    diagram: true,
+    diagram: {
+      caption:
+        "fig. migrate module by module, shift users gradually, ship the new stuff in the new codebase only.",
+    },
   },
   {
     id: "reach",
@@ -156,7 +170,10 @@ export const caseStudies: CaseStudy[] = [
       role: "Project Manager / Deputy Division Head · Frankfurter Bankgesellschaft",
     },
     stack: ["React Native", "Node.js", "AWS", "Software Architecture"],
-    diagram: true,
+    diagram: {
+      caption:
+        "fig. reactive calculations on-device, proprietary ones on AWS next to the data; one UI, matching numbers.",
+    },
   },
   {
     id: "equinet",
@@ -183,6 +200,9 @@ export const caseStudies: CaseStudy[] = [
       role: "Product Director & CTO",
     },
     stack: ["React Native", "Node.js", "Offline-first"],
-    diagram: true,
+    diagram: {
+      caption:
+        "fig. two devices, one org: offline edits queue locally, conflicts resolve centrally, every device converges.",
+    },
   },
 ];

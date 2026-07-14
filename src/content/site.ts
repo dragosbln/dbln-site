@@ -4,6 +4,7 @@ import type {
   EngagementsSection,
   Hero,
   NavItem,
+  NotFound,
   TestimonialsSection,
   WorkSection,
   WritingSection,
@@ -19,12 +20,17 @@ export const site = {
   url: "https://dbln.me",
   name: "Dragos Bilaniuc",
   company: "Luckylabs Software SRL",
+  /** Short brand form, e.g. the header's "/ Luckylabs". */
+  companyShort: "Luckylabs",
   role: "Independent Software Architect & Fractional CTO",
   title: "Dragos Bilaniuc — Independent Software Architect & Fractional CTO",
   description:
     "I help teams get the expensive-to-reverse decisions right, then build them. Eight years of architecture and platform work across insurance, Web3 and health-tech: auth, data, system boundaries.",
   email: "dragos@dbln.me",
   location: "Cluj-Napoca, Romania",
+  /** Structured halves of `location`, for the Person schema's PostalAddress. */
+  locality: "Cluj-Napoca",
+  countryCode: "RO",
   socials: {
     devto: "https://dev.to/dragosbln",
     github: "https://github.com/dragosbln",
@@ -32,8 +38,6 @@ export const site = {
     x: "https://twitter.com/dragosbln",
   },
 } as const;
-
-export type Site = typeof site;
 
 /** Ordered social links for display (schema.ts reads site.socials directly). */
 export const socialLinks: NavItem[] = [
@@ -215,4 +219,16 @@ export const contact: Contact = {
   title: "Have a decision worth *getting right?*",
   body: "A system review, a fractional engagement, or a build where design and delivery belong to the same person. Tell me what you're weighing and I'll tell you straight whether I can help.",
   cta: "Book a conversation",
+};
+
+/** /404 page copy (src/app/not-found.tsx). */
+export const notFound: NotFound = {
+  eyebrow: "Error · 404",
+  title: "That page *isn't here.*",
+  lede: "The URL is wrong, the page has moved, or it was never real. Head back to the front, or pick one of these.",
+  links: [
+    { label: "Home", href: "/" },
+    { label: "Selected work", href: "/work" },
+    { label: "Writing", href: "/blog" },
+  ],
 };
