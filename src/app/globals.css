@@ -3,8 +3,10 @@
   --paper: #f6f4ef;
   --paper-2: #efece4;
   --ink: #17191c;
+  --ink-body: #2a2d31; /* long-form reading text (between --ink and --ink-soft) */
   --ink-soft: #4a4d52;
-  --ink-faint: #6b6e73; /* AA on --paper */
+  --ink-faint: #6b6e73; /* AA on --paper only (4.66:1) */
+  --ink-faint-2: #5f6266; /* faint text on --paper-2 surfaces (AA there) */
   --line: #d9d5cb;
   --teal: #0c7b72;
   --teal-deep: #0a5b55;
@@ -18,6 +20,17 @@
   --sans: var(--font-sans), system-ui, sans-serif;
   --mono: var(--font-mono), ui-monospace, monospace;
   --maxw: 1180px;
+  /* Canonical layout constants. --gutter: the page inset the .wrap and the
+     sticky bars share (20px below 640px). --header-h: sticky-header height,
+     the base for anchor/scroll offsets. */
+  --gutter: 40px;
+  --header-h: 72px;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --gutter: 20px;
+  }
 }
 
 /* ---------- Reset ---------- */
@@ -59,7 +72,7 @@ a {
 
 /* Anchored sections land below the sticky header. */
 [id] {
-  scroll-margin-top: 72px;
+  scroll-margin-top: var(--header-h);
 }
 
 :focus-visible {
@@ -88,13 +101,7 @@ a {
 .wrap {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 0 40px;
-}
-
-@media (max-width: 640px) {
-  .wrap {
-    padding: 0 20px;
-  }
+  padding: 0 var(--gutter);
 }
 
 .section {

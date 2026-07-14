@@ -65,7 +65,9 @@
   transform: translateY(-1px);
 }
 
-.primary:focus-visible {
+/* The global teal focus ring is too dim on this --ink surface (~3.4:1);
+   brighten it for every focusable element in the section, not just .primary. */
+.contact :focus-visible {
   outline-color: var(--teal-bright);
 }
 

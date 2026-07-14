@@ -21,11 +21,16 @@ export default function CaseNav({ items }: CaseNavProps) {
       .map((item) => document.getElementById(item.id))
       .filter((el): el is HTMLElement => el !== null);
 
+    const visible = new Set<string>();
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) setActiveId(entry.target.id);
+          if (entry.isIntersecting) visible.add(entry.target.id);
+          else visible.delete(entry.target.id);
         }
+        // First case in page order wins; none in the band (e.g. scrolled
+        // back above all cases) clears the highlight.
+        setActiveId(items.find((item) => visible.has(item.id))?.id ?? null);
       },
       // A case counts as active while its top sits between the sticky bars
       // and the upper third of the viewport.

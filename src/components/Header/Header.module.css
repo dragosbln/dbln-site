@@ -10,7 +10,7 @@
 .inner {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 16px 40px;
+  padding: 16px var(--gutter);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -19,7 +19,7 @@
 
 @media (max-width: 640px) {
   .inner {
-    padding: 14px 20px;
+    padding-block: 14px;
   }
 }
 

@@ -64,6 +64,10 @@ export default function DiagramLightbox() {
       });
 
     return () => {
+      // Unmounting while open (e.g. browser Back during client navigation)
+      // removes the <dialog> but not the body scroll lock — release it here.
+      handleCleanup();
+      dialog?.close();
       dialog?.removeEventListener("close", onClose);
       dialog?.removeEventListener("keydown", onEscape);
       wired.forEach(({ btn, open }) => {

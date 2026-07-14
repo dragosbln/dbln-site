@@ -26,11 +26,14 @@ export default function HeadingLink({ id }: { id: string }) {
       >
         {copied ? <CheckIcon size={13} /> : <LinkIcon size={13} />}
       </button>
-      {copied ? (
-        <span className="heading-anchor-tip" role="status">
-          Copied
-        </span>
-      ) : null}
+      {/* Permanently mounted so the status region exists before its content
+          changes — live regions injected pre-filled are unreliably announced. */}
+      <span
+        className={copied ? "heading-anchor-tip show" : "heading-anchor-tip"}
+        role="status"
+      >
+        {copied ? "Copied" : ""}
+      </span>
     </>
   );
 }

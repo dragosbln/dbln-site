@@ -6,6 +6,7 @@ import HeadingAnchors from "@/components/HeadingAnchors";
 import ShareButton from "@/components/ShareButton";
 import type { Post, PostWithBody } from "@/content/types";
 import { formatMonthYear } from "@/lib/format";
+import { postPath } from "@/lib/urls";
 import styles from "./ArticleView.module.css";
 
 type ArticleViewProps = {
@@ -64,7 +65,7 @@ export default function ArticleView({ post, html, related }: ArticleViewProps) {
             <ul className={styles.nextGrid}>
               {related.map((p) => (
                 <li key={p.slug}>
-                  <Link className={styles.nextCard} href={`/blog/${p.slug}`}>
+                  <Link className={styles.nextCard} href={postPath(p.slug)}>
                     <span className={styles.nextCover}>
                       {/* eslint-disable-next-line @next/next/no-img-element -- static export serves the SVG as-is */}
                       <img src={p.cover} alt={p.coverAlt} loading="lazy" />

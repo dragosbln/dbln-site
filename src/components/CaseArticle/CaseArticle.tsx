@@ -68,7 +68,9 @@ export default function CaseArticle({ caseStudy: c, index }: CaseArticleProps) {
             <h3>Approach</h3>
             <p>{richText(c.approach)}</p>
           </div>
-          {c.diagram ? <CaseDiagram id={c.id} /> : null}
+          {c.diagram ? (
+            <CaseDiagram id={c.id} caption={c.diagram.caption} />
+          ) : null}
           {c.proof ? (
             <figure className={styles.proof}>
               <blockquote>
