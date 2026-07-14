@@ -4,15 +4,25 @@ import CaseNav from "@/components/CaseNav";
 import Contact from "@/components/Contact";
 import JsonLd from "@/components/JsonLd";
 import PageHero from "@/components/PageHero";
+import { site } from "@/content/site";
 import { caseStudies, workCta, workHero } from "@/content/work";
 import { workBreadcrumbSchema } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "Work",
-  description:
-    "Selected engagements in depth: the decision that mattered in each, and what it shipped. Insurance, fintech, gaming, healthtech.",
+  description: workHero.metaDescription,
   alternates: {
     canonical: "/work",
+  },
+  // Set per page: openGraph merges shallowly with the layout, which would
+  // otherwise leave this page sharing the homepage's og:url and og:title.
+  openGraph: {
+    type: "website",
+    url: "/work",
+    siteName: site.name,
+    locale: "en_US",
+    title: "Work",
+    description: workHero.metaDescription,
   },
 };
 

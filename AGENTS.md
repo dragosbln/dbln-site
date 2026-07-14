@@ -78,12 +78,17 @@ To publish:
    absolute paths (`/blog/<slug>/name.png`). Never hotlink external hosts.
 3. Create a cover at `public/blog/covers/<slug>.svg` following the cover-art
    system in `../claude_websie/blog-social/style-deck/` (1200×630, paper grid,
-   inset frame, corner ticks, mono FIG label, ONE teal element).
+   inset frame, corner ticks, mono FIG label, ONE teal element). Then generate
+   its raster twin for `og:image` (SVG isn't rendered by link scrapers):
+   `npm run build && node scripts/render-cover-png.mts <slug>` — commit the
+   resulting `public/blog/covers/<slug>.png` alongside the SVG.
 4. Cross-link other articles with site-relative URLs (`/blog/<slug>`), never
    dev.to URLs — this site is the canonical home; dev.to cross-posts set
    `canonical_url` back to here.
-5. Code blocks are highlighted at build (shiki, css-variables theme mapped in
-   `ArticleView.module.css`) — no client-side highlighting, ever.
+5. Code blocks are highlighted at build by shiki using the `dbln-dark` theme
+   defined in `src/lib/markdown.ts` (colors inlined at build, no client-side
+   highlighting ever); the `.prose pre` container is styled in
+   `src/styles/prose.css`.
 
 ## Heading anchors (copy deep link)
 

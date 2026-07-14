@@ -43,10 +43,11 @@ export const metadata: Metadata = {
     description: site.description,
     locale: "en_US",
   },
+  // Card type only: title/description here would shadow every page's own
+  // (twitter.* merges shallowly and X falls back to og:* anyway). Article
+  // pages override with summary_large_image + their cover PNG.
   twitter: {
-    card: "summary_large_image",
-    title: site.title,
-    description: site.description,
+    card: "summary",
   },
   robots: {
     index: true,

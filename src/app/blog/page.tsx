@@ -3,15 +3,25 @@ import JsonLd from "@/components/JsonLd";
 import PageHero from "@/components/PageHero";
 import PostList from "@/components/PostList";
 import { blogHero } from "@/content/blog";
+import { site } from "@/content/site";
 import { getPosts } from "@/lib/posts";
 import { blogBreadcrumbSchema } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "Writing",
-  description:
-    "Architecture decisions, written up in full. Notes from production work: auth, system boundaries, cloud strategy and the agentic-era tradeoffs that come with them.",
+  description: blogHero.metaDescription,
   alternates: {
     canonical: "/blog",
+  },
+  // Set per page: openGraph merges shallowly with the layout, which would
+  // otherwise leave this page sharing the homepage's og:url and og:title.
+  openGraph: {
+    type: "website",
+    url: "/blog",
+    siteName: site.name,
+    locale: "en_US",
+    title: "Writing",
+    description: blogHero.metaDescription,
   },
 };
 

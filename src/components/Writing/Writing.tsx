@@ -4,6 +4,7 @@ import Reveal from "@/components/Reveal";
 import SectionHead from "@/components/SectionHead";
 import { writing } from "@/content/site";
 import { formatMonthYear } from "@/lib/format";
+import { postPath } from "@/lib/urls";
 import { getPosts } from "@/lib/posts";
 import styles from "./Writing.module.css";
 
@@ -22,7 +23,7 @@ export default function Writing() {
         <ul className={styles.grid}>
           {posts.map((post) => (
             <Reveal as="li" className={styles.cell} key={post.slug}>
-              <Link className={styles.card} href={`/blog/${post.slug}`}>
+              <Link className={styles.card} href={postPath(post.slug)}>
                 <span className={styles.meta}>
                   <time dateTime={post.date}>{formatMonthYear(post.date)}</time>
                   <span>{post.readTime} min</span>

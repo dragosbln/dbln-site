@@ -1,10 +1,12 @@
 import { site } from "@/content/site";
 import type { Post } from "@/content/types";
+import { coverOgImage, postUrl } from "@/lib/urls";
 
 /**
  * schema.org JSON-LD objects, rendered by <JsonLd /> in the root layout.
  * Structured data is the primary machine-readable surface for search
- * engines and AI crawlers; keep it in sync with src/content/site.ts.
+ * engines and AI crawlers. Identity values are referenced from
+ * src/content/site.ts, never restated, so they cannot drift.
  */
 
 export const personSchema = {
@@ -12,7 +14,7 @@ export const personSchema = {
   "@type": "Person",
   "@id": `${site.url}/#person`,
   name: site.name,
-  jobTitle: "Independent Software Architect & Fractional CTO",
+  jobTitle: site.role,
   description: site.description,
   url: site.url,
   email: `mailto:${site.email}`,
@@ -22,8 +24,8 @@ export const personSchema = {
   },
   address: {
     "@type": "PostalAddress",
-    addressLocality: "Cluj-Napoca",
-    addressCountry: "RO",
+    addressLocality: site.locality,
+    addressCountry: site.countryCode,
   },
   sameAs: Object.values(site.socials),
   knowsAbout: [
@@ -42,11 +44,13 @@ export const personSchema = {
   ],
 };
 
+// Home is spelled `site.url` (no trailing slash) everywhere: canonical,
+// og:url, sitemap and breadcrumbs must agree on one form.
 export const workBreadcrumbSchema = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: `${site.url}/` },
+    { "@type": "ListItem", position: 1, name: "Home", item: site.url },
     { "@type": "ListItem", position: 2, name: "Work", item: `${site.url}/work` },
   ],
 };
@@ -55,7 +59,7 @@ export const blogBreadcrumbSchema = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: `${site.url}/` },
+    { "@type": "ListItem", position: 1, name: "Home", item: site.url },
     { "@type": "ListItem", position: 2, name: "Writing", item: `${site.url}/blog` },
   ],
 };
@@ -65,13 +69,13 @@ export function postBreadcrumbSchema(post: Post) {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: `${site.url}/` },
+      { "@type": "ListItem", position: 1, name: "Home", item: site.url },
       { "@type": "ListItem", position: 2, name: "Writing", item: `${site.url}/blog` },
       {
         "@type": "ListItem",
         position: 3,
         name: post.title,
-        item: `${site.url}/blog/${post.slug}`,
+        item: postUrl(post.slug),
       },
     ],
   };
@@ -80,13 +84,17 @@ export function postBreadcrumbSchema(post: Post) {
 export function techArticleSchema(post: Post) {
   return {
     "@context": "https://schema.org",
-    "@type": "TechArticle",
+    // BlogPosting keeps Google Article rich-result eligibility (TechArticle
+    // alone is outside its supported set); TechArticle keeps the precision.
+    "@type": ["TechArticle", "BlogPosting"],
     headline: post.title,
     description: post.excerpt,
-    url: `${site.url}/blog/${post.slug}`,
+    url: postUrl(post.slug),
+    mainEntityOfPage: { "@type": "WebPage", "@id": postUrl(post.slug) },
     datePublished: post.date,
+    dateModified: post.updated ?? post.date,
     keywords: post.tags.join(", "),
-    image: `${site.url}${post.cover}`,
+    image: `${site.url}${coverOgImage(post.cover)}`,
     inLanguage: "en",
     author: { "@id": `${site.url}/#person` },
     publisher: { "@id": `${site.url}/#person` },
