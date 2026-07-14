@@ -14,7 +14,7 @@
 .prose p {
   font-size: 19px;
   line-height: 1.68;
-  color: #2a2d31;
+  color: var(--ink-body);
   margin: 26px 0;
   text-wrap: pretty;
 }
@@ -68,7 +68,7 @@
 .prose li {
   font-size: 19px;
   line-height: 1.62;
-  color: #2a2d31;
+  color: var(--ink-body);
   margin: 8px 0;
   padding-left: 6px;
 }
@@ -124,7 +124,7 @@
   margin: 30px 0;
   font-size: 14.5px;
   line-height: 1.6;
-  border: 1px solid #2a2d31;
+  border: 1px solid var(--ink-body); /* dark code-block edge, same tone */
 }
 
 .prose pre code {
@@ -137,19 +137,27 @@
 
 .prose img {
   width: 100%;
+  /* pairs with the width/height attributes set at build (rehypeRasterImages)
+     so the box is reserved before the image loads */
+  height: auto;
   border: 1px solid var(--line);
   border-radius: 12px;
   margin: 32px auto;
   display: block;
 }
 
+/* Scroll wrapper emitted at build (rehypeTableScroll): the div scrolls, so
+   the table keeps display:table and its screen-reader semantics. */
+.prose .table-scroll {
+  overflow-x: auto;
+  margin: 30px 0;
+}
+
 .prose table {
   width: 100%;
   border-collapse: collapse;
-  margin: 30px 0;
+  margin: 0;
   font-size: 16px;
-  display: block;
-  overflow-x: auto;
 }
 
 .prose th,
@@ -216,6 +224,8 @@
   border-color: var(--teal);
 }
 
+/* Always mounted (it is a live region); opacity keeps the hidden state in
+   the accessibility tree, unlike display/visibility. */
 .heading-anchor-tip {
   position: absolute;
   bottom: calc(100% + 6px);
@@ -230,6 +240,11 @@
   padding: 3px 7px;
   white-space: nowrap;
   pointer-events: none;
+  opacity: 0;
+}
+
+.heading-anchor-tip.show {
+  opacity: 1;
 }
 
 /* ---------- compact variant for the cross-reference peek ---------- */
