@@ -8,6 +8,12 @@ concurrency:
   group: deploy-live
   cancel-in-progress: true
 
+# Least privilege: the deploy needs to read the repo and write a commit
+# status; nothing else. Without this the job inherits the repo default.
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -19,8 +25,12 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
       - run: npm run build
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      # SHA-pinned (this action receives the production deploy credential; a
+      # floating @v0 tag would let a compromised release publish to live).
+      - uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0.11.0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DBLN_B56EC }}

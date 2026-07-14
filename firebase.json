@@ -10,21 +10,32 @@
     "trailingSlash": false,
     "headers": [
       {
-        "source": "/_next/static/**",
+        "source": "**",
         "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public, max-age=31536000, immutable"
-          }
+          { "key": "X-Content-Type-Options", "value": "nosniff" },
+          { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+          { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains" },
+          { "key": "X-Frame-Options", "value": "DENY" },
+          { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+          { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
         ]
       },
       {
-        "source": "**/*.@(svg|png|jpg|jpeg|webp|avif|ico|woff2)",
+        "source": "/blog/*.md",
         "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public, max-age=604800"
-          }
+          { "key": "X-Robots-Tag", "value": "noindex" }
+        ]
+      },
+      {
+        "source": "/blog/**/*.@(svg|png|jpg|jpeg|webp|avif|ico)",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=604800" }
+        ]
+      },
+      {
+        "source": "/_next/static/**",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
         ]
       }
     ]

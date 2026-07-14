@@ -3,12 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "node scripts/export-post-markdown.mjs",
+    "predev": "node scripts/export-post-markdown.mts",
     "dev": "next dev",
-    "prebuild": "node scripts/export-post-markdown.mjs",
+    "prebuild": "node scripts/export-post-markdown.mts",
     "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint --max-warnings=0",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "node --test 'test/**/*.test.mjs'"
+  },
+  "engines": {
+    "node": ">=24"
   },
   "dependencies": {
     "@shikijs/rehype": "^4.3.1",
