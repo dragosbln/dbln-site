@@ -156,7 +156,7 @@
 .spine p {
   font-size: 17px;
   line-height: 1.64;
-  color: #2a2d31;
+  color: var(--ink-body);
   max-width: 66ch;
   text-wrap: pretty;
 }

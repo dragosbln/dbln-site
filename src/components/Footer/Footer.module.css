@@ -4,22 +4,21 @@
   padding: 40px 0;
 }
 
+/* Brighten the focus ring on this dark surface (the global teal is ~3.4:1). */
+.footer :focus-visible {
+  outline-color: var(--teal-bright);
+}
+
 .inner {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 var(--gutter);
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 20px;
   flex-wrap: wrap;
   font-size: 13px;
-}
-
-@media (max-width: 640px) {
-  .inner {
-    padding: 0 20px;
-  }
 }
 
 .socials {

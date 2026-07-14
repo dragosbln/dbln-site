@@ -137,7 +137,7 @@
   font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--ink-faint-2); /* AA on the .next --paper-2 band */
   margin-bottom: 30px;
 }
 

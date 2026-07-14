@@ -17,13 +17,16 @@
   font-family: var(--mono);
   font-size: 11px;
   letter-spacing: 0.04em;
-  color: var(--ink-faint);
+  color: var(--ink-faint-2); /* AA on the figure's --paper-2 background */
   margin-top: 14px;
   text-align: center;
 }
 
-/* Shared diagram vocabulary (dg-*): dashed "legacy" = retired / deliberately
-   not built; teal "key" = the live, important part; "flow" = animated dash. */
+/* Case-diagram vocabulary. These deliberately override the global dg-* rules
+   in src/styles/diagram.css with smaller type for the compact case context,
+   and add case-only styles (text-anchor for cells/chips/steps, ghost labels)
+   that diagram.css doesn't provide. Kept as an explicit fork rather than
+   deduped: the two surfaces genuinely differ. */
 
 .figure :global(.dg-node) rect {
   fill: var(--paper);
@@ -42,17 +45,23 @@
   stroke-dasharray: 4 4;
 }
 
+/* Case-diagram node labels are left-aligned inside their box (SVG sources
+   place them at x = rect_left + 12/16). diagram.css sets text-anchor: middle
+   for the article diagrams, which centers these on that left x and makes them
+   hang off the box — so restore start alignment for the case surface. */
 .figure :global(.dg-node .t) {
   fill: var(--ink);
   font-family: var(--mono);
   font-size: 12px;
   font-weight: 500;
+  text-anchor: start;
 }
 
 .figure :global(.dg-node .s) {
   fill: var(--ink-faint);
   font-family: var(--mono);
   font-size: 9.5px;
+  text-anchor: start;
 }
 
 .figure :global(.dg-node.legacy .t) {
@@ -91,7 +100,7 @@
 }
 
 .figure :global(.dg-band) {
-  fill: var(--ink-faint);
+  fill: var(--ink-faint-2);
   font-family: var(--mono);
   font-size: 10px;
   font-weight: 500;
@@ -117,7 +126,7 @@
 }
 
 .figure :global(.dg-note) {
-  fill: var(--ink-faint);
+  fill: var(--ink-faint-2);
   font-family: var(--mono);
   font-size: 9.5px;
 }
