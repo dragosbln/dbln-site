@@ -38,24 +38,30 @@ type BookingFlowProps = {
 };
 
 /**
- * The contact section's booking flow (direction 3a): format picker and
- * optional note on the left, a paper card with the Cal.com inline embed on
- * the right. The two answers prefill hidden booking fields on the Cal event.
+ * The contact section's booking flow (direction 3a): format picker on the
+ * left, a paper card with the Cal.com inline embed on the right. The picked
+ * format prefills a hidden booking field on the Cal event; the booker stays
+ * veiled (blurred, inert) until a format is picked, and switching the format
+ * after the visitor has clicked into the booker asks for confirmation first,
+ * because the switch restarts the booking.
  *
  * Embed constraints this component works around (see AGENTS.md, "Contact
- * booking"): the embed reads `config` once at iframe creation, so committed
- * answer changes remount `<Cal>` via `key`; and `ui` instructions (theme
- * vars, hideEventTypeDetails) are one-shot postMessages, so they are
- * re-applied on every `linkReady`.
+ * booking"): the embed reads `config` once at iframe creation, so a format
+ * change remounts `<Cal>` via `key`; and `ui` instructions (theme vars,
+ * hideEventTypeDetails) are one-shot postMessages, so they are re-applied on
+ * every `linkReady`.
  */
 export default function BookingFlow({ heading, booking, email }: BookingFlowProps) {
   const [format, setFormat] = useState<string | null>(null);
-  const [note, setNote] = useState("");
-  /** The note value actually baked into the embed (idle-debounced or blur). */
-  const [committedNote, setCommittedNote] = useState("");
+  /** Format change awaiting restart confirmation ({ next: null } = deselect). */
+  const [pending, setPending] = useState<{ next: string | null } | null>(null);
+  /** Whether the visitor has clicked into the booker since its last (re)mount. */
+  const [interacted, setInteracted] = useState(false);
   const [inView, setInView] = useState(false);
   const [calReady, setCalReady] = useState(false);
   const cardRef = useRef<HTMLDivElement | null>(null);
+  const embedRef = useRef<HTMLDivElement | null>(null);
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
 
   // Create the iframe only when the card approaches the viewport (600px
   // margin), so Cal's script and booker don't load with the page. IO does the
@@ -117,21 +123,47 @@ export default function BookingFlow({ heading, booking, email }: BookingFlowProp
     };
   }, [inView]);
 
-  // Commit the note after a typing pause; blur commits immediately. Committing
-  // remounts the embed, so this must not run per keystroke.
+  // A click inside a cross-origin iframe is invisible to us except as the
+  // parent window losing focus to it — that blur is the interaction signal.
   useEffect(() => {
-    const t = setTimeout(() => setCommittedNote(note), 1000);
-    return () => clearTimeout(t);
-  }, [note]);
+    const onWindowBlur = () => {
+      const el = embedRef.current;
+      if (el && document.activeElement && el.contains(document.activeElement)) {
+        setInteracted(true);
+      }
+    };
+    window.addEventListener("blur", onWindowBlur);
+    return () => window.removeEventListener("blur", onWindowBlur);
+  }, []);
+
+  // The restart confirmation is a native <dialog>; open/close follows
+  // `pending`. Cleanup runs in every owned close path (buttons, backdrop,
+  // Esc) — the `close` event is only a safety net for unowned closes.
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (pending && !dialog.open) dialog.showModal();
+    if (!pending && dialog.open) dialog.close();
+  }, [pending]);
+
+  const applyFormat = (next: string | null) => {
+    setFormat(next);
+    // Fresh iframe after a format change; nothing has been clicked in it yet.
+    setInteracted(false);
+    setPending(null);
+  };
+
+  const requestFormat = (value: string) => {
+    const next = format === value ? null : value;
+    if (interacted) setPending({ next });
+    else applyFormat(next);
+  };
 
   const active = booking.formats.find((f) => f.value === format) ?? null;
-  const trimmedNote = committedNote.trim();
+  const veiled = !active;
+  const showCal = inView && calReady;
   const calConfig: Record<string, string> = { layout: "month_view", theme: "light" };
   if (active) calConfig.format = active.value;
-  if (trimmedNote) calConfig.notes = trimmedNote;
-  // Changing the key recreates the iframe with the new prefill (the embed
-  // ignores config changes after init).
-  const calKey = `${active?.value ?? ""} ${trimmedNote}`;
 
   return (
     <div className={styles.grid}>
@@ -153,9 +185,7 @@ export default function BookingFlow({ heading, booking, email }: BookingFlowProp
                 type="button"
                 className={styles.format}
                 aria-pressed={format === f.value}
-                onClick={() =>
-                  setFormat((cur) => (cur === f.value ? null : f.value))
-                }
+                onClick={() => requestFormat(f.value)}
               >
                 <span className={styles.formatNum} aria-hidden="true">
                   {f.num}
@@ -167,22 +197,6 @@ export default function BookingFlow({ heading, booking, email }: BookingFlowProp
               </button>
             ))}
           </div>
-        </Reveal>
-
-        <Reveal className={styles.noteBlock}>
-          <label className={styles.step} htmlFor="booking-note">
-            {booking.noteStep}{" "}
-            <span className={styles.optional}>{booking.noteOptional}</span>
-          </label>
-          <textarea
-            id="booking-note"
-            className={styles.note}
-            rows={2}
-            placeholder={booking.notePlaceholder}
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            onBlur={() => setCommittedNote(note)}
-          />
         </Reveal>
 
         <Reveal className={styles.mailRow}>
@@ -210,34 +224,69 @@ export default function BookingFlow({ heading, booking, email }: BookingFlowProp
               </span>
             )}
           </div>
-          <div className={styles.embed} aria-busy={!(inView && calReady)}>
-            {inView && calReady ? (
-              <Cal
-                key={calKey}
-                namespace={CAL_NAMESPACE}
-                calLink={booking.event.calLink}
-                config={calConfig}
-                className={styles.cal}
-              />
-            ) : (
-              <div className={styles.skeleton} aria-hidden="true">
-                <div />
-                <div />
-                <div />
+          <div className={styles.embed} aria-busy={!showCal}>
+            <div ref={embedRef} inert={veiled}>
+              {showCal ? (
+                <Cal
+                  key={active?.value ?? ""}
+                  namespace={CAL_NAMESPACE}
+                  calLink={booking.event.calLink}
+                  config={calConfig}
+                  className={styles.cal}
+                />
+              ) : (
+                <div className={styles.skeleton} aria-hidden="true">
+                  <div />
+                  <div />
+                  <div />
+                </div>
+              )}
+            </div>
+            {veiled && (
+              <div className={styles.veil}>
+                <p className={styles.veilPill}>{booking.veil}</p>
               </div>
             )}
           </div>
         </div>
-        <p className={styles.fallback}>
-          <a
-            href={`https://cal.com/${booking.event.calLink}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {booking.fallbackLabel} ↗
-          </a>
-        </p>
       </div>
+
+      <dialog
+        ref={dialogRef}
+        className={styles.dialog}
+        aria-labelledby="booking-restart-title"
+        onCancel={(e) => {
+          // Esc = keep the booking.
+          e.preventDefault();
+          setPending(null);
+        }}
+        onClick={(e) => {
+          // Clicks land on the dialog element itself only via the backdrop.
+          if (e.target === dialogRef.current) setPending(null);
+        }}
+        onClose={() => setPending(null)}
+      >
+        <p className={styles.dialogTitle} id="booking-restart-title">
+          {booking.restart.title}
+        </p>
+        <p className={styles.dialogBody}>{booking.restart.body}</p>
+        <div className={styles.dialogActions}>
+          <button
+            type="button"
+            className={styles.dialogCancel}
+            onClick={() => setPending(null)}
+          >
+            {booking.restart.cancel}
+          </button>
+          <button
+            type="button"
+            className={styles.dialogConfirm}
+            onClick={() => pending && applyFormat(pending.next)}
+          >
+            {booking.restart.confirm}
+          </button>
+        </div>
+      </dialog>
     </div>
   );
 }

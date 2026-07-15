@@ -224,15 +224,13 @@ export const contact: Contact = {
 /**
  * The Cal.com booking flow (direction 3a in claude_websie/directions/brief.html),
  * shared by every page that renders Contact. `value` strings are the option
- * values of the hidden `format` booking field on the Cal event type; the note
- * prefills the hidden built-in `notes` field. Both must match Cal's
- * configuration exactly or the prefill silently no-ops.
+ * values of the hidden `format` booking field on the Cal event type; they must
+ * match Cal's configuration exactly or the prefill silently no-ops. The
+ * "What are you weighing?" question lives inside Cal's own booking form.
  */
 export const booking: ContactBooking = {
   formatStep: "01 · What kind of help are you imagining?",
-  noteStep: "02 · What are you weighing?",
-  noteOptional: "· optional",
-  timeStep: "03 · Pick a time",
+  timeStep: "02 · Pick a time",
   formats: [
     {
       num: "01",
@@ -263,15 +261,20 @@ export const booking: ContactBooking = {
       chip: "Not sure yet",
     },
   ],
-  notePlaceholder: "A migration, a rewrite, a hire. Whatever is on the table.",
   emailHint: "Prefer email? That works too.",
+  veil: "Pick a format to open the calendar",
+  restart: {
+    title: "Switch the format?",
+    body: "Switching restarts the booking. Anything you entered is lost.",
+    confirm: "Switch",
+    cancel: "Keep booking",
+  },
   event: {
     title: "Intro call",
     meta: "30 min · Google Meet",
     calLink: "dragosbln/30min",
     chipPrefix: "Format: ",
   },
-  fallbackLabel: "Or book directly on Cal.com",
 };
 
 /** /404 page copy (src/app/not-found.tsx). */

@@ -170,13 +170,19 @@ export type BookingFormat = {
 export type ContactBooking = {
   /** Step labels (mono, uppercase). */
   formatStep: string;
-  noteStep: string;
-  noteOptional: string;
   timeStep: string;
   formats: BookingFormat[];
-  notePlaceholder: string;
   /** Aside next to the email link. */
   emailHint: string;
+  /** Pill over the blurred booker until a format is picked. */
+  veil: string;
+  /** Confirmation shown when switching format would restart a started booking. */
+  restart: {
+    title: string;
+    body: string;
+    confirm: string;
+    cancel: string;
+  };
   event: {
     /** Site-authored card header (Cal's own meta panel is hidden). */
     title: string;
@@ -186,8 +192,6 @@ export type ContactBooking = {
     /** Chip prefix ("Format: "). */
     chipPrefix: string;
   };
-  /** Text of the plain link-out under the card (no-JS / blocked-embed path). */
-  fallbackLabel: string;
 };
 
 export type NotFound = {

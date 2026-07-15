@@ -101,17 +101,28 @@ The Cal side is configuration the code depends on — breaking it fails
 silently:
 - Event: `dragosbln/30min` (30 min, Google Meet via the connected Google
   Calendar).
-- Hidden booking fields on that event: select `format` with option values
-  exactly `consultancy` / `hands-on` / `cto` / `not-sure` (mapped in
-  `site.ts` `booking.formats[].value`), and the built-in `notes` field.
-  Both stay **optional + hidden** (a required hidden field would deadlock
-  the booking; the visitor answers on-site instead).
+- Booking field on that event: select `format`, **optional + hidden**, with
+  option values exactly `consultancy` / `hands-on` / `cto` / `not-sure`
+  (mapped in `site.ts` `booking.formats[].value`). A required hidden field
+  would deadlock the booking; the visitor answers on-site instead. The
+  "What are you weighing?" question is a **visible** field inside Cal's own
+  booking form, not asked on-site.
+
+Interaction model (decided by Dragos, don't regress):
+- The booker renders veiled (blurred overlay + `inert`) until a format is
+  picked; the veil pill asks for one. Picking the first format lifts the
+  veil and remounts the iframe with the prefill.
+- Switching (or deselecting) the format after the visitor has clicked into
+  the booker opens a native `<dialog>` confirming the restart — the remount
+  throws away anything entered in Cal's form. A click inside the
+  cross-origin iframe is detected as the parent window's `blur` with
+  `document.activeElement` inside the embed wrapper.
+- No "book directly on Cal.com" link-out; the email link is the fallback
+  path.
 
 Embed facts learned from the package source (do not "simplify" these away):
 - The embed reads `config` once at iframe creation and ignores prop changes,
-  so committed answer changes remount `<Cal>` via `key`. The note commits on
-  a 1s typing pause or blur, never per keystroke (each commit reloads the
-  booker).
+  so a format change remounts `<Cal>` via `key`.
 - `cal("ui", …)` (cssVarsPerTheme, hideEventTypeDetails) is a one-shot
   postMessage, lost on remount — `BookingFlow` re-applies it on every
   `linkReady` event.
@@ -121,7 +132,6 @@ Embed facts learned from the package source (do not "simplify" these away):
   Cal's own.
 - The iframe mounts lazily (IntersectionObserver, 600px margin) so Cal's
   script never loads with the page; a skeleton holds the card's min-height.
-  The mono link-out under the card is the no-JS / blocked-embed path.
 
 ## Heading anchors (copy deep link)
 
