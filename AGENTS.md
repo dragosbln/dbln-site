@@ -90,6 +90,39 @@ To publish:
    highlighting ever); the `.prose pre` container is styled in
    `src/styles/prose.css`.
 
+## Contact booking (Cal.com)
+
+The contact section (design: 3a in `../claude_websie/directions/brief.html`)
+is a server shell (`Contact`) slotting the heading into one client leaf
+(`BookingFlow`): format picker + optional note on the left, a paper card with
+the Cal.com inline embed (`@calcom/embed-react`) on the right.
+
+The Cal side is configuration the code depends on — breaking it fails
+silently:
+- Event: `dragosbln/30min` (30 min, Google Meet via the connected Google
+  Calendar).
+- Hidden booking fields on that event: select `format` with option values
+  exactly `consultancy` / `hands-on` / `cto` / `not-sure` (mapped in
+  `site.ts` `booking.formats[].value`), and the built-in `notes` field.
+  Both stay **optional + hidden** (a required hidden field would deadlock
+  the booking; the visitor answers on-site instead).
+
+Embed facts learned from the package source (do not "simplify" these away):
+- The embed reads `config` once at iframe creation and ignores prop changes,
+  so committed answer changes remount `<Cal>` via `key`. The note commits on
+  a 1s typing pause or blur, never per keystroke (each commit reloads the
+  booker).
+- `cal("ui", …)` (cssVarsPerTheme, hideEventTypeDetails) is a one-shot
+  postMessage, lost on remount — `BookingFlow` re-applies it on every
+  `linkReady` event.
+- Theming is **colors only** (`cssVarsPerTheme`); the booker's fonts are
+  Cal's and will not match the site. The card header (event title, meta,
+  format chip) is site-authored because `hideEventTypeDetails` removes
+  Cal's own.
+- The iframe mounts lazily (IntersectionObserver, 600px margin) so Cal's
+  script never loads with the page; a skeleton holds the card's min-height.
+  The mono link-out under the card is the no-JS / blocked-embed path.
+
 ## Heading anchors (copy deep link)
 
 Every article heading gets a hover "copy link" button — `HeadingAnchors`

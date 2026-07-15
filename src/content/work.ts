@@ -19,8 +19,7 @@ export const workHero: PageHero = {
 export const workCta: Contact = {
   label: "Start a conversation",
   title: "Recognize your situation in one of *these?*",
-  body: "A decision that's expensive to reverse (auth, data, system boundaries), or a build where design and delivery belong to the same person. That's where I'm useful. Tell me what you're weighing and I'll tell you straight whether I can help.",
-  cta: "Book a conversation",
+  body: "Two questions, then pick a time. The intro call is 30 minutes.",
 };
 
 export const caseStudies: CaseStudy[] = [

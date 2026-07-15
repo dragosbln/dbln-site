@@ -1,6 +1,7 @@
 import type {
   AgenticSection,
   Contact,
+  ContactBooking,
   EngagementsSection,
   Hero,
   NavItem,
@@ -217,8 +218,60 @@ export const writing: WritingSection = {
 export const contact: Contact = {
   label: "Start a conversation",
   title: "Have a decision worth *getting right?*",
-  body: "A system review, a fractional engagement, or a build where design and delivery belong to the same person. Tell me what you're weighing and I'll tell you straight whether I can help.",
-  cta: "Book a conversation",
+  body: "Two questions, then pick a time. The intro call is 30 minutes.",
+};
+
+/**
+ * The Cal.com booking flow (direction 3a in claude_websie/directions/brief.html),
+ * shared by every page that renders Contact. `value` strings are the option
+ * values of the hidden `format` booking field on the Cal event type; the note
+ * prefills the hidden built-in `notes` field. Both must match Cal's
+ * configuration exactly or the prefill silently no-ops.
+ */
+export const booking: ContactBooking = {
+  formatStep: "01 · What kind of help are you imagining?",
+  noteStep: "02 · What are you weighing?",
+  noteOptional: "· optional",
+  timeStep: "03 · Pick a time",
+  formats: [
+    {
+      num: "01",
+      title: "Architecture advisory",
+      desc: "Reviews and second opinions.",
+      value: "consultancy",
+      chip: "Advisory",
+    },
+    {
+      num: "02",
+      title: "Hands-on architecture & engineering",
+      desc: "Design and delivery together.",
+      value: "hands-on",
+      chip: "Hands-on",
+    },
+    {
+      num: "03",
+      title: "Fractional CTO",
+      desc: "Ongoing technical ownership.",
+      value: "cto",
+      chip: "Fractional CTO",
+    },
+    {
+      num: "04",
+      title: "Not sure yet",
+      desc: "We can figure it out on the call.",
+      value: "not-sure",
+      chip: "Not sure yet",
+    },
+  ],
+  notePlaceholder: "A migration, a rewrite, a hire. Whatever is on the table.",
+  emailHint: "Prefer email? That works too.",
+  event: {
+    title: "Intro call",
+    meta: "30 min · Google Meet",
+    calLink: "dragosbln/30min",
+    chipPrefix: "Format: ",
+  },
+  fallbackLabel: "Or book directly on Cal.com",
 };
 
 /** /404 page copy (src/app/not-found.tsx). */

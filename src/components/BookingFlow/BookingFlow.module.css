@@ -1,0 +1,271 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 72px;
+  align-items: start;
+}
+
+@media (max-width: 940px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 44px;
+  }
+}
+
+/* ---------- Step labels ---------- */
+
+.step {
+  display: block;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 12px;
+}
+
+.optional {
+  opacity: 0.55;
+  text-transform: none;
+  letter-spacing: 0.05em;
+}
+
+/* ---------- Step 01: format picker ---------- */
+
+.formats {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.format {
+  position: relative;
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  width: 100%;
+  text-align: left;
+  padding: 14px 18px;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+
+.format:last-child {
+  border-bottom: none;
+}
+
+.format:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.format:focus-visible {
+  outline: 2px solid var(--teal-bright);
+  outline-offset: -2px;
+}
+
+.format[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 1.5px var(--teal-bright);
+  background: rgba(110, 231, 218, 0.06);
+  pointer-events: none;
+}
+
+.formatNum {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--teal-bright);
+  flex-shrink: 0;
+}
+
+.formatTitle {
+  display: block;
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--paper);
+}
+
+.formatDesc {
+  display: block;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 2px;
+}
+
+/* ---------- Step 02: note ---------- */
+
+.noteBlock {
+  margin-top: 26px;
+}
+
+.note {
+  display: block;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  color: var(--paper);
+  padding: 14px 16px;
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.note::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ---------- Email fallback ---------- */
+
+.mailRow {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin-top: 26px;
+}
+
+.mail {
+  color: var(--paper);
+  font-weight: 600;
+  font-size: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 2px;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.mail:hover {
+  color: var(--teal-bright);
+  border-color: var(--teal-bright);
+}
+
+.mailHint {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ---------- Step 03: the booking card ---------- */
+
+.card {
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+}
+
+.cardHead {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.event {
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.2;
+}
+
+.eventMeta {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
+.chip {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--teal-deep);
+  background: var(--accent-wash);
+  border-radius: 999px;
+  padding: 3px 12px;
+  white-space: nowrap;
+}
+
+/* The Cal iframe reports its own height; the min-height only covers loading
+   so the card doesn't collapse and the page doesn't shift. */
+.embed {
+  min-height: 480px;
+}
+
+.cal {
+  height: 100%;
+}
+
+/* ---------- Loading skeleton ---------- */
+
+.skeleton {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skeleton > div {
+  border-radius: 10px;
+  background: var(--paper-2);
+}
+
+.skeleton > div:nth-child(1) {
+  height: 44px;
+}
+
+.skeleton > div:nth-child(2) {
+  height: 260px;
+}
+
+.skeleton > div:nth-child(3) {
+  height: 108px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton > div {
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    50% {
+      opacity: 0.55;
+    }
+  }
+}
+
+/* ---------- Link-out fallback ---------- */
+
+.fallback {
+  margin-top: 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+
+.fallback a {
+  color: rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 2px;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.fallback a:hover {
+  color: var(--teal-bright);
+  border-color: var(--teal-bright);
+}

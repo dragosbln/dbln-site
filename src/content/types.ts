@@ -148,7 +148,46 @@ export type Contact = {
   /** Rich text. */
   title: string;
   body: string;
-  cta: string;
+};
+
+/** One row in the contact section's format picker (step 01). */
+export type BookingFormat = {
+  /** Two-digit index shown in the row ("01"). */
+  num: string;
+  title: string;
+  desc: string;
+  /**
+   * Option value of the hidden `format` booking field on the Cal.com event
+   * type. Must match Cal's stored option exactly or the prefill silently
+   * no-ops.
+   */
+  value: string;
+  /** Short label for the card-header chip ("Advisory"). */
+  chip: string;
+};
+
+/** The Cal.com booking flow shared by every page that renders Contact. */
+export type ContactBooking = {
+  /** Step labels (mono, uppercase). */
+  formatStep: string;
+  noteStep: string;
+  noteOptional: string;
+  timeStep: string;
+  formats: BookingFormat[];
+  notePlaceholder: string;
+  /** Aside next to the email link. */
+  emailHint: string;
+  event: {
+    /** Site-authored card header (Cal's own meta panel is hidden). */
+    title: string;
+    meta: string;
+    /** Cal.com link path ("dragosbln/30min"). */
+    calLink: string;
+    /** Chip prefix ("Format: "). */
+    chipPrefix: string;
+  };
+  /** Text of the plain link-out under the card (no-JS / blocked-embed path). */
+  fallbackLabel: string;
 };
 
 export type NotFound = {
