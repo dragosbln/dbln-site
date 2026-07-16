@@ -1,5 +1,6 @@
+import BookingFlow from "@/components/BookingFlow";
 import Reveal from "@/components/Reveal";
-import { contact as defaultContent, site } from "@/content/site";
+import { booking, contact as defaultContent, site } from "@/content/site";
 import type { Contact as ContactContent } from "@/content/types";
 import { richText } from "@/lib/richText";
 import styles from "./Contact.module.css";
@@ -13,23 +14,37 @@ export default function Contact({ content = defaultContent }: ContactProps) {
   return (
     <section id="contact" className={styles.contact} aria-labelledby="contact-title">
       <div className="wrap">
-        <Reveal as="p" className={styles.label}>
-          {content.label}
-        </Reveal>
-        <Reveal as="h2" id="contact-title" className={styles.title}>
-          {richText(content.title)}
-        </Reveal>
-        <Reveal as="p" className={styles.body}>
-          {content.body}
-        </Reveal>
-        <Reveal className={styles.actions}>
-          <a className={styles.primary} href={`mailto:${site.email}`}>
-            {content.cta}
-          </a>
-          <a className={styles.mail} href={`mailto:${site.email}`}>
-            {site.email}
-          </a>
-        </Reveal>
+        <BookingFlow
+          booking={booking}
+          email={site.email}
+          hostName={site.name}
+          heading={
+            <>
+              <Reveal as="p" className={styles.label}>
+                {content.label}
+              </Reveal>
+              <Reveal as="h2" id="contact-title" className={styles.title}>
+                {richText(content.title)}
+              </Reveal>
+              <Reveal as="p" className={styles.body}>
+                {content.body}
+              </Reveal>
+            </>
+          }
+          confirmedHeading={
+            <>
+              <Reveal as="p" className={styles.label}>
+                {booking.confirmed.label}
+              </Reveal>
+              <Reveal as="h2" id="contact-title" className={styles.title}>
+                {richText(booking.confirmed.title)}
+              </Reveal>
+              <Reveal as="p" className={styles.body}>
+                {booking.confirmed.body}
+              </Reveal>
+            </>
+          }
+        />
       </div>
     </section>
   );

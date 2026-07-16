@@ -19,10 +19,12 @@
   font-weight: 500;
 }
 
+/* Capped at 44px (not the old 58px): the title shares the row with the
+   booking card in the 3a side-by-side layout. */
 .title {
   font-family: var(--serif);
   font-weight: 400;
-  font-size: clamp(30px, 5vw, 58px);
+  font-size: clamp(30px, 5vw, 44px);
   line-height: 1.06;
   letter-spacing: -0.02em;
   max-width: 16ch;
@@ -36,53 +38,13 @@
 
 .body {
   color: rgba(255, 255, 255, 0.66);
-  max-width: 48ch;
-  font-size: 18px;
-  margin-bottom: 40px;
-}
-
-.actions {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.primary {
-  background: var(--teal-bright);
-  color: var(--ink);
-  padding: 15px 28px;
-  border-radius: 999px;
-  font-weight: 700;
-  font-size: 15px;
-  transition:
-    background 0.2s,
-    transform 0.2s;
-}
-
-.primary:hover {
-  background: #fff;
-  transform: translateY(-1px);
+  max-width: 44ch;
+  font-size: 17px;
+  margin-bottom: 32px;
 }
 
 /* The global teal focus ring is too dim on this --ink surface (~3.4:1);
-   brighten it for every focusable element in the section, not just .primary. */
+   brighten it for every focusable element in the section, not just links. */
 .contact :focus-visible {
   outline-color: var(--teal-bright);
-}
-
-.mail {
-  color: var(--paper);
-  font-weight: 600;
-  font-size: 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-  padding-bottom: 2px;
-  transition:
-    color 0.2s,
-    border-color 0.2s;
-}
-
-.mail:hover {
-  border-color: var(--teal-bright);
-  color: var(--teal-bright);
 }

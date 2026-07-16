@@ -1,6 +1,7 @@
 import type {
   AgenticSection,
   Contact,
+  ContactBooking,
   EngagementsSection,
   Hero,
   NavItem,
@@ -217,8 +218,85 @@ export const writing: WritingSection = {
 export const contact: Contact = {
   label: "Start a conversation",
   title: "Have a decision worth *getting right?*",
-  body: "A system review, a fractional engagement, or a build where design and delivery belong to the same person. Tell me what you're weighing and I'll tell you straight whether I can help.",
-  cta: "Book a conversation",
+  body: "Two questions, then pick a time. The intro call is 30 minutes.",
+};
+
+/**
+ * The Cal.com booking flow (direction 3a in claude_websie/directions/brief.html),
+ * shared by every page that renders Contact. `value` strings are the option
+ * values of the hidden `format` booking field on the Cal event type; they must
+ * match Cal's configuration exactly or the prefill silently no-ops. The
+ * "What are you weighing?" question lives inside Cal's own booking form.
+ */
+export const booking: ContactBooking = {
+  formatStep: "01 · What kind of help are you imagining?",
+  timeStep: "02 · Pick a time",
+  formats: [
+    {
+      num: "01",
+      title: "Architecture advisory",
+      desc: "Reviews and second opinions.",
+      value: "consultancy",
+      chip: "Advisory",
+    },
+    {
+      num: "02",
+      title: "Hands-on architecture & engineering",
+      desc: "Design and delivery together.",
+      value: "hands-on",
+      chip: "Hands-on",
+    },
+    {
+      num: "03",
+      title: "Fractional CTO",
+      desc: "Ongoing technical ownership.",
+      value: "cto",
+      chip: "Fractional CTO",
+    },
+    {
+      num: "04",
+      title: "Not sure yet",
+      desc: "We can figure it out on the call.",
+      value: "not-sure",
+      chip: "Not sure yet",
+    },
+  ],
+  emailHint: "Prefer email? That works too.",
+  veil: "Pick a format to open the calendar",
+  veilNote: "The calendar loads from Cal.com.",
+  restart: {
+    title: "Switch the format?",
+    body: "Switching restarts the booking. Anything you entered is lost.",
+    confirm: "Switch",
+    cancel: "Keep booking",
+  },
+  confirmed: {
+    label: "You're on the calendar",
+    title: "Talk soon. The *invite is in your inbox.*",
+    body: "The details are on the right and in your calendar invitation. Bring the decision you're weighing. If something shifts, the invite has the links to move or cancel it.",
+    focusLabel: "Focus",
+    weighingLabel: "Weighing",
+    emailHint: "Something to send ahead? Email works.",
+    timeStep: "02 · Scheduled",
+    card: {
+      title: "This meeting is scheduled",
+      body: "A calendar invitation with all the details went to your email.",
+      whatLabel: "What",
+      whenLabel: "When",
+      whoLabel: "Who",
+      whereLabel: "Where",
+      what: "Intro call · 30 min",
+      where: "Google Meet",
+      reschedule: "Reschedule",
+      cancel: "Cancel",
+    },
+  },
+  event: {
+    title: "Intro call",
+    meta: "30 min · Google Meet",
+    calLink: "dragosbln/30min",
+    chipPrefix: "Format: ",
+  },
 };
 
 /** /404 page copy (src/app/not-found.tsx). */

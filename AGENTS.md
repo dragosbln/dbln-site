@@ -27,6 +27,21 @@ user checkpoint at each stage.
 Follow these exactly — they encode decisions already made. The reference
 implementation for all of them is the landing page.
 
+## Reveal: never swap a Reveal's className on a live instance
+
+`Reveal` adds its `.in` class **imperatively** (`el.classList.add`), but React
+owns `className`. So if React reuses a `Reveal` instance and its `className`
+prop differs, React rewrites the attribute and silently wipes `.in` — and the
+mount effect that would re-add it never re-runs (empty deps). The element
+stays at `opacity: 0`: present in the DOM, correct styles, invisible.
+
+This bites when two branches of a conditional render `Reveal` at the same
+position with different classNames (React reconciles by type + position, so
+it updates rather than remounts). Give each branch a distinct `key` (see
+`BookingFlow`'s resting/confirmed fragments) so React mounts a fresh subtree.
+Symptom to recognize: one Reveal lacks `in` while its siblings — whose
+className props didn't change — still have it.
+
 ## Adding a section to a page
 
 1. Add the copy to `src/content/site.ts`, typed with a shape from
@@ -89,6 +104,98 @@ To publish:
    defined in `src/lib/markdown.ts` (colors inlined at build, no client-side
    highlighting ever); the `.prose pre` container is styled in
    `src/styles/prose.css`.
+
+## Contact booking (Cal.com)
+
+The contact section (design: 3a in `../claude_websie/directions/brief.html`)
+is a server shell (`Contact`) slotting the heading into one client leaf
+(`BookingFlow`): format picker + optional note on the left, a paper card with
+the Cal.com inline embed (`@calcom/embed-react`) on the right.
+
+The Cal side is configuration the code depends on — breaking it fails
+silently:
+- Event: `dragosbln/30min` (30 min, Google Meet via the connected Google
+  Calendar).
+- Booking field on that event: select `format`, **optional + hidden**, with
+  option values exactly `consultancy` / `hands-on` / `cto` / `not-sure`
+  (mapped in `site.ts` `booking.formats[].value`). A required hidden field
+  would deadlock the booking; the visitor answers on-site instead. The
+  "What are you weighing?" question is a **visible** field inside Cal's own
+  booking form, not asked on-site.
+
+Interaction model (decided by Dragos, don't regress):
+- **Click-to-load, and it is a privacy boundary — do not "optimize" it by
+  preloading.** Nothing is requested from Cal until the visitor picks a
+  format: no `embed.js`, no iframe, so scrolling past the section contacts
+  no third party and stores nothing on the device. The pick is the visitor's
+  explicit request for the booking service, which is what keeps this
+  defensible under ePrivacy without a consent banner (the site has no
+  analytics and sets no first-party cookies; keep it that way, or this
+  calculus changes). The veil names Cal.com so the choice is informed.
+- The booker renders veiled (blurred overlay + `inert`) until a format is
+  picked; the veil pill asks for one. Picking the first format boots Cal and
+  mounts the iframe with the prefill.
+- The boot is latched to run **once** (`booted` ref): `cal("on", …)` adds
+  window listeners that are never removed, so re-running on a later pick
+  would double-register the booking handlers and fire them twice per event.
+  Unpicking unmounts the iframe but leaves the boot latched, so re-picking
+  is instant.
+- Switching (or deselecting) the format after the visitor has clicked into
+  the booker opens a native `<dialog>` confirming the restart — the remount
+  throws away anything entered in Cal's form. A click inside the
+  cross-origin iframe is detected as the parent window's `blur` with
+  `document.activeElement` inside the embed wrapper.
+- No "book directly on Cal.com" link-out; the email link is the fallback
+  path.
+- Reschedule/Cancel reset the whole flow back to its resting state (veiled
+  picker, fresh embed, cleared storage) on click. Those flows happen in Cal's
+  own tab and fire no embed events here, so a cancelled booking would
+  otherwise leave a permanently false acknowledgement behind. Resetting
+  unmounts the link mid-click, which is safe: per HTML, a disconnected `<a>`
+  still navigates (the connectedness check in "cannot navigate" excludes
+  `a` elements) — verified in-browser, don't "fix" it with a setTimeout.
+- After a booking lands (design 5a): the left column swaps to the
+  acknowledgement (`booking.confirmed` in `site.ts`, heading slotted from
+  `Contact` like the resting one) and the card swaps to a **site-rendered
+  scheduled card** — the iframe unmounts entirely. Cal's own success screen
+  brings gutters, an inner scroll and a signup banner that cannot be styled
+  from outside, so we render the details ourselves and keep Cal
+  authoritative through links: `cal.com/reschedule/<uid>` and
+  `cal.com/booking/<uid>?cancel=true` (both also live in the invite email).
+- Confirmed-state data merges from both events, either order:
+  `bookingSuccessfulV2` (documented) carries uid + start/end; the deprecated
+  v1 `bookingSuccessful` carries the booking object. Real payloads are
+  messier than the types: response values can be strings, `{value,label}`
+  (selects) or `{firstName,lastName}` (name); notes may live in
+  `responses.notes` OR `booking.description`; the attendee in
+  `responses.name` OR `attendees[0].name`; times on the booking object OR
+  derived from the event root's `date`+`duration`. `asString`/
+  `extractBooking` in BookingFlow normalize all of these — extend them,
+  don't bypass them. The Focus echo falls back through Cal's record →
+  picker ref → `sessionStorage["dbln:booking-format"]` (written on every
+  pick, so it survives client-side navigation between pages). Both handlers
+  `console.debug("[dbln booking]", …)` the raw payload on purpose — a real
+  booking is diagnosable from the visitor console when Cal's shape drifts
+  again. Rows render only when their data arrived. State is per-session;
+  reload resets. To test without a real booking, dispatch the namespaced
+  CustomEvent (`CAL:booking:bookingSuccessfulV2` / `…:bookingSuccessful`)
+  on `window` — that is exactly how embed-core delivers them. Pick a format
+  first, or the handlers aren't registered yet and the events go nowhere.
+
+Embed facts learned from the package source (do not "simplify" these away):
+- The embed reads `config` once at iframe creation and ignores prop changes,
+  so a format change remounts `<Cal>` via `key`.
+- `cal("ui", …)` (cssVarsPerTheme, hideEventTypeDetails) is a one-shot
+  postMessage, lost on remount — `BookingFlow` re-applies it on every
+  `linkReady` event.
+- Theming is **colors only** (`cssVarsPerTheme`); the booker's fonts are
+  Cal's and will not match the site. The card header (event title, meta,
+  format chip) is site-authored because `hideEventTypeDetails` removes
+  Cal's own.
+- A skeleton holds the card's min-height while the picked booker loads, so
+  the card never collapses or shifts. (The old IntersectionObserver lazy
+  mount was removed when click-to-load landed: a pick already implies the
+  section is on screen, so the observer was dead weight.)
 
 ## Heading anchors (copy deep link)
 

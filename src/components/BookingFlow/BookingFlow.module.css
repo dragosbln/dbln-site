@@ -1,0 +1,454 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 72px;
+  align-items: start;
+}
+
+@media (max-width: 940px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 44px;
+  }
+}
+
+/* ---------- Step labels ---------- */
+
+.step {
+  display: block;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 12px;
+}
+
+/* ---------- Step 01: format picker ---------- */
+
+.formats {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.format {
+  position: relative;
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  width: 100%;
+  text-align: left;
+  padding: 14px 18px;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+
+.format:last-child {
+  border-bottom: none;
+}
+
+.format:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.format:focus-visible {
+  outline: 2px solid var(--teal-bright);
+  outline-offset: -2px;
+}
+
+.format[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 1.5px var(--teal-bright);
+  background: rgba(110, 231, 218, 0.06);
+  pointer-events: none;
+}
+
+/* The container's radius clips the ring on the edge rows; round the ring
+   itself there (13px = container radius minus its 1px border). */
+.format:first-child::after {
+  border-radius: 13px 13px 0 0;
+}
+
+.format:last-child::after {
+  border-radius: 0 0 13px 13px;
+}
+
+.formatNum {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--teal-bright);
+  flex-shrink: 0;
+}
+
+.formatTitle {
+  display: block;
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--paper);
+}
+
+.formatDesc {
+  display: block;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 2px;
+}
+
+/* ---------- Confirmed state: answer echo (design 5a) ---------- */
+
+.echo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  padding-top: 22px;
+  max-width: 44ch;
+}
+
+.echoRow {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.echoLabel {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.echoValue {
+  font-size: 15.5px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- Email fallback ---------- */
+
+.mailRow {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin-top: 26px;
+}
+
+.mail {
+  color: var(--paper);
+  font-weight: 600;
+  font-size: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding-bottom: 2px;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.mail:hover {
+  color: var(--teal-bright);
+  border-color: var(--teal-bright);
+}
+
+.mailHint {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ---------- Step 02: the booking card ---------- */
+
+.card {
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+}
+
+.cardHead {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.event {
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.2;
+}
+
+.eventMeta {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+
+.chip {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--teal-deep);
+  background: var(--accent-wash);
+  border-radius: 999px;
+  padding: 3px 12px;
+  white-space: nowrap;
+}
+
+/* The Cal iframe reports its own height; the min-height only covers loading
+   so the card doesn't collapse and the page doesn't shift. */
+.embed {
+  position: relative;
+  min-height: 480px;
+}
+
+/* ---------- Confirmed state: the site-rendered scheduled card ----------
+   Replaces the iframe entirely once the booking lands (design 5a): Cal's
+   own success screen brings gutters, an inner scroll and a signup banner we
+   can't reach from outside. Reschedule/Cancel stay Cal's, as links. */
+
+.scheduled {
+  padding: 32px 28px 28px;
+}
+
+.scheduledCheck {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 2px solid var(--teal);
+  color: var(--teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 18px;
+}
+
+.scheduledTitle {
+  font-family: var(--serif);
+  font-size: 24px;
+  line-height: 1.15;
+  margin-bottom: 6px;
+}
+
+.scheduledBody {
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  margin-bottom: 24px;
+}
+
+.scheduledDetails {
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 12px 14px;
+  margin: 0;
+}
+
+.scheduledDetails dt {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.scheduledDetails dd {
+  font-size: 14px;
+  margin: 0;
+}
+
+.scheduledActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+
+.scheduledActions a {
+  flex: 1;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 0;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--ink);
+  transition: border-color 0.2s;
+}
+
+.scheduledActions a:hover {
+  border-color: var(--teal);
+}
+
+.scheduledActions .scheduledCancel {
+  color: var(--red);
+}
+
+.scheduledActions .scheduledCancel:hover {
+  border-color: var(--red);
+}
+
+.cal {
+  height: 100%;
+}
+
+/* ---------- Veil (no format picked yet) ---------- */
+
+.veil {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  background: rgba(246, 244, 239, 0.82);
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+}
+
+.veilPill {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 18px;
+  text-align: center;
+}
+
+.veilNote {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+/* ---------- Loading skeleton ---------- */
+
+.skeleton {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skeleton > div {
+  border-radius: 10px;
+  background: var(--paper-2);
+}
+
+.skeleton > div:nth-child(1) {
+  height: 44px;
+}
+
+.skeleton > div:nth-child(2) {
+  height: 260px;
+}
+
+.skeleton > div:nth-child(3) {
+  height: 108px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton > div {
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    50% {
+      opacity: 0.55;
+    }
+  }
+}
+
+/* ---------- Restart confirmation ---------- */
+
+.dialog {
+  margin: auto;
+  width: min(400px, calc(100vw - 48px));
+  background: var(--paper);
+  color: var(--ink);
+  border: none;
+  border-radius: 14px;
+  padding: 26px 28px 24px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+}
+
+.dialog::backdrop {
+  background: rgba(23, 25, 28, 0.6);
+}
+
+.dialogTitle {
+  font-family: var(--serif);
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.dialogBody {
+  margin-top: 10px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 18px;
+  margin-top: 22px;
+}
+
+.dialogCancel {
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.dialogCancel:hover {
+  color: var(--ink);
+}
+
+.dialogConfirm {
+  border: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--teal);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dialogConfirm:hover {
+  background: var(--teal-deep);
+}

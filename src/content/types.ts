@@ -148,7 +148,80 @@ export type Contact = {
   /** Rich text. */
   title: string;
   body: string;
-  cta: string;
+};
+
+/** One row in the contact section's format picker (step 01). */
+export type BookingFormat = {
+  /** Two-digit index shown in the row ("01"). */
+  num: string;
+  title: string;
+  desc: string;
+  /**
+   * Option value of the hidden `format` booking field on the Cal.com event
+   * type. Must match Cal's stored option exactly or the prefill silently
+   * no-ops.
+   */
+  value: string;
+  /** Short label for the card-header chip ("Advisory"). */
+  chip: string;
+};
+
+/** The Cal.com booking flow shared by every page that renders Contact. */
+export type ContactBooking = {
+  /** Step labels (mono, uppercase). */
+  formatStep: string;
+  timeStep: string;
+  formats: BookingFormat[];
+  /** Aside next to the email link. */
+  emailHint: string;
+  /** Pill over the blurred booker until a format is picked. */
+  veil: string;
+  /**
+   * Under the pill: names the third party the pick will contact, since that
+   * pick is what loads Cal (click-to-load). Keep it factual.
+   */
+  veilNote: string;
+  /** Confirmation shown when switching format would restart a started booking. */
+  restart: {
+    title: string;
+    body: string;
+    confirm: string;
+    cancel: string;
+  };
+  /** The section after Cal fires bookingSuccessful (design 5a). */
+  confirmed: {
+    label: string;
+    /** Rich text. */
+    title: string;
+    body: string;
+    /** Echo-row labels for the two answers. */
+    focusLabel: string;
+    weighingLabel: string;
+    emailHint: string;
+    timeStep: string;
+    /** The site-rendered scheduled card that replaces the embed. */
+    card: {
+      title: string;
+      body: string;
+      whatLabel: string;
+      whenLabel: string;
+      whoLabel: string;
+      whereLabel: string;
+      what: string;
+      where: string;
+      reschedule: string;
+      cancel: string;
+    };
+  };
+  event: {
+    /** Site-authored card header (Cal's own meta panel is hidden). */
+    title: string;
+    meta: string;
+    /** Cal.com link path ("dragosbln/30min"). */
+    calLink: string;
+    /** Chip prefix ("Format: "). */
+    chipPrefix: string;
+  };
 };
 
 export type NotFound = {

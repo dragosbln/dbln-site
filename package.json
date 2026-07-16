@@ -15,6 +15,7 @@
     "node": ">=24"
   },
   "dependencies": {
+    "@calcom/embed-react": "^1.5.3",
     "@shikijs/rehype": "^4.3.1",
     "gray-matter": "^4.0.3",
     "next": "16.2.10",
