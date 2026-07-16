@@ -263,6 +263,7 @@ export const booking: ContactBooking = {
   ],
   emailHint: "Prefer email? That works too.",
   veil: "Pick a format to open the calendar",
+  veilNote: "The calendar loads from Cal.com.",
   restart: {
     title: "Switch the format?",
     body: "Switching restarts the booking. Anything you entered is lost.",

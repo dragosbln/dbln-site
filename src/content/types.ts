@@ -176,6 +176,11 @@ export type ContactBooking = {
   emailHint: string;
   /** Pill over the blurred booker until a format is picked. */
   veil: string;
+  /**
+   * Under the pill: names the third party the pick will contact, since that
+   * pick is what loads Cal (click-to-load). Keep it factual.
+   */
+  veilNote: string;
   /** Confirmation shown when switching format would restart a started booking. */
   restart: {
     title: string;

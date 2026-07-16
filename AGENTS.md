@@ -124,9 +124,22 @@ silently:
   booking form, not asked on-site.
 
 Interaction model (decided by Dragos, don't regress):
+- **Click-to-load, and it is a privacy boundary — do not "optimize" it by
+  preloading.** Nothing is requested from Cal until the visitor picks a
+  format: no `embed.js`, no iframe, so scrolling past the section contacts
+  no third party and stores nothing on the device. The pick is the visitor's
+  explicit request for the booking service, which is what keeps this
+  defensible under ePrivacy without a consent banner (the site has no
+  analytics and sets no first-party cookies; keep it that way, or this
+  calculus changes). The veil names Cal.com so the choice is informed.
 - The booker renders veiled (blurred overlay + `inert`) until a format is
-  picked; the veil pill asks for one. Picking the first format lifts the
-  veil and remounts the iframe with the prefill.
+  picked; the veil pill asks for one. Picking the first format boots Cal and
+  mounts the iframe with the prefill.
+- The boot is latched to run **once** (`booted` ref): `cal("on", …)` adds
+  window listeners that are never removed, so re-running on a later pick
+  would double-register the booking handlers and fire them twice per event.
+  Unpicking unmounts the iframe but leaves the boot latched, so re-picking
+  is instant.
 - Switching (or deselecting) the format after the visitor has clicked into
   the booker opens a native `<dialog>` confirming the restart — the remount
   throws away anything entered in Cal's form. A click inside the
@@ -166,10 +179,8 @@ Interaction model (decided by Dragos, don't regress):
   again. Rows render only when their data arrived. State is per-session;
   reload resets. To test without a real booking, dispatch the namespaced
   CustomEvent (`CAL:booking:bookingSuccessfulV2` / `…:bookingSuccessful`)
-  on `window` — that is exactly how embed-core delivers them. In the
-  throttled preview tab, arm the lazy mount with a synthetic scroll AFTER
-  hydration and make sure the viewport has a real height (a 0-height
-  viewport silently breaks the `near()` check).
+  on `window` — that is exactly how embed-core delivers them. Pick a format
+  first, or the handlers aren't registered yet and the events go nowhere.
 
 Embed facts learned from the package source (do not "simplify" these away):
 - The embed reads `config` once at iframe creation and ignores prop changes,
@@ -181,8 +192,10 @@ Embed facts learned from the package source (do not "simplify" these away):
   Cal's and will not match the site. The card header (event title, meta,
   format chip) is site-authored because `hideEventTypeDetails` removes
   Cal's own.
-- The iframe mounts lazily (IntersectionObserver, 600px margin) so Cal's
-  script never loads with the page; a skeleton holds the card's min-height.
+- A skeleton holds the card's min-height while the picked booker loads, so
+  the card never collapses or shifts. (The old IntersectionObserver lazy
+  mount was removed when click-to-load landed: a pick already implies the
+  section is on screen, so the observer was dead weight.)
 
 ## Heading anchors (copy deep link)
 

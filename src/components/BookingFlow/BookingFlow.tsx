@@ -192,57 +192,28 @@ export default function BookingFlow({
   const [interacted, setInteracted] = useState(false);
   /** Set once Cal reports a completed booking; per-session only (design 5a). */
   const [confirmed, setConfirmed] = useState<ConfirmedBooking | null>(null);
-  const [inView, setInView] = useState(false);
   const [calReady, setCalReady] = useState(false);
   /** Mirror of `format` for the event handlers (registered once, no stale closure). */
   const formatRef = useRef<string | null>(null);
-  const cardRef = useRef<HTMLDivElement | null>(null);
+  /** Latch: Cal's script + handlers are booted once, on the first pick. */
+  const booted = useRef(false);
   const embedRef = useRef<HTMLDivElement | null>(null);
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
-  // Create the iframe only when the card approaches the viewport (600px
-  // margin), so Cal's script and booker don't load with the page. IO does the
-  // watching; a position check on mount and on scroll covers environments
-  // where IO entries are late or absent (same reasoning as Reveal's
-  // above-the-fold check).
+  // Click-to-load (see AGENTS.md, "Contact booking"): nothing is requested
+  // from Cal until the visitor picks a format. Merely scrolling past the
+  // section contacts no third party at all; the pick is the explicit request
+  // for the booking service. Both the embed script (loaded by getCalApi and
+  // by <Cal>) and the iframe are behind this gate.
+  //
+  // Boots exactly once: `cal("on", …)` adds window listeners that are never
+  // removed, so re-running on a later pick would double-register the booking
+  // handlers and fire them twice per event. No cancel flag — the async work
+  // only registers listeners (which outlive this component by design) and
+  // sets one state, which is a no-op after unmount.
   useEffect(() => {
-    const el = cardRef.current;
-    if (!el) return;
-    const margin = 600;
-    const near = () =>
-      el.getBoundingClientRect().top < window.innerHeight + margin;
-    let io: IntersectionObserver | null = null;
-    const arm = () => {
-      setInView(true);
-      io?.disconnect();
-      window.removeEventListener("scroll", onScroll);
-    };
-    const onScroll = () => {
-      if (near()) arm();
-    };
-    if (near()) {
-      arm();
-      return;
-    }
-    io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) arm();
-      },
-      { rootMargin: `${margin}px 0px` },
-    );
-    io.observe(el);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      io?.disconnect();
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, []);
-
-  // Theme the booker and hide its own event meta (the card header replaces
-  // it). linkReady fires after every iframe load, including remounts.
-  useEffect(() => {
-    if (!inView) return;
-    let cancelled = false;
+    if (!format || booted.current) return;
+    booted.current = true;
     const ui = {
       hideEventTypeDetails: true,
       layout: "month_view" as const,
@@ -250,7 +221,9 @@ export default function BookingFlow({
     };
     (async () => {
       const cal = await getCalApi({ namespace: CAL_NAMESPACE });
-      if (cancelled) return;
+      // Theme the booker and hide its own event meta (the card header
+      // replaces it). linkReady fires after every iframe load, including
+      // remounts, and the ui instruction is one-shot — so re-apply it there.
       cal("ui", ui);
       cal("on", { action: "linkReady", callback: () => cal("ui", ui) });
       // A landed booking flips the section to its confirmed state (5a). The
@@ -305,10 +278,7 @@ export default function BookingFlow({
       });
       setCalReady(true);
     })();
-    return () => {
-      cancelled = true;
-    };
-  }, [inView]);
+  }, [format]);
 
   // A click inside a cross-origin iframe is invisible to us except as the
   // parent window losing focus to it — that blur is the interaction signal.
@@ -361,7 +331,8 @@ export default function BookingFlow({
 
   const active = booking.formats.find((f) => f.value === format) ?? null;
   const veiled = !active && !confirmed;
-  const showCal = inView && calReady;
+  // The iframe exists only once a format is picked and Cal's script is up.
+  const showCal = calReady && active !== null;
   const calConfig: Record<string, string> = { layout: "month_view", theme: "light" };
   if (active) calConfig.format = active.value;
   // Focus echo: Cal's own record of the booked format wins over picker
@@ -468,7 +439,7 @@ export default function BookingFlow({
         <Reveal as="p" className={styles.step}>
           {confirmed ? booking.confirmed.timeStep : booking.timeStep}
         </Reveal>
-        <div className={styles.card} ref={cardRef}>
+        <div className={styles.card}>
           {!confirmed && (
             <div className={styles.cardHead}>
               <div>
@@ -539,7 +510,9 @@ export default function BookingFlow({
               )}
             </div>
           ) : (
-            <div className={styles.embed} aria-busy={!showCal}>
+            // Busy only while a picked format's booker is loading — the
+            // veiled state is waiting on the visitor, not on the network.
+            <div className={styles.embed} aria-busy={!!active && !showCal}>
               <div ref={embedRef} inert={veiled}>
                 {showCal ? (
                   <Cal
@@ -560,6 +533,7 @@ export default function BookingFlow({
               {veiled && (
                 <div className={styles.veil}>
                   <p className={styles.veilPill}>{booking.veil}</p>
+                  <p className={styles.veilNote}>{booking.veilNote}</p>
                 </div>
               )}
             </div>
