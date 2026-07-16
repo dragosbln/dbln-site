@@ -183,6 +183,31 @@ export type ContactBooking = {
     confirm: string;
     cancel: string;
   };
+  /** The section after Cal fires bookingSuccessful (design 5a). */
+  confirmed: {
+    label: string;
+    /** Rich text. */
+    title: string;
+    body: string;
+    /** Echo-row labels for the two answers. */
+    focusLabel: string;
+    weighingLabel: string;
+    emailHint: string;
+    timeStep: string;
+    /** The site-rendered scheduled card that replaces the embed. */
+    card: {
+      title: string;
+      body: string;
+      whatLabel: string;
+      whenLabel: string;
+      whoLabel: string;
+      whereLabel: string;
+      what: string;
+      where: string;
+      reschedule: string;
+      cancel: string;
+    };
+  };
   event: {
     /** Site-authored card header (Cal's own meta panel is hidden). */
     title: string;

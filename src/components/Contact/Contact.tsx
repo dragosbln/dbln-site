@@ -17,6 +17,7 @@ export default function Contact({ content = defaultContent }: ContactProps) {
         <BookingFlow
           booking={booking}
           email={site.email}
+          hostName={site.name}
           heading={
             <>
               <Reveal as="p" className={styles.label}>
@@ -27,6 +28,19 @@ export default function Contact({ content = defaultContent }: ContactProps) {
               </Reveal>
               <Reveal as="p" className={styles.body}>
                 {content.body}
+              </Reveal>
+            </>
+          }
+          confirmedHeading={
+            <>
+              <Reveal as="p" className={styles.label}>
+                {booking.confirmed.label}
+              </Reveal>
+              <Reveal as="h2" id="contact-title" className={styles.title}>
+                {richText(booking.confirmed.title)}
+              </Reveal>
+              <Reveal as="p" className={styles.body}>
+                {booking.confirmed.body}
               </Reveal>
             </>
           }

@@ -105,6 +105,37 @@
   margin-top: 2px;
 }
 
+/* ---------- Confirmed state: answer echo (design 5a) ---------- */
+
+.echo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  padding-top: 22px;
+  max-width: 44ch;
+}
+
+.echoRow {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.echoLabel {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.echoValue {
+  font-size: 15.5px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
 /* ---------- Email fallback ---------- */
 
 .mailRow {
@@ -184,6 +215,95 @@
 .embed {
   position: relative;
   min-height: 480px;
+}
+
+/* ---------- Confirmed state: the site-rendered scheduled card ----------
+   Replaces the iframe entirely once the booking lands (design 5a): Cal's
+   own success screen brings gutters, an inner scroll and a signup banner we
+   can't reach from outside. Reschedule/Cancel stay Cal's, as links. */
+
+.scheduled {
+  padding: 32px 28px 28px;
+}
+
+.scheduledCheck {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 2px solid var(--teal);
+  color: var(--teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 18px;
+}
+
+.scheduledTitle {
+  font-family: var(--serif);
+  font-size: 24px;
+  line-height: 1.15;
+  margin-bottom: 6px;
+}
+
+.scheduledBody {
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  margin-bottom: 24px;
+}
+
+.scheduledDetails {
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 12px 14px;
+  margin: 0;
+}
+
+.scheduledDetails dt {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.scheduledDetails dd {
+  font-size: 14px;
+  margin: 0;
+}
+
+.scheduledActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+
+.scheduledActions a {
+  flex: 1;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 0;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--ink);
+  transition: border-color 0.2s;
+}
+
+.scheduledActions a:hover {
+  border-color: var(--teal);
+}
+
+.scheduledActions .scheduledCancel {
+  color: var(--red);
+}
+
+.scheduledActions .scheduledCancel:hover {
+  border-color: var(--red);
 }
 
 .cal {

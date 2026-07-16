@@ -1,7 +1,7 @@
 "use client";
 
 import Cal, { getCalApi } from "@calcom/embed-react";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { Fragment, type ReactNode, useEffect, useRef, useState } from "react";
 import Reveal from "@/components/Reveal";
 import type { ContactBooking } from "@/content/types";
 import styles from "./BookingFlow.module.css";
@@ -33,9 +33,136 @@ const CAL_CSS_VARS: Record<string, string> = {
 type BookingFlowProps = {
   /** Server-rendered kicker + title + lede (slotted in above the steps). */
   heading: ReactNode;
+  /** Server-rendered heading for the post-booking state (design 5a). */
+  confirmedHeading: ReactNode;
   booking: ContactBooking;
   email: string;
+  /** Host name for the scheduled card's Who row (site.name). */
+  hostName: string;
 };
+
+/** Everything the confirmed state can render, merged from Cal's events. */
+type ConfirmedBooking = {
+  /** Booked format's option value, from Cal's record or the local pick. */
+  format: string | null;
+  /** The visitor's "What are you weighing?" answer. */
+  weighing: string | null;
+  /** Needed for the When row and the reschedule/cancel links. */
+  uid: string | null;
+  start: string | null;
+  end: string | null;
+  /** Attendee name, for the Who row. */
+  attendee: string | null;
+};
+
+/**
+ * Session-scoped copy of the picked format: the confirmed echo must survive
+ * client-side navigation (each page mounts a fresh BookingFlow) and payload
+ * gaps. Read only as an echo fallback — never to preselect the picker.
+ */
+const FORMAT_STORE_KEY = "dbln:booking-format";
+
+function storeFormat(value: string | null) {
+  try {
+    if (value) window.sessionStorage.setItem(FORMAT_STORE_KEY, value);
+    else window.sessionStorage.removeItem(FORMAT_STORE_KEY);
+  } catch {
+    // Storage unavailable (private mode etc.); the echo falls back to state.
+  }
+}
+
+function storedFormat(): string | null {
+  try {
+    return window.sessionStorage.getItem(FORMAT_STORE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Cal response values arrive in several shapes across versions: plain
+ * strings, `{ value, label }` (selects), `{ firstName, lastName }` (name).
+ */
+function asString(v: unknown): string | null {
+  if (typeof v === "string" && v.trim()) return v.trim();
+  if (typeof v === "object" && v !== null) {
+    const o = v as Record<string, unknown>;
+    if (typeof o.value === "string" && o.value.trim()) return o.value.trim();
+    const name = [o.firstName, o.lastName]
+      .filter((p): p is string => typeof p === "string" && p.trim() !== "")
+      .join(" ")
+      .trim();
+    if (name) return name;
+    if (typeof o.label === "string" && o.label.trim()) return o.label.trim();
+  }
+  return null;
+}
+
+/**
+ * Pull what the confirmed card needs out of the deprecated v1
+ * `bookingSuccessful` event's booking object (`bookingSuccessfulV2` strips
+ * responses). Every field is best-effort with the fallbacks Cal has used:
+ * notes can live in `responses.notes` or `description`; the attendee in
+ * `responses.name` or `attendees[0].name`; times in `startTime`/`endTime`.
+ */
+function extractBooking(bookingData: unknown): {
+  format: string | null;
+  weighing: string | null;
+  attendee: string | null;
+  uid: string | null;
+  start: string | null;
+  end: string | null;
+} {
+  const out: ReturnType<typeof extractBooking> = {
+    format: null,
+    weighing: null,
+    attendee: null,
+    uid: null,
+    start: null,
+    end: null,
+  };
+  if (typeof bookingData !== "object" || bookingData === null) return out;
+  const b = bookingData as Record<string, unknown>;
+  const responses = (
+    typeof b.responses === "object" && b.responses !== null ? b.responses : {}
+  ) as Record<string, unknown>;
+  out.format = asString(responses.format);
+  out.weighing = asString(responses.notes) ?? asString(b.description);
+  out.attendee = asString(responses.name);
+  if (!out.attendee && Array.isArray(b.attendees) && b.attendees.length > 0) {
+    const first = b.attendees[0];
+    if (typeof first === "object" && first !== null) {
+      out.attendee = asString((first as { name?: unknown }).name);
+    }
+  }
+  out.uid = asString(b.uid);
+  out.start = asString(b.startTime);
+  out.end = asString(b.endTime);
+  return out;
+}
+
+/** "Thursday, July 16 2026" + "11:30 – 12:00" + the visitor's timezone. */
+function formatWhen(
+  startIso: string | null,
+  endIso: string | null,
+): { date: string; range: string; tz: string } | null {
+  if (!startIso || !endIso) return null;
+  const start = new Date(startIso);
+  const end = new Date(endIso);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return null;
+  const day = (d: Date) =>
+    `${d.toLocaleDateString("en-US", { weekday: "long" })}, ${d.toLocaleDateString(
+      "en-US",
+      { month: "long", day: "numeric" },
+    )} ${d.getFullYear()}`;
+  const time = (d: Date) =>
+    d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  return {
+    date: day(start),
+    range: `${time(start)} – ${time(end)}`,
+    tz: Intl.DateTimeFormat().resolvedOptions().timeZone ?? "",
+  };
+}
 
 /**
  * The contact section's booking flow (direction 3a): format picker on the
@@ -51,14 +178,24 @@ type BookingFlowProps = {
  * hideEventTypeDetails) are one-shot postMessages, so they are re-applied on
  * every `linkReady`.
  */
-export default function BookingFlow({ heading, booking, email }: BookingFlowProps) {
+export default function BookingFlow({
+  heading,
+  confirmedHeading,
+  booking,
+  email,
+  hostName,
+}: BookingFlowProps) {
   const [format, setFormat] = useState<string | null>(null);
   /** Format change awaiting restart confirmation ({ next: null } = deselect). */
   const [pending, setPending] = useState<{ next: string | null } | null>(null);
   /** Whether the visitor has clicked into the booker since its last (re)mount. */
   const [interacted, setInteracted] = useState(false);
+  /** Set once Cal reports a completed booking; per-session only (design 5a). */
+  const [confirmed, setConfirmed] = useState<ConfirmedBooking | null>(null);
   const [inView, setInView] = useState(false);
   const [calReady, setCalReady] = useState(false);
+  /** Mirror of `format` for the event handlers (registered once, no stale closure). */
+  const formatRef = useRef<string | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
   const embedRef = useRef<HTMLDivElement | null>(null);
   const dialogRef = useRef<HTMLDialogElement | null>(null);
@@ -116,6 +253,56 @@ export default function BookingFlow({ heading, booking, email }: BookingFlowProp
       if (cancelled) return;
       cal("ui", ui);
       cal("on", { action: "linkReady", callback: () => cal("ui", ui) });
+      // A landed booking flips the section to its confirmed state (5a). The
+      // documented V2 event carries uid + times; the deprecated V1 event
+      // carries the booking object (responses, attendees, description).
+      // Either event triggers the state, in any order — the two are merged.
+      // The picked format is read lazily (ref, then sessionStorage) so it is
+      // current at event time, whichever instance registered the handlers.
+      const pickedFormat = () => formatRef.current ?? storedFormat();
+      cal("on", {
+        action: "bookingSuccessfulV2",
+        callback: (e) => {
+          // Intentional: Cal's payload shapes drift across versions; this
+          // makes a real booking diagnosable from the visitor console.
+          console.debug("[dbln booking] bookingSuccessfulV2", e.detail.data);
+          const d = e.detail.data;
+          setConfirmed((cur) => ({
+            format: cur?.format ?? pickedFormat(),
+            weighing: cur?.weighing ?? null,
+            attendee: cur?.attendee ?? null,
+            uid: d.uid ?? cur?.uid ?? null,
+            start: d.startTime ?? cur?.start ?? null,
+            end: d.endTime ?? cur?.end ?? null,
+          }));
+        },
+      });
+      cal("on", {
+        action: "bookingSuccessful",
+        callback: (e) => {
+          console.debug("[dbln booking] bookingSuccessful", e.detail.data);
+          const d = e.detail.data;
+          const b = extractBooking(d.booking);
+          // The event root carries date + duration; derive times when the
+          // booking object doesn't spell them out.
+          const start =
+            b.start ?? (typeof d.date === "string" && d.date ? d.date : null);
+          const startMs = start ? new Date(start).getTime() : Number.NaN;
+          const end =
+            b.end ??
+            (!Number.isNaN(startMs) && typeof d.duration === "number"
+              ? new Date(startMs + d.duration * 60000).toISOString()
+              : null);
+          setConfirmed((cur) => ({
+            format: b.format ?? cur?.format ?? pickedFormat(),
+            weighing: b.weighing ?? cur?.weighing ?? null,
+            attendee: b.attendee ?? cur?.attendee ?? null,
+            uid: b.uid ?? cur?.uid ?? null,
+            start: cur?.start ?? start,
+            end: cur?.end ?? end,
+          }));
+        },
+      });
       setCalReady(true);
     })();
     return () => {
@@ -148,6 +335,8 @@ export default function BookingFlow({ heading, booking, email }: BookingFlowProp
 
   const applyFormat = (next: string | null) => {
     setFormat(next);
+    formatRef.current = next;
+    storeFormat(next);
     // Fresh iframe after a format change; nothing has been clicked in it yet.
     setInteracted(false);
     setPending(null);
@@ -159,98 +348,226 @@ export default function BookingFlow({ heading, booking, email }: BookingFlowProp
     else applyFormat(next);
   };
 
+  /**
+   * Reschedule and cancel hand the booking back to Cal in its own tab, and
+   * what happens there is invisible to us (those flows fire no embed events).
+   * Return to the resting state on the way out: a cancelled booking would
+   * make the acknowledgement a lie, and a stale one is worse than none.
+   */
+  const handOffToCal = () => {
+    setConfirmed(null);
+    applyFormat(null);
+  };
+
   const active = booking.formats.find((f) => f.value === format) ?? null;
-  const veiled = !active;
+  const veiled = !active && !confirmed;
   const showCal = inView && calReady;
   const calConfig: Record<string, string> = { layout: "month_view", theme: "light" };
   if (active) calConfig.format = active.value;
+  // Focus echo: Cal's own record of the booked format wins over picker
+  // state. Match the option value first, then the title (Cal select
+  // responses have carried either); never show an unmapped raw slug.
+  const bookedFormat = confirmed?.format?.toLowerCase() ?? null;
+  const focus = confirmed
+    ? (booking.formats.find(
+        (f) =>
+          f.value.toLowerCase() === bookedFormat ||
+          f.title.toLowerCase() === bookedFormat,
+      )?.title ??
+      active?.title ??
+      null)
+    : null;
+  const when = confirmed ? formatWhen(confirmed.start, confirmed.end) : null;
 
   return (
     <div className={styles.grid}>
       <div>
-        {heading}
+        {/* Keyed so React mounts a fresh subtree per state instead of reusing
+            the Reveal instances across branches: Reveal adds its `.in` class
+            imperatively, and a reused instance whose className prop changes
+            gets that class overwritten by React (its mount effect, which
+            would re-add it, never re-runs). */}
+        {confirmed ? (
+          <Fragment key="confirmed">
+            {confirmedHeading}
 
-        <Reveal>
-          <p className={styles.step} id="booking-format-label">
-            {booking.formatStep}
-          </p>
-          <div
-            className={styles.formats}
-            role="group"
-            aria-labelledby="booking-format-label"
-          >
-            {booking.formats.map((f) => (
-              <button
-                key={f.value}
-                type="button"
-                className={styles.format}
-                aria-pressed={format === f.value}
-                onClick={() => requestFormat(f.value)}
+            {(focus || confirmed.weighing) && (
+              <Reveal className={styles.echo}>
+                {focus && (
+                  <div className={styles.echoRow}>
+                    <p className={styles.echoLabel}>
+                      {booking.confirmed.focusLabel}
+                    </p>
+                    <p className={styles.echoValue}>{focus}</p>
+                  </div>
+                )}
+                {confirmed.weighing && (
+                  <div className={styles.echoRow}>
+                    <p className={styles.echoLabel}>
+                      {booking.confirmed.weighingLabel}
+                    </p>
+                    <p className={styles.echoValue}>{confirmed.weighing}</p>
+                  </div>
+                )}
+              </Reveal>
+            )}
+
+            <Reveal className={styles.mailRow}>
+              <a className={styles.mail} href={`mailto:${email}`}>
+                {email}
+              </a>
+              <span className={styles.mailHint}>
+                {booking.confirmed.emailHint}
+              </span>
+            </Reveal>
+          </Fragment>
+        ) : (
+          <Fragment key="booking">
+            {heading}
+
+            <Reveal>
+              <p className={styles.step} id="booking-format-label">
+                {booking.formatStep}
+              </p>
+              <div
+                className={styles.formats}
+                role="group"
+                aria-labelledby="booking-format-label"
               >
-                <span className={styles.formatNum} aria-hidden="true">
-                  {f.num}
-                </span>
-                <span>
-                  <span className={styles.formatTitle}>{f.title}</span>
-                  <span className={styles.formatDesc}>{f.desc}</span>
-                </span>
-              </button>
-            ))}
-          </div>
-        </Reveal>
+                {booking.formats.map((f) => (
+                  <button
+                    key={f.value}
+                    type="button"
+                    className={styles.format}
+                    aria-pressed={format === f.value}
+                    onClick={() => requestFormat(f.value)}
+                  >
+                    <span className={styles.formatNum} aria-hidden="true">
+                      {f.num}
+                    </span>
+                    <span>
+                      <span className={styles.formatTitle}>{f.title}</span>
+                      <span className={styles.formatDesc}>{f.desc}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </Reveal>
 
-        <Reveal className={styles.mailRow}>
-          <a className={styles.mail} href={`mailto:${email}`}>
-            {email}
-          </a>
-          <span className={styles.mailHint}>{booking.emailHint}</span>
-        </Reveal>
+            <Reveal className={styles.mailRow}>
+              <a className={styles.mail} href={`mailto:${email}`}>
+                {email}
+              </a>
+              <span className={styles.mailHint}>{booking.emailHint}</span>
+            </Reveal>
+          </Fragment>
+        )}
       </div>
 
       <div>
         <Reveal as="p" className={styles.step}>
-          {booking.timeStep}
+          {confirmed ? booking.confirmed.timeStep : booking.timeStep}
         </Reveal>
         <div className={styles.card} ref={cardRef}>
-          <div className={styles.cardHead}>
-            <div>
-              <p className={styles.event}>{booking.event.title}</p>
-              <p className={styles.eventMeta}>{booking.event.meta}</p>
+          {!confirmed && (
+            <div className={styles.cardHead}>
+              <div>
+                <p className={styles.event}>{booking.event.title}</p>
+                <p className={styles.eventMeta}>{booking.event.meta}</p>
+              </div>
+              {active && (
+                <span className={styles.chip}>
+                  {booking.event.chipPrefix}
+                  {active.chip}
+                </span>
+              )}
             </div>
-            {active && (
-              <span className={styles.chip}>
-                {booking.event.chipPrefix}
-                {active.chip}
-              </span>
-            )}
-          </div>
-          <div className={styles.embed} aria-busy={!showCal}>
-            <div ref={embedRef} inert={veiled}>
-              {showCal ? (
-                <Cal
-                  key={active?.value ?? ""}
-                  namespace={CAL_NAMESPACE}
-                  calLink={booking.event.calLink}
-                  config={calConfig}
-                  className={styles.cal}
-                />
-              ) : (
-                <div className={styles.skeleton} aria-hidden="true">
-                  <div />
-                  <div />
-                  <div />
+          )}
+          {confirmed ? (
+            <div className={styles.scheduled}>
+              <div className={styles.scheduledCheck} aria-hidden="true">
+                ✓
+              </div>
+              <p className={styles.scheduledTitle}>
+                {booking.confirmed.card.title}
+              </p>
+              <p className={styles.scheduledBody}>
+                {booking.confirmed.card.body}
+              </p>
+              <dl className={styles.scheduledDetails}>
+                <dt>{booking.confirmed.card.whatLabel}</dt>
+                <dd>{booking.confirmed.card.what}</dd>
+                {when && (
+                  <>
+                    <dt>{booking.confirmed.card.whenLabel}</dt>
+                    <dd>
+                      {when.date}
+                      <br />
+                      {when.range}
+                      {when.tz && ` (${when.tz})`}
+                    </dd>
+                  </>
+                )}
+                <dt>{booking.confirmed.card.whoLabel}</dt>
+                <dd>
+                  {hostName}
+                  {confirmed.attendee && ` · ${confirmed.attendee}`}
+                </dd>
+                <dt>{booking.confirmed.card.whereLabel}</dt>
+                <dd>{booking.confirmed.card.where}</dd>
+              </dl>
+              {confirmed.uid && (
+                <div className={styles.scheduledActions}>
+                  <a
+                    href={`https://cal.com/reschedule/${confirmed.uid}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={handOffToCal}
+                  >
+                    {booking.confirmed.card.reschedule}
+                  </a>
+                  <a
+                    className={styles.scheduledCancel}
+                    href={`https://cal.com/booking/${confirmed.uid}?cancel=true`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={handOffToCal}
+                  >
+                    {booking.confirmed.card.cancel}
+                  </a>
                 </div>
               )}
             </div>
-            {veiled && (
-              <div className={styles.veil}>
-                <p className={styles.veilPill}>{booking.veil}</p>
+          ) : (
+            <div className={styles.embed} aria-busy={!showCal}>
+              <div ref={embedRef} inert={veiled}>
+                {showCal ? (
+                  <Cal
+                    key={active?.value ?? ""}
+                    namespace={CAL_NAMESPACE}
+                    calLink={booking.event.calLink}
+                    config={calConfig}
+                    className={styles.cal}
+                  />
+                ) : (
+                  <div className={styles.skeleton} aria-hidden="true">
+                    <div />
+                    <div />
+                    <div />
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+              {veiled && (
+                <div className={styles.veil}>
+                  <p className={styles.veilPill}>{booking.veil}</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
+      {!confirmed && (
       <dialog
         ref={dialogRef}
         className={styles.dialog}
@@ -287,6 +604,7 @@ export default function BookingFlow({ heading, booking, email }: BookingFlowProp
           </button>
         </div>
       </dialog>
+      )}
     </div>
   );
 }
