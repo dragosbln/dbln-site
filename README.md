@@ -9,6 +9,9 @@ Personal site of Dragos Bilaniuc. Next.js (App Router, static export) deployed t
 - **CSS Modules** per component, design tokens in `src/app/globals.css`.
 - **Fonts** self-hosted via `next/font/google` (Newsreader, Hanken Grotesk, Spline Sans Mono).
 - **Firebase Hosting**, project `dbln-b56ec`, serving `out/`.
+- **Plausible** (cloud) for analytics — cookieless, loaded via the official
+  npm tracker; boots only on the canonical host and stays off preview
+  channels (see AGENTS.md, "Analytics").
 
 ## Development
 

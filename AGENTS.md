@@ -129,9 +129,11 @@ Interaction model (decided by Dragos, don't regress):
   format: no `embed.js`, no iframe, so scrolling past the section contacts
   no third party and stores nothing on the device. The pick is the visitor's
   explicit request for the booking service, which is what keeps this
-  defensible under ePrivacy without a consent banner (the site has no
-  analytics and sets no first-party cookies; keep it that way, or this
-  calculus changes). The veil names Cal.com so the choice is informed.
+  defensible under ePrivacy without a consent banner (the site's only
+  analytics is Plausible — cookieless, nothing stored on the device, see
+  "Analytics" below — and the site sets no first-party cookies; keep both
+  true, or this calculus changes). The veil names Cal.com so the choice is
+  informed.
 - The booker renders veiled (blurred overlay + `inert`) until a format is
   picked; the veil pill asks for one. Picking the first format boots Cal and
   mounts the iframe with the prefill.
@@ -196,6 +198,37 @@ Embed facts learned from the package source (do not "simplify" these away):
   the card never collapses or shifts. (The old IntersectionObserver lazy
   mount was removed when click-to-load landed: a pick already implies the
   section is on screen, so the observer was dead weight.)
+
+## Analytics (Plausible)
+
+Traffic stats come from Plausible Cloud (EU-hosted) via the official
+`@plausible-analytics/tracker` npm package — no snippet, no cookies, nothing
+stored on the visitor's device. That last part is load-bearing: it is why
+the Cal.com calculus above survives analytics being present. Never replace
+this with a tool that sets cookies or touches device storage without adding
+a consent banner first.
+
+- `src/lib/analytics.ts` owns the integration: `initAnalytics()` (called
+  once by the `Analytics` client leaf in the root layout) and
+  `track(name, props)`, a safe no-op wherever the tracker didn't boot. The
+  package reads `location` at module scope, so it is dynamic-imported at
+  runtime — a static import crashes the prerender in `next build`.
+- Hostname gate: the tracker boots on the canonical host (+ `www`) and on
+  localhost, where it only logs "Ignoring Event" instead of sending
+  (`captureOnLocalhost` stays false). Firebase preview channels
+  (`*.web.app`) never boot it: preview traffic can't pollute the stats, and
+  previews contact no third party.
+- Pageviews (SPA navigations included), scroll depth, engagement time and
+  outbound link clicks are automatic. Custom events: `Booking Format
+  Picked` and `Booking Confirmed` (both carry a `format` prop) in
+  `BookingFlow`; the confirmed one is latched per booking because Cal fires
+  both the v1 and v2 success events for a single booking.
+- Dashboard side: each custom event (plus `Outbound Link: Click`) needs a
+  goal created once in Plausible under Site settings → Goals, or it won't
+  surface there.
+- Exclude your own visits with `localStorage.plausible_ignore = "true"` —
+  the tracker ships in the site's own bundle, so an adblocker won't filter
+  it for you.
 
 ## Heading anchors (copy deep link)
 

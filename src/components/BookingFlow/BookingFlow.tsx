@@ -4,6 +4,7 @@ import Cal, { getCalApi } from "@calcom/embed-react";
 import { Fragment, type ReactNode, useEffect, useRef, useState } from "react";
 import Reveal from "@/components/Reveal";
 import type { ContactBooking } from "@/content/types";
+import { track } from "@/lib/analytics";
 import styles from "./BookingFlow.module.css";
 
 const CAL_NAMESPACE = "booking";
@@ -197,6 +198,8 @@ export default function BookingFlow({
   const formatRef = useRef<string | null>(null);
   /** Latch: Cal's script + handlers are booted once, on the first pick. */
   const booted = useRef(false);
+  /** Analytics latch: Cal fires both success events per booking — count once. */
+  const confirmedTracked = useRef(false);
   const embedRef = useRef<HTMLDivElement | null>(null);
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
@@ -293,6 +296,25 @@ export default function BookingFlow({
     return () => window.removeEventListener("blur", onWindowBlur);
   }, []);
 
+  // Count the conversion once per landed booking: the v1 and v2 success
+  // events both fire for one booking (either order), each updating
+  // `confirmed`. The prop mirrors the focus echo's matching — Cal's record
+  // may carry the option value or the title — but reports the option value.
+  useEffect(() => {
+    if (!confirmed || confirmedTracked.current) return;
+    confirmedTracked.current = true;
+    const recorded = confirmed.format?.toLowerCase() ?? null;
+    const format =
+      booking.formats.find(
+        (f) =>
+          f.value.toLowerCase() === recorded ||
+          f.title.toLowerCase() === recorded,
+      )?.value ??
+      recorded ??
+      "unknown";
+    track("Booking Confirmed", { format });
+  }, [confirmed, booking.formats]);
+
   // The restart confirmation is a native <dialog>; open/close follows
   // `pending`. Cleanup runs in every owned close path (buttons, backdrop,
   // Esc) — the `close` event is only a safety net for unowned closes.
@@ -307,6 +329,7 @@ export default function BookingFlow({
     setFormat(next);
     formatRef.current = next;
     storeFormat(next);
+    if (next) track("Booking Format Picked", { format: next });
     // Fresh iframe after a format change; nothing has been clicked in it yet.
     setInteracted(false);
     setPending(null);
@@ -327,6 +350,8 @@ export default function BookingFlow({
   const handOffToCal = () => {
     setConfirmed(null);
     applyFormat(null);
+    // A booking made after a reschedule/cancel hand-off is a new conversion.
+    confirmedTracked.current = false;
   };
 
   const active = booking.formats.find((f) => f.value === format) ?? null;
