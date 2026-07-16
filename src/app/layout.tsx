@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Newsreader, Hanken_Grotesk, Spline_Sans_Mono } from "next/font/google";
+import Analytics from "@/components/Analytics";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import JsonLd from "@/components/JsonLd";
@@ -86,6 +87,7 @@ export default function RootLayout({
         <Footer />
         <JsonLd data={personSchema} />
         <JsonLd data={webSiteSchema} />
+        <Analytics />
       </body>
     </html>
   );
