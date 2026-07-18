@@ -95,6 +95,9 @@
 .dg-band { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; fill: var(--ink-faint-2); }
 .dg-band.live { fill: var(--teal-deep); }
 .dg-note { font-family: var(--mono); font-size: 11px; fill: var(--ink-faint-2); }
+/* an annotation about the failure, in the same red as dg-node.fail / dg-edge.fail.
+   Needed as a class: a fill="" presentation attribute loses to the .dg-note rule. */
+.dg-note.fail { fill: var(--red); }
 .dg-cell rect { fill: var(--accent-wash); stroke: none; }
 .dg-cell text { font-family: var(--mono); font-size: 10.5px; fill: var(--teal-deep); }
 .dg-cell.ghost rect { fill: none; stroke: var(--line); stroke-dasharray: 3 3; }
