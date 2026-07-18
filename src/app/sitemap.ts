@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { privacy } from "@/content/privacy";
 import { site } from "@/content/site";
 import { getPosts } from "@/lib/posts";
 import { postUrl } from "@/lib/urls";
@@ -35,5 +36,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly" as const,
       priority: 0.7,
     })),
+    {
+      url: `${site.url}/privacy`,
+      lastModified: new Date(privacy.updated),
+      changeFrequency: "yearly",
+      priority: 0.2,
+    },
   ];
 }

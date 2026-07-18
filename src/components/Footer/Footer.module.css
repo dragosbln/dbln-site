@@ -21,6 +21,23 @@
   font-size: 13px;
 }
 
+.legal {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.privacy {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 12px;
+  transition: color 0.2s;
+}
+
+.privacy:hover {
+  color: var(--teal-bright);
+}
+
 .socials {
   display: flex;
   gap: 22px;

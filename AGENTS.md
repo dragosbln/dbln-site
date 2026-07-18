@@ -230,6 +230,18 @@ a consent banner first.
   the tracker ships in the site's own bundle, so an adblocker won't filter
   it for you.
 
+## Privacy notice (/privacy)
+
+`src/content/privacy.ts` → `PrivacyNotice` component → `/privacy`, linked
+small under the copyright in the footer. The copy is **a description of what
+the code does**, not boilerplate: it states that the site sets no cookies,
+that the only device storage is the booking picker's `sessionStorage` key,
+that Plausible is cookieless and EU-hosted, and that Cal.com is contacted
+only after a format pick. Change any of those behaviours and this copy is
+wrong — which is a compliance problem, not a stale-doc problem. Identity
+values interpolate from `site.ts`; bump `privacy.updated` (drives both the
+rendered date and the sitemap's `lastModified`) when the substance changes.
+
 ## Heading anchors (copy deep link)
 
 Every article heading gets a hover "copy link" button — `HeadingAnchors`
