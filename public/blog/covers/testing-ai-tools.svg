@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+<defs>
+  <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse">
+    <path d="M34 0H0V34" fill="none" stroke="#d2cdc2" stroke-width="1" opacity="0.5"></path>
+  </pattern>
+</defs>
+<rect width="1200" height="630" fill="#f1eee7"></rect>
+<rect width="1200" height="630" fill="url(#grid)"></rect>
+<rect x="28" y="28" width="1144" height="574" fill="none" stroke="#d2cdc2" stroke-width="1.5"></rect>
+
+<g stroke="#17191c" stroke-width="2">
+  <path d="M28 60 H52 M60 28 V52"></path>
+  <path d="M1172 570 H1148 M1140 602 V578"></path>
+</g>
+<text x="60" y="78" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="15" letter-spacing="3" fill="#4a4d52">FIG.06 — HARNESS</text>
+
+<!-- two sources feed one entry: predefined output (solid) and the rare paid run (dashed) -->
+<text x="120" y="146" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="14" letter-spacing="1" fill="#4a4d52">PREDEFINED OUTPUT</text>
+<text x="120" y="167" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="12.5" fill="#8a8c8f">audit.json · report.md · summary.md</text>
+<path d="M120 178 H586" fill="none" stroke="#8a8c8f" stroke-width="1.5"></path>
+
+<text x="1080" y="146" text-anchor="end" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="14" letter-spacing="1" fill="#4a4d52">LIVE RUN · $3</text>
+<text x="1080" y="167" text-anchor="end" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="12.5" fill="#8a8c8f">the model, only here</text>
+<path d="M1080 178 H614" fill="none" stroke="#8a8c8f" stroke-width="1.5" stroke-dasharray="6 6"></path>
+
+<!-- the gauntlet: four deterministic layers, checked in order -->
+<g font-family="&#39;Spline Sans Mono&#39;,monospace">
+  <!-- L1 -->
+  <rect x="390" y="205" width="420" height="58" rx="10" fill="none" stroke="#17191c" stroke-width="2"></rect>
+  <rect x="402" y="217" width="396" height="34" rx="6" fill="#e8e4da"></rect>
+  <circle cx="390" cy="234" r="15" fill="#f1eee7" stroke="#17191c" stroke-width="2"></circle>
+  <text x="390" y="240" text-anchor="middle" font-size="16" fill="#17191c">1</text>
+  <text x="432" y="240" font-size="15" fill="#4a4d52">shape</text>
+  <path d="M748 234 l7 8 l13 -17" fill="none" stroke="#4a4d52" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+  <!-- L2 -->
+  <rect x="390" y="289" width="420" height="58" rx="10" fill="none" stroke="#17191c" stroke-width="2"></rect>
+  <rect x="402" y="301" width="396" height="34" rx="6" fill="#e8e4da"></rect>
+  <circle cx="390" cy="318" r="15" fill="#f1eee7" stroke="#17191c" stroke-width="2"></circle>
+  <text x="390" y="324" text-anchor="middle" font-size="16" fill="#17191c">2</text>
+  <text x="432" y="324" font-size="15" fill="#4a4d52">invariants</text>
+  <path d="M748 318 l7 8 l13 -17" fill="none" stroke="#4a4d52" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+  <!-- L3 -->
+  <rect x="390" y="373" width="420" height="58" rx="10" fill="none" stroke="#17191c" stroke-width="2"></rect>
+  <rect x="402" y="385" width="396" height="34" rx="6" fill="#e8e4da"></rect>
+  <circle cx="390" cy="402" r="15" fill="#f1eee7" stroke="#17191c" stroke-width="2"></circle>
+  <text x="390" y="408" text-anchor="middle" font-size="16" fill="#17191c">3</text>
+  <text x="432" y="408" font-size="15" fill="#4a4d52">expectations</text>
+  <path d="M748 402 l7 8 l13 -17" fill="none" stroke="#4a4d52" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+  <!-- L4 -->
+  <rect x="390" y="457" width="420" height="58" rx="10" fill="none" stroke="#17191c" stroke-width="2"></rect>
+  <rect x="402" y="469" width="396" height="34" rx="6" fill="#e8e4da"></rect>
+  <circle cx="390" cy="486" r="15" fill="#f1eee7" stroke="#17191c" stroke-width="2"></circle>
+  <text x="390" y="492" text-anchor="middle" font-size="16" fill="#17191c">4</text>
+  <text x="432" y="492" font-size="15" fill="#4a4d52">agreement</text>
+  <path d="M748 486 l7 8 l13 -17" fill="none" stroke="#4a4d52" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</g>
+
+<!-- THE TEAL: the output threads down through every layer and exits verified -->
+<circle cx="600" cy="178" r="10" fill="#f1eee7" stroke="#0c7b72" stroke-width="3.5"></circle>
+<path d="M600 188 V521" fill="none" stroke="#0c7b72" stroke-width="3.5"></path>
+<g fill="#0c7b72">
+  <circle cx="600" cy="234" r="6"></circle>
+  <circle cx="600" cy="318" r="6"></circle>
+  <circle cx="600" cy="402" r="6"></circle>
+  <circle cx="600" cy="486" r="6"></circle>
+</g>
+<circle cx="600" cy="534" r="14" fill="#0c7b72"></circle>
+<path d="M592 534 l6 7 l11 -14" fill="none" stroke="#f1eee7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+<text x="600" y="573" text-anchor="middle" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="13" letter-spacing="1" fill="#4a4d52">PASS · EVERY COMMIT · FREE</text>
+</svg>

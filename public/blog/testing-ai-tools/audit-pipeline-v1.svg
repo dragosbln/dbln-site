@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 880" role="img" aria-label="How the auth audit tool works, in three lanes: inputs, the tool, deliverables. The only required input is the target repo. The vendor profiles ship with the skill, one markdown file per provider: cognito and auth0, plus an empty slot for a third. Adding a provider means writing one more profile, so a new profile is the one optional input from outside. Both the repo and the profiles feed the mechanical pass, which detects vendors, locates candidates by search, and confirms each candidate by reading the surrounding code. A decision follows: in an interactive run the maintainer answers an interview covering the judgment calls; in a non-interactive run those judgment calls stay open. A compose step then combines the findings, the risks and the backlog, and writes both deliverables. One line goes straight to the full report. The line to the one-screen summary first meets a dashed connection coming out of the report, and the two enter the summary together: compose writes the summary, distilling it from the report and never from the codebase again. Animated teal dashes trace one run through the machine, alternating at the check: through the interview on one cycle, along the non-interactive bypass on the next.">
+  <title>How the tool works</title>
+  <desc>Audit pipeline v1: the target repo is the only required input; vendor profiles ship with the skill (cognito, auth0, plus an open slot). Both feed the mechanical pass (detect, locate, confirm); interactive runs add a maintainer interview; compose combines findings, risks and backlog and writes both report.md and summary.md, distilling the summary from the report rather than from the code.</desc>
+  <defs>
+    <marker id="ap1-ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#8a8c8f"/>
+    </marker>
+  </defs>
+
+  <text class="dg-band" x="20" y="26">inputs</text>
+
+  <g class="dg-node" id="n1">
+    <rect x="20" y="40" width="185" height="54" rx="8"/>
+    <text class="t" x="112" y="63">Target repo</text>
+    <text class="s" x="112" y="80">code under audit</text>
+  </g>
+  <g class="dg-node" id="n2">
+    <rect x="250" y="40" width="170" height="54" rx="8"/>
+    <text class="t" x="335" y="63">New profile</text>
+    <text class="s" x="335" y="80">optional · one .md</text>
+  </g>
+
+  <path class="dg-edge" id="e1" d="M112 94 V 230" marker-end="url(#ap1-ah)"/>
+  <path id="e2" d="M335 94 V 130" fill="none" stroke="#6b6e73" stroke-width="1.4" stroke-dasharray="4 4" marker-end="url(#ap1-ah)"/>
+
+  <path id="lane1" d="M20 104 H 420" fill="none" stroke="#d9d5cb" stroke-width="1"/>
+  <text class="dg-band" x="20" y="126">the tool</text>
+
+  <g class="dg-node" id="n8">
+    <rect x="140" y="136" width="280" height="76" rx="8"/>
+    <text class="t" x="280" y="158">Vendor profiles</text>
+    <text class="s" x="280" y="175">shipped with the skill</text>
+  </g>
+  <g class="dg-cell" id="c4">
+    <rect x="154" y="184" width="78" height="22" rx="6"/>
+    <text x="193" y="199" text-anchor="middle">cognito</text>
+  </g>
+  <g class="dg-cell" id="c5">
+    <rect x="242" y="184" width="64" height="22" rx="6"/>
+    <text x="274" y="199" text-anchor="middle">auth0</text>
+  </g>
+  <g class="dg-cell ghost" id="c6">
+    <rect x="316" y="184" width="90" height="22" rx="6"/>
+    <text x="361" y="199" text-anchor="middle">+ yours</text>
+  </g>
+
+  <path class="dg-edge" id="e10" d="M280 212 V 230" marker-end="url(#ap1-ah)"/>
+
+  <g class="dg-node key" id="n3">
+    <rect x="75" y="236" width="290" height="170" rx="8"/>
+    <text class="t" x="220" y="260">Mechanical pass</text>
+  </g>
+  <g class="dg-cell" id="c1">
+    <rect x="87" y="272" width="266" height="30" rx="6"/>
+    <text x="228" y="291" text-anchor="middle">detect vendors</text>
+  </g>
+  <g class="dg-cell" id="c2">
+    <rect x="87" y="306" width="266" height="30" rx="6"/>
+    <text x="228" y="325" text-anchor="middle">locate candidates · grep</text>
+  </g>
+  <g class="dg-cell" id="c3">
+    <rect x="87" y="340" width="266" height="30" rx="6"/>
+    <text x="228" y="359" text-anchor="middle">confirm · read the code</text>
+  </g>
+  <g class="dg-step">
+    <circle cx="87" cy="287" r="8"/>
+    <text x="87" y="290" text-anchor="middle">1</text>
+  </g>
+  <g class="dg-step">
+    <circle cx="87" cy="321" r="8"/>
+    <text x="87" y="324" text-anchor="middle">2</text>
+  </g>
+  <g class="dg-step">
+    <circle cx="87" cy="355" r="8"/>
+    <text x="87" y="358" text-anchor="middle">3</text>
+  </g>
+  <text class="dg-note" x="220" y="392" text-anchor="middle">a match is a candidate, never a finding</text>
+
+  <path class="dg-edge" id="e3" d="M220 406 V 428" marker-end="url(#ap1-ah)"/>
+
+  <g class="dg-chip" id="d1">
+    <rect x="172" y="434" width="96" height="22" rx="11"/>
+    <text x="220" y="449" text-anchor="middle">interactive?</text>
+  </g>
+
+  <text class="dg-note" x="175" y="476" text-anchor="middle">yes</text>
+  <text class="dg-note" x="265" y="476" text-anchor="middle">no</text>
+  <path class="dg-edge" id="e4" d="M220 456 V 484 H 130 V 508" marker-end="url(#ap1-ah)"/>
+  <path class="dg-edge" id="e5" d="M220 456 V 484 H 310 V 602" marker-end="url(#ap1-ah)"/>
+
+  <g class="dg-node" id="n4">
+    <rect x="45" y="514" width="170" height="54" rx="8"/>
+    <text class="t" x="130" y="537">Interview</text>
+    <text class="s" x="130" y="554">the judgment calls</text>
+  </g>
+  <text class="dg-note" x="322" y="546">judgment calls</text>
+  <text class="dg-note" x="322" y="560">stay open</text>
+
+  <path class="dg-edge" id="e6" d="M130 568 V 602" marker-end="url(#ap1-ah)"/>
+
+  <g class="dg-node" id="n5">
+    <rect x="95" y="608" width="230" height="92" rx="8"/>
+    <text class="t" x="210" y="632">Compose</text>
+  </g>
+  <g class="dg-chip plain" id="k1">
+    <rect x="113" y="652" width="64" height="22" rx="11"/>
+    <text x="145" y="667" text-anchor="middle">findings</text>
+  </g>
+  <g class="dg-chip plain" id="k2">
+    <rect x="189" y="652" width="48" height="22" rx="11"/>
+    <text x="213" y="667" text-anchor="middle">risks</text>
+  </g>
+  <g class="dg-chip plain" id="k3">
+    <rect x="249" y="652" width="58" height="22" rx="11"/>
+    <text x="278" y="667" text-anchor="middle">backlog</text>
+  </g>
+
+  <path id="lane2" d="M20 716 H 420" fill="none" stroke="#d9d5cb" stroke-width="1"/>
+  <text class="dg-band" x="20" y="736">deliverables</text>
+
+  <path class="dg-edge" id="e7" d="M210 700 V 750 H 90 V 760" marker-end="url(#ap1-ah)"/>
+  <path class="dg-edge" id="e8" d="M210 700 V 750 H 245 V 793 H 259" marker-end="url(#ap1-ah)"/>
+
+  <g class="dg-node" id="n6">
+    <rect x="25" y="766" width="130" height="54" rx="8"/>
+    <text class="t" x="90" y="789">report.md</text>
+    <text class="s" x="90" y="806">the full report</text>
+  </g>
+  <g class="dg-node" id="n7">
+    <rect x="265" y="766" width="130" height="54" rx="8"/>
+    <text class="t" x="330" y="789">summary.md</text>
+    <text class="s" x="330" y="806">one screen</text>
+  </g>
+
+  <path id="e9" d="M155 793 H 245" fill="none" stroke="#6b6e73" stroke-width="1.4" stroke-dasharray="4 4"/>
+  <circle id="j1" cx="245" cy="793" r="2.6" fill="#6b6e73"/>
+  <text class="dg-note" x="195" y="786" text-anchor="middle">distilled</text>
+
+  <text class="dg-note" x="220" y="848" text-anchor="middle">compose renders the summary from the report</text>
+  <text class="dg-note" x="220" y="862" text-anchor="middle">never from the codebase again</text>
+
+  <path class="dg-flow run" d="M112 94 V 230"/>
+  <path class="dg-flow run" d="M280 212 V 230"/>
+  <path class="dg-flow run" d="M220 406 V 428"/>
+  <path class="dg-flow run" d="M210 700 V 750 H 90 V 760"/>
+  <path class="dg-flow run" d="M210 700 V 750 H 245 V 793 H 259"/>
+
+  <g class="dg-appear">
+    <path class="dg-flow run" d="M220 456 V 484 H 130 V 508"/>
+    <path class="dg-flow run" d="M130 568 V 602"/>
+  </g>
+  <g class="dg-recede">
+    <path class="dg-flow run" d="M220 456 V 484 H 310 V 602"/>
+  </g>
+</svg>

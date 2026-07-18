@@ -1,0 +1,162 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 620" role="img" aria-label="The test harness behind the audit tool, in three lanes: free test run, mechanical tests, live run. On the left the tool's outputs are already predefined from figure 2 — audit.json, report.md and summary.md — and each enters the layer that consumes it: audit.json into layer one, and the two markdowns straight into layer four. The centre lane is the gauntlet of mechanical tests: shape validation against audit-schema.json, the same output contract from figure 2; relational invariants, where finding ids must resolve, escape hatches must carry their obligations and every evidence quote is re-read from the audited code; fixture expectations, the declared ground truth; and cross-format agreement, where the markdowns are checked against the JSON. It is free, takes about two seconds and runs on every commit. On the right is the paid path: a fixture copied to a fresh workspace and a headless run of the skill at about 3 dollars and 8 minutes, producing the same three artifacts, which enter the very same layer one, plus the audited code the quote check reads. Teal dashes stream along whichever flow is live while a pale teal wash fades between the free-test lanes and the live-run lanes, overlapping on the mechanical tests because both flows pass through them; the active lane's title turns teal with it.">
+  <title>4 free layers in front of every paid run</title>
+  <desc>Three lanes: the predefined outputs of a free test run on the left, the four mechanical test layers in the middle, the paid live run on the right. Both sources feed the same layer one; a wash and the lane title alternate between the two flows and overlap on the shared mechanical tests.</desc>
+  <defs>
+    <marker id="fl-ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#8a8c8f"/>
+    </marker>
+  </defs>
+
+  <!-- the highlight fades between the two flows; both cover the mechanical tests -->
+  <g class="dg-appear" id="wfree">
+    <rect x="0" y="0" width="478" height="620" fill="#e4efec"/>
+  </g>
+  <g class="dg-recede" id="wlive">
+    <rect x="160" y="0" width="560" height="620" fill="#e4efec"/>
+  </g>
+
+  <!-- swimlanes -->
+  <path id="lane1" d="M160 0 V 620" fill="none" stroke="#d9d5cb" stroke-width="1"/>
+  <path id="lane2" d="M478 0 V 620" fill="none" stroke="#d9d5cb" stroke-width="1"/>
+
+  <!-- the active lane's title goes teal with its wash -->
+  <g class="dg-appear">
+    <text class="dg-band live" font-weight="500" x="20" y="34">free test run</text>
+    <text class="dg-band" x="496" y="34">live run</text>
+  </g>
+  <g class="dg-recede">
+    <text class="dg-band" x="20" y="34">free test run</text>
+    <text class="dg-band live" font-weight="500" x="496" y="34">live run</text>
+  </g>
+  <text class="dg-band" x="180" y="34">mechanical tests</text>
+
+  <text class="dg-note" x="20" y="52">outputs predefined</text>
+  <text class="dg-note" x="20" y="66">from fig. 2</text>
+  <text class="dg-note" x="180" y="52">~2 s · every commit</text>
+  <text class="dg-note" x="496" y="52">$3 · ~8 min</text>
+
+  <!-- the outputs: already there, no model needed -->
+  <g class="dg-chip plain" id="a1">
+    <rect x="20" y="215" width="90" height="24" rx="12"/>
+    <text x="65" y="231" text-anchor="middle">audit.json</text>
+  </g>
+  <g class="dg-chip plain" id="a2">
+    <rect x="20" y="523" width="90" height="24" rx="12"/>
+    <text x="65" y="539" text-anchor="middle">report.md</text>
+  </g>
+  <g class="dg-chip plain" id="a3">
+    <rect x="20" y="551" width="90" height="24" rx="12"/>
+    <text x="65" y="567" text-anchor="middle">summary.md</text>
+  </g>
+
+  <path class="dg-edge" id="e1" d="M110 227 H 174" marker-end="url(#fl-ah)"/>
+  <path class="dg-edge" id="e3" d="M110 535 H 174" marker-end="url(#fl-ah)"/>
+  <path class="dg-edge" id="e4" d="M110 563 H 174" marker-end="url(#fl-ah)"/>
+
+  <!-- the gauntlet -->
+  <g class="dg-node" id="L1">
+    <rect x="180" y="190" width="270" height="74" rx="8"/>
+    <text class="t" x="315" y="214">Shape</text>
+  </g>
+  <g class="dg-cell" id="c1">
+    <rect x="192" y="222" width="246" height="36" rx="6"/>
+    <text x="315" y="237" text-anchor="middle">ajv vs audit-schema.json</text>
+    <text x="315" y="251" text-anchor="middle">the output contract (fig. 2)</text>
+  </g>
+  <g class="dg-step" id="s1">
+    <circle cx="200" cy="209" r="8"/>
+    <text x="200" y="212" text-anchor="middle">1</text>
+  </g>
+
+  <path class="dg-edge" id="e5" d="M315 264 V 290" marker-end="url(#fl-ah)"/>
+
+  <g class="dg-node" id="L2">
+    <rect x="180" y="296" width="270" height="74" rx="8"/>
+    <text class="t" x="315" y="320">Relational invariants</text>
+  </g>
+  <g class="dg-cell" id="c2">
+    <rect x="192" y="328" width="246" height="36" rx="6"/>
+    <text x="315" y="343" text-anchor="middle">ids resolve · quotes verify</text>
+    <text x="315" y="357" text-anchor="middle">hatches paired · non-negotiables</text>
+  </g>
+  <g class="dg-step" id="s2">
+    <circle cx="200" cy="315" r="8"/>
+    <text x="200" y="318" text-anchor="middle">2</text>
+  </g>
+
+  <path class="dg-edge" id="e6" d="M315 370 V 396" marker-end="url(#fl-ah)"/>
+
+  <g class="dg-node" id="L3">
+    <rect x="180" y="402" width="270" height="74" rx="8"/>
+    <text class="t" x="315" y="426">Fixture expectations</text>
+  </g>
+  <g class="dg-cell" id="c3">
+    <rect x="192" y="434" width="246" height="36" rx="6"/>
+    <text x="315" y="449" text-anchor="middle">ground truth · 87 assertions</text>
+    <text x="315" y="463" text-anchor="middle">the byte-identical pair</text>
+  </g>
+  <g class="dg-step" id="s3">
+    <circle cx="200" cy="421" r="8"/>
+    <text x="200" y="424" text-anchor="middle">3</text>
+  </g>
+
+  <path class="dg-edge" id="e7" d="M315 476 V 502" marker-end="url(#fl-ah)"/>
+
+  <g class="dg-node" id="L4">
+    <rect x="180" y="508" width="270" height="74" rx="8"/>
+    <text class="t" x="315" y="532">Cross-format agreement</text>
+  </g>
+  <g class="dg-cell" id="c4">
+    <rect x="192" y="540" width="246" height="36" rx="6"/>
+    <text x="315" y="562" text-anchor="middle">markdowns vs JSON</text>
+  </g>
+  <g class="dg-step" id="s4">
+    <circle cx="200" cy="527" r="8"/>
+    <text x="200" y="530" text-anchor="middle">4</text>
+  </g>
+
+  <!-- the paid path -->
+  <g class="dg-node" id="p1">
+    <rect x="496" y="62" width="204" height="44" rx="8"/>
+    <text class="t" x="598" y="85">copy fixture</text>
+    <text class="s" x="598" y="100">to a fresh workspace</text>
+  </g>
+  <path class="dg-edge" id="e8" d="M598 106 V 134" marker-end="url(#fl-ah)"/>
+  <g class="dg-node" id="p2">
+    <rect x="496" y="140" width="204" height="30" rx="8"/>
+    <text class="t" x="598" y="160">headless skill run</text>
+  </g>
+  <path class="dg-edge" id="e9" d="M598 170 V 196" marker-end="url(#fl-ah)"/>
+  <g class="dg-node" id="p3">
+    <rect x="496" y="202" width="204" height="50" rx="8"/>
+    <text class="t" x="598" y="232">3 artifacts</text>
+  </g>
+  <path class="dg-edge" id="e10" d="M496 227 H 456" marker-end="url(#fl-ah)"/>
+
+  <g class="dg-node" id="a4">
+    <rect x="496" y="308" width="204" height="50" rx="8"/>
+    <text class="t" x="598" y="331">audited code</text>
+    <text class="s" x="598" y="348">quotes re-read from source</text>
+  </g>
+  <path class="dg-edge" id="e2" d="M496 333 H 456" marker-end="url(#fl-ah)"/>
+
+  <!-- the gauntlet runs whichever source fed it -->
+  <path class="dg-flow run" d="M315 264 V 290"/>
+  <path class="dg-flow run" d="M315 370 V 396"/>
+  <path class="dg-flow run" d="M315 476 V 502"/>
+
+  <!-- the free flow (shows at rest: the path most runs take) -->
+  <g class="dg-appear">
+    <path class="dg-flow run" d="M110 227 H 174"/>
+    <path class="dg-flow run" d="M110 535 H 174"/>
+    <path class="dg-flow run" d="M110 563 H 174"/>
+  </g>
+
+  <!-- the paid flow -->
+  <g class="dg-recede">
+    <path class="dg-flow run" d="M598 106 V 134"/>
+    <path class="dg-flow run" d="M598 170 V 196"/>
+    <path class="dg-flow run" d="M496 227 H 456"/>
+    <path class="dg-flow run" d="M496 333 H 456"/>
+  </g>
+</svg>
