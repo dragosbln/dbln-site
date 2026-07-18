@@ -10,3 +10,15 @@ const monthYear = new Intl.DateTimeFormat("en", {
 export function formatMonthYear(isoDate: string): string {
   return monthYear.format(new Date(isoDate));
 }
+
+const fullDate = new Intl.DateTimeFormat("en", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+/** "2026-07-16" -> "July 16, 2026". Same UTC caveat as above. */
+export function formatFullDate(isoDate: string): string {
+  return fullDate.format(new Date(isoDate));
+}

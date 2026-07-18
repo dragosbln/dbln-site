@@ -231,3 +231,27 @@ export type NotFound = {
   lede: string;
   links: NavItem[];
 };
+
+/** One numbered block of the privacy notice. */
+export type PrivacySection = {
+  /** Two-digit index shown in the mono kicker ("01"). */
+  num: string;
+  title: string;
+  /** Rich text paragraphs. */
+  body: string[];
+};
+
+/**
+ * /privacy page copy. Every claim here is a statement about what the code
+ * actually does: change one and the other has to move with it.
+ */
+export type PrivacyNotice = {
+  hero: PageHero;
+  /** ISO date of the last substantive change, shown under the hero. */
+  updated: string;
+  /** Mono prefix for that date ("Last updated"). */
+  updatedLabel: string;
+  sections: PrivacySection[];
+  /** Closing block; its email link renders from `site.email`. */
+  contact: PrivacySection & { emailHint: string };
+};

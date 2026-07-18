@@ -64,6 +64,20 @@ export const blogBreadcrumbSchema = {
   ],
 };
 
+export const privacyBreadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: site.url },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Privacy Notice",
+      item: `${site.url}/privacy`,
+    },
+  ],
+};
+
 export function postBreadcrumbSchema(post: Post) {
   return {
     "@context": "https://schema.org",
