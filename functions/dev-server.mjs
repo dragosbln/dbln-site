@@ -15,6 +15,7 @@ import { fileURLToPath } from "node:url";
 const require = createRequire(import.meta.url);
 const express = require("express");
 const { createApp } = require("./lib/app.js");
+const { consoleMailer } = require("./lib/notify.js");
 const { MemoryStore } = require("./lib/store.js");
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -23,7 +24,14 @@ const port = 4610;
 
 const store = new MemoryStore();
 const app = express();
-app.use(createApp(store));
+// Comment cooldown shortened so manual testing isn't 30s-gated; the
+// notification "email" prints to this console.
+app.use(
+  createApp(store, {
+    mailer: consoleMailer(),
+    limits: { commentCooldownMs: 2000 },
+  }),
+);
 app.get("/__dump", (req, res) => res.json(store.dump()));
 // cleanUrls the way Firebase resolves them: /blog/<slug> serves
 // blog/<slug>.html even when a same-named directory (article images)

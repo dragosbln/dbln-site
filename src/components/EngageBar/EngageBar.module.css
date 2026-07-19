@@ -1,5 +1,5 @@
-/* Like pill — visual twin of ShareButton's pill (keep them in sync). */
-.like {
+/* Action pill — visual twin of ShareButton's pill (keep them in sync). */
+.act {
   display: inline-flex;
   align-items: center;
   gap: 9px;
@@ -19,22 +19,22 @@
     background-color 0.18s;
 }
 
-.like svg {
+.act svg {
   transition: transform 0.18s;
 }
 
-.like:hover {
+.act:hover {
   border-color: var(--teal);
   color: var(--teal-deep);
 }
 
-.like.on {
+.act.on {
   border-color: var(--teal);
   background: var(--accent-wash);
   color: var(--teal-deep);
 }
 
-.like.on svg {
+.act.on svg {
   fill: var(--teal);
   stroke: var(--teal);
 }
@@ -54,7 +54,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .like[data-bump] svg {
+  .act[data-bump] svg {
     animation: pop 0.34s ease;
   }
 }

@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import CommentIcon from "@/components/CommentIcon";
+import HeartIcon from "@/components/HeartIcon";
 import type { Post } from "@/content/types";
 import { formatMonthYear } from "@/lib/format";
+import { fetchCounts, likedLocally, type SocialCounts } from "@/lib/social";
 import { postPath } from "@/lib/urls";
 import styles from "./PostList.module.css";
 
@@ -21,6 +24,16 @@ type PostListProps = {
 export default function PostList({ posts }: PostListProps) {
   const [activeTags, setActiveTags] = useState<Set<string>>(new Set());
   const [sortMode, setSortMode] = useState<SortMode>("new");
+  // Engagement counts (design: stats under each row). Fetched once after
+  // mount; rows render without stats until then — and stay without them
+  // if the API is unreachable, which is the honest degraded state.
+  const [counts, setCounts] = useState<SocialCounts | null>(null);
+
+  useEffect(() => {
+    fetchCounts()
+      .then(setCounts)
+      .catch((err) => console.debug("[dbln social]", err));
+  }, []);
 
   const tagCounts = useMemo(() => {
     const counts = new Map<string, number>();
@@ -160,6 +173,38 @@ export default function PostList({ posts }: PostListProps) {
                           <li key={tag}>#{tag}</li>
                         ))}
                       </ul>
+                      {(() => {
+                        if (!counts) return null;
+                        const likeCount = counts.likes[post.slug] ?? 0;
+                        const commentCount = counts.comments[post.slug] ?? 0;
+                        if (likeCount < 1 && commentCount < 1) return null;
+                        return (
+                          <span className={styles.stats}>
+                            {likeCount >= 1 ? (
+                              <span
+                                className={
+                                  likedLocally(post.slug)
+                                    ? `${styles.stat} ${styles.statLiked}`
+                                    : styles.stat
+                                }
+                                aria-label={`${likeCount} likes`}
+                              >
+                                <HeartIcon size={14} />
+                                {likeCount}
+                              </span>
+                            ) : null}
+                            {commentCount >= 1 ? (
+                              <span
+                                className={styles.stat}
+                                aria-label={`${commentCount} comments`}
+                              >
+                                <CommentIcon size={14} />
+                                {commentCount}
+                              </span>
+                            ) : null}
+                          </span>
+                        );
+                      })()}
                     </div>
                   </Link>
                 </li>

@@ -1,5 +1,22 @@
-import { FieldValue, type Firestore } from "firebase-admin/firestore";
-import type { LikeAction, SocialStore, ToggleResult } from "./store";
+import {
+  FieldValue,
+  Timestamp,
+  type Firestore,
+} from "firebase-admin/firestore";
+import {
+  DEPTH_LIMIT,
+  THREAD_LIMIT,
+  toPublic,
+  toPublicThread,
+  type AddCommentInput,
+  type AddCommentResult,
+  type CommentStatus,
+  type LikeAction,
+  type PublicComment,
+  type SocialStore,
+  type StoredComment,
+  type ToggleResult,
+} from "./store";
 
 /**
  * Production store. Collections:
@@ -7,9 +24,11 @@ import type { LikeAction, SocialStore, ToggleResult } from "./store";
  *   ({slug, subject, action, at}). Never updated, never deleted by code.
  * - likeStates/{slug}__{subject}: the subject's current toggle state —
  *   what makes a like idempotent per browser (later: per account).
- * - meta/counters: {likes: {slug: n}} — displayed counts, written in the
- *   SAME transaction as the state + event, so counts always equal what
- *   the records add up to.
+ * - comments/{auto}: {slug, parentId, name, body, subject, status,
+ *   depth, at}. Soft-removed via status (admin), never edited by code.
+ * - meta/counters: {likes: {slug: n}, comments: {slug: n}} — displayed
+ *   counts, written in the SAME transaction as the writes they count,
+ *   so counts always equal what the records add up to.
  *
  * `subject` is a random client id (`d_<uuid>`), never an IP, never a
  * name. See AGENTS.md "Social backend".
@@ -17,13 +36,17 @@ import type { LikeAction, SocialStore, ToggleResult } from "./store";
 export class FirestoreStore implements SocialStore {
   constructor(private db: Firestore) {}
 
+  private countersRef() {
+    return this.db.collection("meta").doc("counters");
+  }
+
   async toggleLike(
     slug: string,
     subject: string,
     action: LikeAction,
   ): Promise<ToggleResult> {
     const stateRef = this.db.collection("likeStates").doc(`${slug}__${subject}`);
-    const countersRef = this.db.collection("meta").doc("counters");
+    const countersRef = this.countersRef();
     const eventRef = this.db.collection("likeEvents").doc();
 
     return this.db.runTransaction(async (tx) => {
@@ -64,8 +87,138 @@ export class FirestoreStore implements SocialStore {
     });
   }
 
-  async getLikeCounts(): Promise<Record<string, number>> {
-    const snap = await this.db.collection("meta").doc("counters").get();
-    return (snap.get("likes") as Record<string, number> | undefined) ?? {};
+  async getCounts() {
+    const snap = await this.countersRef().get();
+    return {
+      likes: (snap.get("likes") as Record<string, number> | undefined) ?? {},
+      comments:
+        (snap.get("comments") as Record<string, number> | undefined) ?? {},
+    };
+  }
+
+  async addComment(input: AddCommentInput): Promise<AddCommentResult> {
+    const countersRef = this.countersRef();
+    const newRef = this.db.collection("comments").doc();
+    const parentRef = input.parentId
+      ? this.db.collection("comments").doc(input.parentId)
+      : null;
+
+    return this.db.runTransaction(async (tx) => {
+      const [countersSnap, parentSnap] = await Promise.all([
+        tx.get(countersRef),
+        parentRef ? tx.get(parentRef) : Promise.resolve(null),
+      ]);
+
+      let depth = 0;
+      if (parentRef) {
+        if (
+          !parentSnap?.exists ||
+          parentSnap.get("slug") !== input.slug ||
+          parentSnap.get("status") !== "visible"
+        ) {
+          return { ok: false as const, error: "parent_missing" as const };
+        }
+        const parentDepth = (parentSnap.get("depth") as number | undefined) ?? 0;
+        if (parentDepth >= DEPTH_LIMIT) {
+          return { ok: false as const, error: "depth_exceeded" as const };
+        }
+        depth = parentDepth + 1;
+      }
+
+      const commentCounts =
+        (countersSnap.get("comments") as Record<string, number> | undefined) ??
+        {};
+      const current = commentCounts[input.slug] ?? 0;
+      if (current >= THREAD_LIMIT) {
+        return { ok: false as const, error: "thread_closed" as const };
+      }
+
+      // Timestamp.now() (not serverTimestamp) so the stored value can be
+      // returned to the poster in this same request.
+      const at = Timestamp.now();
+      tx.create(newRef, {
+        slug: input.slug,
+        parentId: input.parentId,
+        name: input.name,
+        body: input.body,
+        subject: input.subject,
+        status: "visible",
+        depth,
+        at,
+      });
+      tx.set(
+        countersRef,
+        { comments: { [input.slug]: current + 1 } },
+        { merge: true },
+      );
+
+      const row: StoredComment = {
+        id: newRef.id,
+        slug: input.slug,
+        parentId: input.parentId,
+        name: input.name,
+        body: input.body,
+        subject: input.subject,
+        status: "visible",
+        depth,
+        at: at.toDate().toISOString(),
+      };
+      return { ok: true as const, comment: toPublic(row) };
+    });
+  }
+
+  async getComments(slug: string): Promise<PublicComment[]> {
+    // Equality-only query: ordering + the placeholder rule are applied in
+    // memory (shared toPublicThread), which keeps parity with MemoryStore
+    // and avoids composite-index management for a per-article thread.
+    const snap = await this.db
+      .collection("comments")
+      .where("slug", "==", slug)
+      .get();
+    const rows: StoredComment[] = snap.docs.map((doc) => ({
+      id: doc.id,
+      slug: doc.get("slug") as string,
+      parentId: (doc.get("parentId") as string | null) ?? null,
+      name: (doc.get("name") as string) ?? "",
+      body: (doc.get("body") as string) ?? "",
+      subject: (doc.get("subject") as string) ?? "",
+      status: (doc.get("status") as CommentStatus) ?? "visible",
+      depth: (doc.get("depth") as number) ?? 0,
+      at:
+        doc.get("at") instanceof Timestamp
+          ? (doc.get("at") as Timestamp).toDate().toISOString()
+          : new Date(0).toISOString(),
+    }));
+    return toPublicThread(rows);
+  }
+
+  async setCommentStatus(id: string, status: CommentStatus): Promise<boolean> {
+    const ref = this.db.collection("comments").doc(id);
+    const countersRef = this.countersRef();
+    return this.db.runTransaction(async (tx) => {
+      const [snap, countersSnap] = await Promise.all([
+        tx.get(ref),
+        tx.get(countersRef),
+      ]);
+      if (!snap.exists) return false;
+      const current = snap.get("status") as CommentStatus;
+      if (current === status) return true;
+      const slug = snap.get("slug") as string;
+      const commentCounts =
+        (countersSnap.get("comments") as Record<string, number> | undefined) ??
+        {};
+      const delta = status === "removed" ? -1 : 1;
+      tx.update(ref, { status });
+      tx.set(
+        countersRef,
+        {
+          comments: {
+            [slug]: Math.max(0, (commentCounts[slug] ?? 0) + delta),
+          },
+        },
+        { merge: true },
+      );
+      return true;
+    });
   }
 }

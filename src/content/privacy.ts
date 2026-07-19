@@ -16,7 +16,7 @@ export const privacy: PrivacyNotice = {
     metaDescription:
       "What dbln.me collects and what it doesn't. Cookieless analytics, no cross-site tracking, and a booking flow that contacts Cal.com only when you choose to.",
   },
-  updated: "2026-07-19",
+  updated: "2026-07-20",
   updatedLabel: "Last updated",
   sections: [
     {
@@ -32,7 +32,7 @@ export const privacy: PrivacyNotice = {
       body: [
         "This site sets no cookies. Nothing is stored on your device to track you, and there is no consent banner because there is nothing to consent to.",
         "A few things are held in your browser, each tied to something you did. When you pick a call format in the contact section, that choice stays in session storage so the page can show it back to you after you book. The stored copy never leaves your browser and is gone when you close the tab. The choice itself goes to Cal.com with your booking.",
-        "When you like an article, your browser keeps a random id and the list of articles you liked. The list keeps the button lit on your next visit. The id travels with your likes so one browser counts once. Neither says who you are. Clear your browsing data and both are gone.",
+        "When you like or comment, your browser keeps a random id, the list of articles you liked, and the name you commented under. The list keeps the button lit. The name saves you retyping it. The id travels with your likes and comments so one browser counts once. None of it says who you are unless your name does. Clear your browsing data and it is all gone.",
       ],
     },
     {
@@ -55,6 +55,15 @@ export const privacy: PrivacyNotice = {
     },
     {
       num: "05",
+      title: "Commenting",
+      body: [
+        "Comments are public. The name you choose and what you write are stored by this site's own backend in the EU and shown to every reader. Use any name you like.",
+        "Your browser's random id is stored with each comment. No email address and no IP address is stored with it. Every new comment is emailed to me, so unwelcome ones get removed quickly.",
+        "Want a comment of yours gone? Email me which one it is and it goes. The legal basis is legitimate interest.",
+      ],
+    },
+    {
+      num: "06",
       title: "Booking a call",
       body: [
         "The contact section embeds Cal.com. Nothing is requested from Cal.com until you pick a call format. Scroll past the section and no third party is contacted at all.",
@@ -63,14 +72,14 @@ export const privacy: PrivacyNotice = {
       ],
     },
     {
-      num: "06",
+      num: "07",
       title: "Email",
       body: [
         "If you email me, I keep the message so I can reply and pick the thread up later. It stays in my mailbox. You are not added to a list. There is no list.",
       ],
     },
     {
-      num: "07",
+      num: "08",
       title: "Your rights",
       body: [
         "You can ask what I hold about you, ask for a copy, ask for it to be corrected or deleted, and object to any of it. The analytics are aggregate, so nothing in them points to you and I cannot pull your visit out of them.",
@@ -79,7 +88,7 @@ export const privacy: PrivacyNotice = {
     },
   ],
   contact: {
-    num: "08",
+    num: "09",
     title: "Questions",
     body: ["Anything on this page, ask. A plain answer comes back."],
     emailHint: "Questions about this notice, or a request about your data.",

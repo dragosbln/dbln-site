@@ -2,6 +2,7 @@ import type {
   AgenticSection,
   Contact,
   ContactBooking,
+  DiscussionContent,
   Hero,
   NavItem,
   NotFound,
@@ -234,6 +235,28 @@ export const contact: Contact = {
   label: "Book a call",
   title: "Ready to find out where your AI product *breaks?*",
   body: "Pick your situation, pick a time. The intro call is 30 minutes.",
+};
+
+/**
+ * Discussion (comments) copy. Taken from the blog-social design where it
+ * exists; `hint` replaces the prototype's "Stored in your browser. Be
+ * decent." (comments are no longer browser-local) — DRAFT for Dragos.
+ */
+export const discussion: DiscussionContent = {
+  heading: "Discussion",
+  namePlaceholder: "Your name",
+  bodyPlaceholder:
+    "Add to the discussion — push back, ask, or share where you've seen this play out.",
+  hint: "Posted publicly. Be decent.",
+  postLabel: "Post comment",
+  replyLabel: "Reply",
+  cancelLabel: "Cancel",
+  replyPlaceholder: "Reply to {name}…",
+  removedLabel: "Comment removed",
+  empty: "No comments yet — start the discussion.",
+  posted: "Posted.",
+  errorGeneric: "That didn't post. Try again in a moment.",
+  errorRate: "Too fast. Give it a few seconds.",
 };
 
 /**

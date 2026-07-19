@@ -114,11 +114,14 @@
    peek (ArticlePeek) renders fetched fragments with the same class. */
 
 /* ---------- Engage bar ---------- */
+/* Bottom border + trimmed padding since the Discussion section follows
+   (its own padding provides the page's bottom space). */
 .engage {
   max-width: var(--prose);
   margin: 8px auto 0;
-  padding: 22px 0 90px;
+  padding: 22px 0;
   border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
   display: flex;
   align-items: center;
   gap: 12px;

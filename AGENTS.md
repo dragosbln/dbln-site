@@ -260,6 +260,38 @@ Invariants. These are privacy boundaries: breaking any of them makes
 - **Counts render only when ≥ 1** — a real zero shows nothing. Fake or
   seeded counts were explicitly rejected; never add them.
 
+Comments (instant post, no review queue — Dragos's call): POST
+/api/comments goes public immediately; the guardrails replace the queue.
+- Server: honeypot field `website` (must arrive empty), HMAC
+  proof-of-page-visit token from GET /api/comments (functions/src/token.ts,
+  ripens after 5s, dies after 2h — stateless, any instance verifies),
+  30s per-subject cooldown, per-subject/per-client/global comment windows,
+  name ≤ 60 / body ≤ 1200 / ≤ 3 links, control chars stripped (newlines
+  kept), nested replies to depth 4 with the parent required to be visible
+  on the same slug, 1000-comment thread cap. GET /api/comments is
+  no-store (it carries the token and must read back instantly after a
+  post); only the counts endpoint is CDN-cached.
+- Removal is SOFT (`status: "removed"`, admin in phase 3): the doc stays,
+  the visible counter decrements in the same transaction, and the reader
+  view (shared `toPublicThread`) keeps a bare placeholder only while a
+  visible descendant needs it for thread shape. Replying to a removed
+  parent is refused.
+- Every comment is emailed to Dragos via HIS OWN Gmail (nodemailer, app
+  password) — deliberately no third-party mail service. Sends are
+  fire-and-forget AFTER the response; mail failure never fails a post.
+- Secrets (one-time, BEFORE the phase-2 deploy — deploys fail while any
+  is missing):
+  `firebase functions:secrets:set SOCIAL_TOKEN_KEY` (openssl rand -hex 32),
+  `firebase functions:secrets:set GMAIL_USER`,
+  `firebase functions:secrets:set GMAIL_APP_PASSWORD`.
+  CI needs Secret Manager access on top of the deploy roles: firebase-tools
+  validates secret versions on EVERY deploy and grants the runtime SA
+  access on the first secret-attaching deploy. Do the FIRST deploy from a
+  logged-in owner machine (it performs the IAM grant), and give the CI
+  service account `roles/secretmanager.viewer` for the validation calls on
+  later deploys (or `roles/secretmanager.admin` if CI must ever attach new
+  secrets itself).
+
 Client side: `src/lib/social.ts` (the storage keys, enumerated in
 /privacy, + fetch helpers; liked flags are an external store consumed via
 useSyncExternalStore, with an in-memory overlay so hardened private modes
@@ -274,6 +306,14 @@ that wipes queued presses' deltas and drifts the count when one fails.
 Plausible event: `Like` (needs a one-time goal in the dashboard; /privacy
 discloses that likes are counted by analytics — remove that line if the
 event ever goes).
+`Discussion` (client leaf in ArticleView) renders the thread: lazy fetch
+on approach, top-level newest-first / replies oldest-first, one reply
+form open at a time, saved name in localStorage `dbln:name` filled
+imperatively (never via state — hydration must match the empty input).
+Cross-component count sync: posting calls `notifyCommentAdded(slug)`;
+EngageBar subscribes and bumps its Comment count, and its Comment button
+scrolls to #discussion and focuses #comment-body. /blog index rows fetch
+the counts once on mount and show heart/bubble stats when ≥ 1.
 
 Slug allowlist: `functions/src/slugs.ts` is generated from
 `src/content/posts/*.md` by `functions/scripts/gen-slugs.mjs` (prebuild

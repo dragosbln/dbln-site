@@ -43,7 +43,7 @@ test("counts start empty, with CDN cache headers", async () => {
   const res = await fetch(`${base}/api/social/counts`);
   assert.equal(res.status, 200);
   assert.match(res.headers.get("cache-control"), /s-maxage=60/);
-  assert.deepEqual(await res.json(), { likes: {} });
+  assert.deepEqual(await res.json(), { likes: {}, comments: {} });
 });
 
 test("like → unlike lifecycle keeps counts and records honest", async () => {
@@ -74,7 +74,7 @@ test("like → unlike lifecycle keeps counts and records honest", async () => {
   );
 
   const counts = await (await fetch(`${base}/api/social/counts`)).json();
-  assert.deepEqual(counts, { likes: { [SLUG]: 1 } });
+  assert.deepEqual(counts, { likes: { [SLUG]: 1 }, comments: {} });
 });
 
 test("validation: unknown slug, bad subject, bad action, bad JSON", async () => {

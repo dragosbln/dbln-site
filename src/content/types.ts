@@ -238,6 +238,26 @@ export type NotFound = {
   links: NavItem[];
 };
 
+/** Copy for the article Discussion section (comments). */
+export type DiscussionContent = {
+  heading: string;
+  namePlaceholder: string;
+  bodyPlaceholder: string;
+  /** Small note next to the post button ("Posted publicly. …"). */
+  hint: string;
+  postLabel: string;
+  replyLabel: string;
+  cancelLabel: string;
+  /** `{name}` interpolates the parent commenter's first name. */
+  replyPlaceholder: string;
+  removedLabel: string;
+  empty: string;
+  /** Screen-reader announcement after a successful post. */
+  posted: string;
+  errorGeneric: string;
+  errorRate: string;
+};
+
 /** One numbered block of the privacy notice. */
 export type PrivacySection = {
   /** Two-digit index shown in the mono kicker ("01"). */

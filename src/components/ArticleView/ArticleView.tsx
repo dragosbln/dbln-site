@@ -2,6 +2,7 @@ import Link from "next/link";
 import ArrowIcon from "@/components/ArrowIcon";
 import ArticlePeek from "@/components/ArticlePeek";
 import DiagramLightbox from "@/components/DiagramLightbox";
+import Discussion from "@/components/Discussion";
 import EngageBar from "@/components/EngageBar";
 import HeadingAnchors from "@/components/HeadingAnchors";
 import type { Post, PostWithBody } from "@/content/types";
@@ -57,6 +58,7 @@ export default function ArticleView({ post, html, related }: ArticleViewProps) {
         <div className={styles.engage}>
           <EngageBar slug={post.slug} />
         </div>
+        <Discussion slug={post.slug} />
       </div>
       {related.length > 0 ? (
         <aside className={styles.next} aria-label="Keep reading">

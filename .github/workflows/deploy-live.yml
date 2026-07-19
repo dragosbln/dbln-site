@@ -33,8 +33,12 @@ jobs:
       # Backend deploys BEFORE hosting: the /api/** rewrite in the new
       # hosting release must point at a function that already exists.
       # Prereqs (one-time, console): Blaze billing, Firestore DB in
-      # europe-west1, and this service account granted Cloud Functions
-      # Admin + Service Account User + Firebase Rules Admin.
+      # europe-west1, this service account granted Cloud Functions Admin +
+      # Service Account User + Firebase Rules Admin + Secret Manager
+      # Viewer (secret-version validation runs on every deploy), the three
+      # function secrets set (see AGENTS.md "Social backend"), and the
+      # FIRST deploy run from a logged-in owner machine (it grants the
+      # runtime SA access to those secrets).
       - name: Deploy backend (functions + Firestore rules)
         run: |
           printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-sa.json"

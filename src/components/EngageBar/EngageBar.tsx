@@ -1,14 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import CommentIcon from "@/components/CommentIcon";
 import HeartIcon from "@/components/HeartIcon";
 import ShareButton from "@/components/ShareButton";
 import { track } from "@/lib/analytics";
 import {
-  fetchLikeCounts,
+  fetchCounts,
   likedLocally,
   postLike,
   setLikedLocally,
+  subscribeComments,
   subscribeLiked,
 } from "@/lib/social";
 import styles from "./EngageBar.module.css";
@@ -42,6 +44,7 @@ export default function EngageBar({ slug }: EngageBarProps) {
   const [count, setCount] = useState<{ server: number | null; pending: number }>(
     { server: null, pending: 0 },
   );
+  const [commentCount, setCommentCount] = useState<number | null>(null);
   const [bump, setBump] = useState(false);
   const likeRef = useRef<HTMLButtonElement | null>(null);
   // Serializes POSTs so a quick toggle can't apply out of order; seq
@@ -63,17 +66,18 @@ export default function EngageBar({ slug }: EngageBarProps) {
       if (loaded) return;
       loaded = true;
       cleanup();
-      fetchLikeCounts()
-        .then((counts) =>
-          // Only fills an unset count: a POST response that landed while
-          // this GET was in flight is fresher (no-store, post-toggle)
-          // than this snapshot, which may also be CDN-cached.
+      fetchCounts()
+        .then((counts) => {
+          // Only fills an unset like count: a POST response that landed
+          // while this GET was in flight is fresher (no-store,
+          // post-toggle) than this snapshot, which may be CDN-cached.
           setCount((c) =>
-            c.server == null ? { ...c, server: counts[slug] ?? 0 } : c,
-          ),
-        )
+            c.server == null ? { ...c, server: counts.likes[slug] ?? 0 } : c,
+          );
+          setCommentCount((n) => n ?? counts.comments[slug] ?? 0);
+        })
         .catch((err) => {
-          // Count stays absent; the button still works on its own.
+          // Counts stay absent; the buttons still work on their own.
           console.debug("[dbln social]", err);
         });
     };
@@ -130,6 +134,29 @@ export default function EngageBar({ slug }: EngageBarProps) {
     );
   };
 
+  // A comment posted in the Discussion below updates the bar's count
+  // live — with the poster's real thread total, not a blind increment,
+  // so the bar can't disagree with the heading when the counts GET
+  // failed or lagged.
+  useEffect(
+    () =>
+      subscribeComments((s, total) => {
+        if (s === slug) setCommentCount(total);
+      }),
+    [slug],
+  );
+
+  const jumpToDiscussion = () => {
+    document
+      .getElementById("discussion")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.setTimeout(
+      () =>
+        document.getElementById("comment-body")?.focus({ preventScroll: true }),
+      450,
+    );
+  };
+
   const likes =
     count.server == null ? null : Math.max(0, count.server + count.pending);
 
@@ -138,7 +165,7 @@ export default function EngageBar({ slug }: EngageBarProps) {
       <button
         ref={likeRef}
         type="button"
-        className={liked ? `${styles.like} ${styles.on}` : styles.like}
+        className={liked ? `${styles.act} ${styles.on}` : styles.act}
         onClick={onLike}
         aria-pressed={liked}
         data-bump={bump || undefined}
@@ -148,6 +175,13 @@ export default function EngageBar({ slug }: EngageBarProps) {
         {liked ? "Liked" : "Like"}
         {likes != null && likes > 0 ? (
           <span className={styles.ct}>{likes}</span>
+        ) : null}
+      </button>
+      <button type="button" className={styles.act} onClick={jumpToDiscussion}>
+        <CommentIcon />
+        Comment
+        {commentCount != null && commentCount > 0 ? (
+          <span className={styles.ct}>{commentCount}</span>
         ) : null}
       </button>
       <span className={styles.shareSlot}>
