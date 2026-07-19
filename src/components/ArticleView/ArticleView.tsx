@@ -2,8 +2,8 @@ import Link from "next/link";
 import ArrowIcon from "@/components/ArrowIcon";
 import ArticlePeek from "@/components/ArticlePeek";
 import DiagramLightbox from "@/components/DiagramLightbox";
+import EngageBar from "@/components/EngageBar";
 import HeadingAnchors from "@/components/HeadingAnchors";
-import ShareButton from "@/components/ShareButton";
 import type { Post, PostWithBody } from "@/content/types";
 import { formatMonthYear } from "@/lib/format";
 import { postPath } from "@/lib/urls";
@@ -55,7 +55,7 @@ export default function ArticleView({ post, html, related }: ArticleViewProps) {
         {html.includes("dg-figure") ? <DiagramLightbox /> : null}
         {html.includes('href="/blog/') ? <ArticlePeek /> : null}
         <div className={styles.engage}>
-          <ShareButton />
+          <EngageBar slug={post.slug} />
         </div>
       </div>
       {related.length > 0 ? (

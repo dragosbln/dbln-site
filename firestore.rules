@@ -1,0 +1,12 @@
+rules_version = '2';
+
+// No client ever talks to Firestore directly — all reads and writes go
+// through the /api function's Admin SDK (which bypasses rules). Deny
+// everything so the database has no public surface at all.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

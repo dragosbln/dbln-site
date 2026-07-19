@@ -28,6 +28,20 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - run: npm --prefix functions ci
+      - run: npm --prefix functions test
+      # Backend deploys BEFORE hosting: the /api/** rewrite in the new
+      # hosting release must point at a function that already exists.
+      # Prereqs (one-time, console): Blaze billing, Firestore DB in
+      # europe-west1, and this service account granted Cloud Functions
+      # Admin + Service Account User + Firebase Rules Admin.
+      - name: Deploy backend (functions + Firestore rules)
+        run: |
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-sa.json"
+          npx firebase-tools@15 deploy --only functions,firestore:rules --project dbln-b56ec --non-interactive --force
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DBLN_B56EC }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-sa.json
       # SHA-pinned (this action receives the production deploy credential; a
       # floating @v0 tag would let a compromised release publish to live).
       - uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0.11.0

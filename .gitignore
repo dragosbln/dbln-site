@@ -48,3 +48,8 @@ next-env.d.ts
 
 # diagram workbench (generated review page)
 /diagram-workbench.html
+
+# functions workspace (social backend)
+/functions/node_modules/
+/functions/lib/
+/functions/src/slugs.ts

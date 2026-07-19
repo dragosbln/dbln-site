@@ -1,0 +1,72 @@
+/* Like pill — visual twin of ShareButton's pill (keep them in sync). */
+.like {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 9px 18px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color 0.18s,
+    color 0.18s,
+    background-color 0.18s;
+}
+
+.like svg {
+  transition: transform 0.18s;
+}
+
+.like:hover {
+  border-color: var(--teal);
+  color: var(--teal-deep);
+}
+
+.like.on {
+  border-color: var(--teal);
+  background: var(--accent-wash);
+  color: var(--teal-deep);
+}
+
+.like.on svg {
+  fill: var(--teal);
+  stroke: var(--teal);
+}
+
+.ct {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Share keeps the design's right-hand slot (with its copied note). */
+.shareSlot {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .like[data-bump] svg {
+    animation: pop 0.34s ease;
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

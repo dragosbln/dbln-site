@@ -231,6 +231,75 @@ a consent banner first.
   the tracker ships in the site's own bundle, so an adblocker won't filter
   it for you.
 
+## Social backend (/api)
+
+First-party likes (comments to follow) served by one Cloud Function — the
+`functions/` workspace, gen2 `api` in europe-west1 — behind the Firebase
+Hosting rewrite `/api/**` in firebase.json. Design source:
+`../claude_websie/blog-social/article.html` (engage bar + discussion).
+
+Invariants. These are privacy boundaries: breaking any of them makes
+/privacy wrong (a compliance problem, see below).
+- **Same-origin only.** The visitor's browser talks to dbln.me and nothing
+  else. A new third-party request is a /privacy change, not a tweak.
+- **No person-identifying data on likes.** The subject is `d_<uuid>` from
+  localStorage (`dbln:device`, minted on the first like press — never on
+  page view). No IP is ever persisted (rate limiting in
+  `functions/src/ratelimit.ts` is memory-only by design), no UA, no names.
+  Limits are three-tier: per subject, per client (keyed on the two
+  RIGHTMOST X-Forwarded-For entries — the infra-appended ones; never
+  trust the left of XFF or express `trust proxy: true` + `req.ip`, the
+  caller controls those), and a global per-instance write ceiling that
+  bounds what a determined caller can do before admin cleanup.
+- **Records are append-only.** `likeEvents` is never updated or deleted by
+  code. `meta/counters` is written in the same transaction as the state
+  doc + event record, so displayed counts always equal what the records
+  add up to. Never write counts outside that transaction.
+- **Firestore has no client surface.** firestore.rules denies everything;
+  only the function's Admin SDK reads or writes. Keep it that way.
+- **Counts render only when ≥ 1** — a real zero shows nothing. Fake or
+  seeded counts were explicitly rejected; never add them.
+
+Client side: `src/lib/social.ts` (the storage keys, enumerated in
+/privacy, + fetch helpers; liked flags are an external store consumed via
+useSyncExternalStore, with an in-memory overlay so hardened private modes
+still toggle) and `EngageBar` (client leaf in ArticleView): lazy count
+fetch on approach (IO + scroll fallback — IO delivers nothing in
+throttled tabs; the GET only fills a count no POST response has set yet),
+optimistic presses serialized through a promise chain. Count model:
+displayed = last server count + net delta of unresolved presses; a failed
+press removes only its own delta, and only the NEWEST press's response
+may move the button. Don't "simplify" this back to setLikes(res.likes) —
+that wipes queued presses' deltas and drifts the count when one fails.
+Plausible event: `Like` (needs a one-time goal in the dashboard; /privacy
+discloses that likes are counted by analytics — remove that line if the
+event ever goes).
+
+Slug allowlist: `functions/src/slugs.ts` is generated from
+`src/content/posts/*.md` by `functions/scripts/gen-slugs.mjs` (prebuild
+hook, output gitignored). Publishing an article picks it up on the next
+deploy; likes for unknown slugs are 400s.
+
+Local dev: the Firestore emulator needs Java, which the dev machine lacks.
+Unit tests and the browser run against `MemoryStore` (same semantics as
+`FirestoreStore`): `npm --prefix functions run serve` serves the built
+site from out/ plus the real API app on :4610, with GET /__dump exposing
+the stored records. Real Firestore semantics are exercised on deploy.
+
+Deploy: CI installs + tests the workspace, then runs
+`firebase deploy --only functions,firestore:rules` BEFORE the hosting
+deploy (the rewrite needs the function to exist). One-time console
+prereqs: Blaze billing (confirmed), a Firestore database created in
+europe-west1, and the CI service account granted Cloud Functions Admin +
+Service Account User + Firebase Rules Admin (or Editor).
+Bootstrap order (once): hosting deploys resolve the `/api/**` rewrite
+against the project's EXISTING functions, so until the `api` function has
+been deployed for the first time, any hosting deploy — PR previews
+included — ships a dead /api (404s; the engage bar degrades to
+share-only). After creating the Firestore DB, run
+`firebase deploy --only functions,firestore:rules` once from a logged-in
+machine, then previews and live both route /api correctly.
+
 ## Privacy notice (/privacy)
 
 `src/content/privacy.ts` → `PrivacyNotice` component → `/privacy`, linked
