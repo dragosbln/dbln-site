@@ -64,6 +64,7 @@ teal already means success/live. No other colors, no gradients, no shadows.
 | `dg-step` | numbered circle marker for ordered flows |
 | `dg-band` / `dg-band live` | uppercase section caption inside the svg |
 | `dg-note` | small annotation |
+| `dg-note fail` | annotation about the failure (red). Use the class — a `fill=""` attribute on a `dg-note` silently loses to the class's own `fill`. |
 | `dg-cell` / `dg-cell ghost` | internal layer of a node / empty slot |
 | `dg-chip` / `dg-chip plain` | small pill / muted pill |
 | `dg-wire` | faint fan-in wiring |

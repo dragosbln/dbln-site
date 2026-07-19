@@ -29,7 +29,7 @@ const figure = (extra = "") =>
 // the tokens the diagram css depends on, mirrored from globals.css
 const tokens = `:root {
   --paper: #f6f4ef; --paper-2: #efece4; --ink: #17191c; --ink-soft: #4a4d52;
-  --ink-faint: #6b6e73; --line: #d9d5cb; --teal: #0c7b72; --teal-deep: #0a5b55;
+  --ink-faint: #6b6e73; --ink-faint-2: #5f6266; --line: #d9d5cb; --teal: #0c7b72; --teal-deep: #0a5b55;
   --accent-wash: #e4efec; --red: #a83a2e; --red-deep: #7e2b21; --red-wash: #f5e3de;
   --serif: "Newsreader", Georgia, serif;
   --sans: "Hanken Grotesk", system-ui, sans-serif;

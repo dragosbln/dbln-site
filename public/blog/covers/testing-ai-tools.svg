@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse">
+      <path d="M 42 0 L 0 0 0 42" fill="none" stroke="rgba(23,25,28,0.055)" stroke-width="1"></path>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#f1eee6"></rect>
+  <rect width="1200" height="630" fill="url(#grid)"></rect>
+  <rect x="28" y="28" width="1144" height="574" fill="none" stroke="#17191C" stroke-opacity="0.2" stroke-width="1"></rect>
+  <line x1="60" y1="28" x2="60" y2="52" stroke="#17191c" stroke-width="2"></line>
+  <line x1="28" y1="60" x2="47" y2="60" stroke="#17191c" stroke-width="2"></line>
+  <line x1="1140" y1="578" x2="1140" y2="602" stroke="#17191c" stroke-width="2"></line>
+  <line x1="1153" y1="570" x2="1172" y2="570" stroke="#17191c" stroke-width="2"></line>
+  <text x="62" y="75" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="13" letter-spacing="2.34" fill="#17191c">FOUR FREE LAYERS IN FRONT OF EVERY PAID RUN</text>
+
+  <line x1="176" y1="296" x2="228" y2="296" stroke="#17191c" stroke-width="2" stroke-dasharray="2 5" stroke-linecap="round"></line>
+  <polyline points="392,296 470,296 470,84 738,84" fill="none" stroke="#17191c" stroke-width="2" stroke-dasharray="2 5" stroke-linecap="round"></polyline>
+  <line x1="292" y1="392" x2="248" y2="456" stroke="#b8b4a9" stroke-width="1.5"></line>
+  <line x1="330" y1="392" x2="392" y2="456" stroke="#b8b4a9" stroke-width="1.5"></line>
+  <polyline points="466,514 505,514 505,452 546,452" fill="none" stroke="#0c7b72" stroke-width="1.5" stroke-dasharray="6 5"></polyline>
+  <polyline points="758,560 884,560 884,296 912,296" fill="none" stroke="#0c7b72" stroke-width="2" stroke-dasharray="2 5" stroke-linecap="round"></polyline>
+  <line x1="1118" y1="296" x2="1130" y2="296" stroke="#0c7b72" stroke-width="1.5"></line>
+
+  <rect x="56" y="248" width="120" height="96" rx="14" fill="#17191c"></rect>
+  <text x="116" y="293" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="22" fill="#6ee7da" text-anchor="middle">✳</text>
+  <text x="116" y="319" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="11" letter-spacing="1.76" fill="#f6f4ef" text-anchor="middle">AI TOOL</text>
+
+  <rect x="230" y="202" width="162" height="188" rx="14" fill="#fbfaf6" stroke="#17191c" stroke-width="1.5"></rect>
+  <text x="248" y="238" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="22" fill="#17191c">{ }</text>
+  <rect x="248" y="252" width="96" height="6" rx="3" fill="#d9d5cb"></rect>
+  <rect x="248" y="265" width="68" height="6" rx="3" fill="#0c7b72"></rect>
+  <rect x="248" y="278" width="84" height="6" rx="3" fill="#d9d5cb"></rect>
+  <rect x="248" y="291" width="54" height="6" rx="3" fill="#d9d5cb"></rect>
+  <rect x="248" y="304" width="76" height="6" rx="3" fill="#0c7b72"></rect>
+  <text x="248" y="336" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="10" letter-spacing="1" fill="#6b6e73">AUDIT.JSON</text>
+
+  <rect x="180" y="458" width="132" height="116" rx="12" fill="#fbfaf6" stroke="#b8b4a9" stroke-width="1.5"></rect>
+  <text x="194" y="484" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="14" fill="#17191c">#</text>
+  <rect x="194" y="494" width="84" height="5" rx="2.5" fill="#d9d5cb"></rect>
+  <rect x="194" y="505" width="96" height="5" rx="2.5" fill="#d9d5cb"></rect>
+  <rect x="194" y="516" width="62" height="5" rx="2.5" fill="#d9d5cb"></rect>
+  <text x="194" y="544" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="9.5" letter-spacing="0.76" fill="#6b6e73">REPORT.MD</text>
+
+  <rect x="332" y="458" width="132" height="116" rx="12" fill="#fbfaf6" stroke="#b8b4a9" stroke-width="1.5"></rect>
+  <text x="346" y="484" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="14" fill="#17191c">#</text>
+  <rect x="346" y="494" width="92" height="5" rx="2.5" fill="#d9d5cb"></rect>
+  <rect x="346" y="505" width="58" height="5" rx="2.5" fill="#d9d5cb"></rect>
+  <rect x="346" y="516" width="78" height="5" rx="2.5" fill="#d9d5cb"></rect>
+  <text x="346" y="544" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="9.5" letter-spacing="0.76" fill="#6b6e73">SUMMARY.MD</text>
+  <text x="322" y="590" font-family="&#39;Newsreader&#39;,Georgia,serif" font-style="italic" font-size="15" fill="#6b6e73" text-anchor="middle">two reports, derived from the json</text>
+
+  <rect x="520" y="108" width="332" height="404" rx="18" fill="#fbfaf6" stroke="#17191c" stroke-width="1.5"></rect>
+  <text x="548" y="148" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="14" font-weight="600" letter-spacing="2.8" fill="#17191c">MECHANICAL TESTS</text>
+  <text x="548" y="166" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="10.5" letter-spacing="1.26" fill="#6b6e73">FREE · ~2S</text>
+  <rect x="548" y="194" width="276" height="60" rx="30" fill="#f6f4ef" stroke="#17191c" stroke-width="1.5"></rect>
+  <text x="570" y="228" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="11" fill="#6b6e73">01</text>
+  <text x="599" y="229" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="13" letter-spacing="1.82" fill="#17191c">SHAPE</text>
+  <rect x="548" y="270" width="276" height="60" rx="30" fill="#f7e7e1" stroke="#b0472e" stroke-width="1.5"></rect>
+  <text x="570" y="304" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="11" fill="#b0472e">02</text>
+  <text x="599" y="305" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="13" letter-spacing="1.82" fill="#b0472e">INVARIANTS</text>
+  <rect x="548" y="346" width="276" height="60" rx="30" fill="#f6f4ef" stroke="#17191c" stroke-width="1.5"></rect>
+  <text x="570" y="380" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="11" fill="#6b6e73">03</text>
+  <text x="599" y="381" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="13" letter-spacing="1.82" fill="#17191c">EXPECTATIONS</text>
+  <rect x="548" y="422" width="276" height="60" rx="30" fill="#f6f4ef" stroke="#17191c" stroke-width="1.5"></rect>
+  <text x="570" y="456" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="11" fill="#6b6e73">04</text>
+  <text x="599" y="457" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="13" letter-spacing="1.82" fill="#17191c">AGREEMENT</text>
+
+  <circle cx="748" cy="84" r="8" fill="#f6f4ef" stroke="#0c7b72" stroke-width="2.5"></circle>
+  <line x1="748" y1="92" x2="748" y2="300" stroke="#0c7b72" stroke-width="2.5"></line>
+  <line x1="748" y1="300" x2="748" y2="552" stroke="#0c7b72" stroke-width="2.5" stroke-dasharray="6 5"></line>
+  <circle cx="748" cy="224" r="4.5" fill="#0c7b72"></circle>
+  <circle cx="748" cy="300" r="4.5" fill="#0c7b72"></circle>
+  <circle cx="748" cy="376" r="4.5" fill="#0c7b72"></circle>
+  <circle cx="748" cy="452" r="4.5" fill="#0c7b72"></circle>
+  <circle cx="748" cy="560" r="8" fill="#f6f4ef" stroke="#0c7b72" stroke-width="2.5"></circle>
+
+  <path d="M782 224 l7 8 l14 -16" fill="none" stroke="#4a4d52" stroke-width="2" stroke-linecap="round"></path>
+  <path d="M785 293 l14 14 M799 293 l-14 14" fill="none" stroke="#b0472e" stroke-width="2" stroke-linecap="round"></path>
+  <circle cx="792" cy="376" r="9" fill="none" stroke="#4a4d52" stroke-width="2"></circle>
+  <path d="M792 370 l0 6 l4.5 3" fill="none" stroke="#4a4d52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+  <circle cx="792" cy="452" r="9" fill="none" stroke="#4a4d52" stroke-width="2"></circle>
+  <path d="M792 446 l0 6 l4.5 3" fill="none" stroke="#4a4d52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+
+  <rect x="916" y="256" width="200" height="80" rx="40" fill="#0c7b72"></rect>
+  <text x="1016" y="293" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="14" font-weight="600" letter-spacing="2.8" fill="#ffffff" text-anchor="middle">LIVE RUN</text>
+  <text x="1016" y="312" font-family="&#39;Spline Sans Mono&#39;,monospace" font-size="10.5" letter-spacing="1.26" fill="rgba(255,255,255,0.75)" text-anchor="middle">$3 · 8 MIN</text>
+  <circle cx="1147" cy="296" r="15" fill="#e4efec" stroke="#0c7b72" stroke-width="1.5"></circle>
+  <path d="M1141 296 l4 4.5 l9 -10" fill="none" stroke="#0a5b55" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
