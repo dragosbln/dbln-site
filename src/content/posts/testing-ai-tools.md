@@ -1,10 +1,10 @@
 ---
 title: "Did it check, or did it guess? Testing a tool whose output is written by an LLM"
-date: "2026-07-18"
+date: "2026-07-19"
 tags: ["ai", "agents", "testing"]
 excerpt: "My first AI tool worked, or at least the output looked right when I ran it. Then I pictured a client asking what makes it trustworthy: did it check, or did it guess? This is how I built a real answer, and how designing the output for testing made the tool harder to lie with."
 cover: "/blog/covers/testing-ai-tools.svg"
-coverAlt: "A vertical gauntlet of four numbered checking layers (shape, invariants, expectations, agreement); the tool's output runs down through all four as a single teal thread and exits verified, while a muted side path marks the one paid live run that also feeds the same layers."
+coverAlt: "An AI tool writes audit.json, and two markdown reports derive from that json. The json enters a panel of mechanical tests, free and about two seconds: shape passes, invariants fails in red, expectations and agreement still pending. A teal thread carries on to the paid live run, three dollars and eight minutes, which ends in a check mark."
 # TODO(dragos): add the dev.to URL of this article's cross-post (devto: "…")
 ---
 
