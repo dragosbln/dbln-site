@@ -3,6 +3,7 @@ import { getFirestore } from "firebase-admin/firestore";
 import { defineSecret } from "firebase-functions/params";
 import { onRequest } from "firebase-functions/v2/https";
 import type { Express } from "express";
+import { firebaseAdminVerifier } from "./admin";
 import { createApp } from "./app";
 import { FirestoreStore } from "./firestoreStore";
 import { gmailMailer } from "./notify";
@@ -15,11 +16,14 @@ initializeApp();
  *   string, e.g. `openssl rand -hex 32`).
  * - GMAIL_USER / GMAIL_APP_PASSWORD: the Gmail account + app password
  *   that sends comment notifications (kept out of the repo on purpose).
- * Deploys fail until all three exist.
+ * - ADMIN_UIDS: comma-separated Firebase Auth uids allowed into /admin.
+ *   Empty/missing = the admin API admits no one (fails closed).
+ * Deploys fail until all four exist.
  */
 const tokenKey = defineSecret("SOCIAL_TOKEN_KEY");
 const gmailUser = defineSecret("GMAIL_USER");
 const gmailPass = defineSecret("GMAIL_APP_PASSWORD");
+const adminUids = defineSecret("ADMIN_UIDS");
 
 /** Public on the site already (site.ts) — not a secret. */
 const NOTIFY_TO = "dragos@dbln.me";
@@ -43,7 +47,7 @@ export const api = onRequest(
     maxInstances: 3,
     concurrency: 80,
     invoker: "public",
-    secrets: [tokenKey, gmailUser, gmailPass],
+    secrets: [tokenKey, gmailUser, gmailPass, adminUids],
   },
   (req, res) => {
     if (!app) {
@@ -51,6 +55,7 @@ export const api = onRequest(
         enforceHost: true,
         tokenKey: tokenKey.value(),
         mailer: gmailMailer(gmailUser.value(), gmailPass.value(), NOTIFY_TO),
+        verifyAdmin: firebaseAdminVerifier(adminUids.value().split(",")),
       });
     }
     return app(req, res);

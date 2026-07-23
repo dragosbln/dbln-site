@@ -61,6 +61,13 @@ export type AddCommentResult =
   | { ok: true; comment: PublicComment }
   | { ok: false; error: "parent_missing" | "depth_exceeded" | "thread_closed" };
 
+export type LikeEventRecord = {
+  slug: string;
+  subject: string;
+  action: LikeAction;
+  at: string;
+};
+
 /** Replies nest at most this deep (top level is depth 0). */
 export const DEPTH_LIMIT = 4;
 /** Hard per-article ceiling so a thread can't grow without bound. */
@@ -82,6 +89,15 @@ export interface SocialStore {
   getComments(slug: string): Promise<PublicComment[]>;
   /** Admin (phase 3) + tests. Adjusts the visible counter. */
   setCommentStatus(id: string, status: CommentStatus): Promise<boolean>;
+  /** Admin: every comment (removed included), newest first. */
+  listComments(opts?: {
+    slug?: string;
+    limit?: number;
+  }): Promise<StoredComment[]>;
+  /** Admin: hard delete (GDPR). Decrements the counter if it was visible. */
+  purgeComment(id: string): Promise<boolean>;
+  /** Admin: recent like events, newest first. */
+  listLikeEvents(limit?: number): Promise<LikeEventRecord[]>;
 }
 
 export function toPublic(row: StoredComment): PublicComment {
@@ -212,6 +228,32 @@ export class MemoryStore implements SocialStore {
       row.status = status;
     }
     return true;
+  }
+
+  async listComments(opts: { slug?: string; limit?: number } = {}) {
+    const rows = this.comments
+      .filter((c) => !opts.slug || c.slug === opts.slug)
+      .sort((a, b) => b.at.localeCompare(a.at) || b.id.localeCompare(a.id));
+    return (opts.limit ? rows.slice(0, opts.limit) : rows).map((c) => ({
+      ...c,
+    }));
+  }
+
+  async purgeComment(id: string): Promise<boolean> {
+    const idx = this.comments.findIndex((c) => c.id === id);
+    if (idx === -1) return false;
+    const [row] = this.comments.splice(idx, 1);
+    if (row.status === "visible") {
+      this.commentCounts.set(
+        row.slug,
+        Math.max(0, (this.commentCounts.get(row.slug) ?? 0) - 1),
+      );
+    }
+    return true;
+  }
+
+  async listLikeEvents(limit = 100): Promise<LikeEventRecord[]> {
+    return this.events.slice(-limit).reverse();
   }
 
   /** Harness/test introspection: the records behind the counts. */

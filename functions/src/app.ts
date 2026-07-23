@@ -3,11 +3,12 @@ import express, {
   type Request,
   type Response,
 } from "express";
+import { bearer, type AdminVerifier } from "./admin";
 import type { Mailer } from "./notify";
 import { SlidingWindow } from "./ratelimit";
 import { SLUGS } from "./slugs";
 import { mintToken, verifyToken } from "./token";
-import type { LikeAction, SocialStore } from "./store";
+import type { CommentStatus, LikeAction, SocialStore } from "./store";
 
 /**
  * The API is reached through the Firebase Hosting rewrite (/api/** →
@@ -74,6 +75,8 @@ export type AppOptions = {
   tokenKey?: string;
   /** Comment notifications; null/undefined = don't send (dev, tests). */
   mailer?: Mailer | null;
+  /** Turns a bearer token into an admin uid. Absent = admin API off (404). */
+  verifyAdmin?: AdminVerifier;
   /** Rate-limit knobs, lowered by tests. */
   limits?: {
     perSubject?: number;
@@ -285,6 +288,89 @@ export function createApp(store: SocialStore, opts: AppOptions = {}) {
       next(err);
     }
   });
+
+  // ---- Admin API (phase 3) ----
+  // Mounted only when a verifier is provided. Every route sits behind a
+  // gate that turns the bearer token into an admin uid (Firebase ID token
+  // + allowlist in prod) — no session, no cookie, verified per request.
+  if (opts.verifyAdmin) {
+    const verifyAdmin = opts.verifyAdmin;
+    const admin = express.Router();
+
+    admin.use(async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const token = bearer(req.get("authorization"));
+        const uid = token ? await verifyAdmin(token) : null;
+        if (!uid) {
+          res.status(401).json({ error: "unauthorized" });
+          return;
+        }
+        res.set("Cache-Control", "no-store");
+        next();
+      } catch (err) {
+        next(err);
+      }
+    });
+
+    admin.get("/overview", async (req, res, next) => {
+      try {
+        const [counts, comments, likeEvents] = await Promise.all([
+          store.getCounts(),
+          store.listComments({ limit: 200 }),
+          store.listLikeEvents(100),
+        ]);
+        res.json({ counts, comments, likeEvents });
+      } catch (err) {
+        next(err);
+      }
+    });
+
+    admin.get("/comments", async (req, res, next) => {
+      try {
+        const slug =
+          typeof req.query.slug === "string" ? req.query.slug : undefined;
+        const comments = await store.listComments({ slug, limit: 500 });
+        res.json({ comments });
+      } catch (err) {
+        next(err);
+      }
+    });
+
+    const statusRoute =
+      (status: CommentStatus) =>
+      async (req: Request, res: Response, next: NextFunction) => {
+        try {
+          const id = (req.body ?? {}).id;
+          if (typeof id !== "string" || !/^[A-Za-z0-9]{1,40}$/.test(id)) {
+            res.status(400).json({ error: "bad_request" });
+            return;
+          }
+          const ok = await store.setCommentStatus(id, status);
+          res.status(ok ? 200 : 404).json(ok ? { ok: true } : { error: "not_found" });
+        } catch (err) {
+          next(err);
+        }
+      };
+
+    admin.post("/comments/remove", statusRoute("removed"));
+    admin.post("/comments/restore", statusRoute("visible"));
+
+    admin.post("/comments/purge", async (req, res, next) => {
+      try {
+        const id = (req.body ?? {}).id;
+        if (typeof id !== "string" || !/^[A-Za-z0-9]{1,40}$/.test(id)) {
+          res.status(400).json({ error: "bad_request" });
+          return;
+        }
+        const ok = await store.purgeComment(id);
+        res.status(ok ? 200 : 404).json(ok ? { ok: true } : { error: "not_found" });
+      } catch (err) {
+        next(err);
+      }
+    });
+
+    app.use("/api/admin", admin);
+  }
 
   // Catch-alls are scoped to /api so the dev harness can mount this app
   // in front of its static file serving and let other paths fall through.

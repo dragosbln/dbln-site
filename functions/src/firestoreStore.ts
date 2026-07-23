@@ -12,6 +12,7 @@ import {
   type AddCommentResult,
   type CommentStatus,
   type LikeAction,
+  type LikeEventRecord,
   type PublicComment,
   type SocialStore,
   type StoredComment,
@@ -167,15 +168,8 @@ export class FirestoreStore implements SocialStore {
     });
   }
 
-  async getComments(slug: string): Promise<PublicComment[]> {
-    // Equality-only query: ordering + the placeholder rule are applied in
-    // memory (shared toPublicThread), which keeps parity with MemoryStore
-    // and avoids composite-index management for a per-article thread.
-    const snap = await this.db
-      .collection("comments")
-      .where("slug", "==", slug)
-      .get();
-    const rows: StoredComment[] = snap.docs.map((doc) => ({
+  private rowFromDoc(doc: FirebaseFirestore.DocumentSnapshot): StoredComment {
+    return {
       id: doc.id,
       slug: doc.get("slug") as string,
       parentId: (doc.get("parentId") as string | null) ?? null,
@@ -188,8 +182,71 @@ export class FirestoreStore implements SocialStore {
         doc.get("at") instanceof Timestamp
           ? (doc.get("at") as Timestamp).toDate().toISOString()
           : new Date(0).toISOString(),
+    };
+  }
+
+  async getComments(slug: string): Promise<PublicComment[]> {
+    // Equality-only query: ordering + the placeholder rule are applied in
+    // memory (shared toPublicThread), which keeps parity with MemoryStore
+    // and avoids composite-index management for a per-article thread.
+    const snap = await this.db
+      .collection("comments")
+      .where("slug", "==", slug)
+      .get();
+    return toPublicThread(snap.docs.map((doc) => this.rowFromDoc(doc)));
+  }
+
+  async listComments(
+    opts: { slug?: string; limit?: number } = {},
+  ): Promise<StoredComment[]> {
+    let query: FirebaseFirestore.Query = this.db.collection("comments");
+    if (opts.slug) query = query.where("slug", "==", opts.slug);
+    query = query.orderBy("at", "desc");
+    if (opts.limit) query = query.limit(opts.limit);
+    const snap = await query.get();
+    return snap.docs.map((doc) => this.rowFromDoc(doc));
+  }
+
+  async purgeComment(id: string): Promise<boolean> {
+    const ref = this.db.collection("comments").doc(id);
+    const countersRef = this.countersRef();
+    return this.db.runTransaction(async (tx) => {
+      const [snap, countersSnap] = await Promise.all([
+        tx.get(ref),
+        tx.get(countersRef),
+      ]);
+      if (!snap.exists) return false;
+      if ((snap.get("status") as CommentStatus) === "visible") {
+        const slug = snap.get("slug") as string;
+        const commentCounts =
+          (countersSnap.get("comments") as Record<string, number> | undefined) ??
+          {};
+        tx.set(
+          countersRef,
+          { comments: { [slug]: Math.max(0, (commentCounts[slug] ?? 0) - 1) } },
+          { merge: true },
+        );
+      }
+      tx.delete(ref);
+      return true;
+    });
+  }
+
+  async listLikeEvents(limit = 100): Promise<LikeEventRecord[]> {
+    const snap = await this.db
+      .collection("likeEvents")
+      .orderBy("at", "desc")
+      .limit(limit)
+      .get();
+    return snap.docs.map((doc) => ({
+      slug: doc.get("slug") as string,
+      subject: doc.get("subject") as string,
+      action: doc.get("action") as LikeAction,
+      at:
+        doc.get("at") instanceof Timestamp
+          ? (doc.get("at") as Timestamp).toDate().toISOString()
+          : new Date(0).toISOString(),
     }));
-    return toPublicThread(rows);
   }
 
   async setCommentStatus(id: string, status: CommentStatus): Promise<boolean> {
