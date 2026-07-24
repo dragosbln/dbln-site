@@ -57,7 +57,7 @@ export default function CaseArticle({ caseStudy: c, index }: CaseArticleProps) {
             ))}
           </div>
           <div className={styles.spine}>
-            <h3>Situation</h3>
+            <h3>Context</h3>
             <p>{richText(c.situation)}</p>
           </div>
           <div className={`${styles.spine} ${styles.decision}`}>

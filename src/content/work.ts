@@ -10,15 +10,15 @@ import type { CaseStudy, Contact, PageHero } from "./types";
 
 export const workHero: PageHero = {
   eyebrow: "Selected work",
-  title: "The work, and the *decisions* behind it.",
-  lede: "Six engagements across insurance, fintech, gaming, healthtech and field service. For each: the situation, the call that was expensive to reverse, how I approached it, and what it shipped. The numbers are real.",
+  title: "The work behind the *reviews*.",
+  lede: "Previous engagements across insurance, fintech, gaming, healthtech and field service. This is where I developed the architectural and engineering depth that I now apply to my AI reviews and solution design. The numbers are real.",
   metaDescription:
-    "Selected engagements in depth: the decision that mattered in each, and what it shipped. Insurance, fintech, gaming, healthtech.",
+    "The background behind the AI Reliability Reviews: eight years of architecture decisions across insurance, fintech, gaming and healthtech, in depth.",
 };
 
 export const workCta: Contact = {
   label: "Start a conversation",
-  title: "Recognize your situation in one of *these?*",
+  title: "Want an *in-depth* review for your AI Product?",
   body: "Two questions, then pick a time. The intro call is 30 minutes.",
 };
 
@@ -58,13 +58,14 @@ export const caseStudies: CaseStudy[] = [
   {
     id: "bullseye",
     name: "Bullseye Web3 Studio",
-    sector: "Web3 · gaming",
+    sector: "Web3 · AI agents & gaming",
     period: "2024 — 2025",
     role: "Lead Backend Architect & Developer (contract)",
     engagement: "Architecture + hands-on build",
-    tagline: "Architecting and leading the backend for two greenfield Web3 games.",
+    tagline:
+      "Architecting and leading the backend for two greenfield products, one of them an AI-agents platform.",
     situation:
-      "Two products from zero: AI Nexus, a Unity-powered social-metaverse mobile game, and A1X Clone Machine, a web app for creating AI agents. Neither had product-market fit yet, and nobody could say how fast either would grow. The backend had to handle growth without burning money waiting for it.",
+      "Two products from zero: A1X Clone Machine, a web app where users create and run their own AI agents, and AI Nexus, a Unity-powered social-metaverse mobile game. Neither had product-market fit yet, and nobody could say how fast either would grow. The backend had to handle growth without burning money waiting for it.",
     decision:
       "The hard call was scope, not scale. I committed to an **event-driven microservices** architecture on GCP, then kept cutting: no orchestrator, Firebase Cloud Messaging instead of custom websockets, nothing built for a growth curve we hadn't seen yet.",
     approach:
@@ -94,7 +95,7 @@ export const caseStudies: CaseStudy[] = [
     decision:
       "As the technical owner, the recurring decision was allocation: what to build, what to defer, and where limited resources buy the most progress toward product-market fit. The rest was building a team and a process that could carry it without burning the runway.",
     approach:
-      "I took it from Figma designs to live apps on both stores, then owned architecture, delivery and the technical side of growth and hiring, eventually formalized as CTO and shareholder. Every decision got explained in plain terms to non-technical founders.",
+      "I took it from Figma designs to live apps on both stores, then owned architecture, delivery and the technical side of growth and hiring, eventually formalized as CTO and shareholder. Every decision got explained in plain terms to non-technical founders. Along the way I shipped an LLM chatbot (OpenAI, structured outputs) into the product, in a domain where wrong answers carry real cost.",
     outcomes: [
       { stat: "10,000+", label: "users, organic" },
       { stat: "#3", label: "App Store Health & Fitness" },
