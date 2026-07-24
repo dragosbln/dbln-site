@@ -3,8 +3,8 @@ import type { PageHero } from "./types";
 /** /blog index page copy. Post content lives in src/content/posts/*.md. */
 export const blogHero: PageHero = {
   eyebrow: "Writing",
-  title: "Architecture decisions, *written up in full.*",
-  lede: "Notes from production work: auth, system boundaries, cloud strategy and the agentic-era tradeoffs that come with them. The decisions, not the keystrokes.",
+  title: "Notes from *production work.*",
+  lede: "What I build and review, written up in full: the decisions, the failures, and the evidence behind the claims.",
   metaDescription:
-    "Architecture decisions, written up in full. Notes from production work: auth, system boundaries, cloud strategy and the agentic-era tradeoffs that come with them.",
+    "Notes from production work. What I build and review, written up in full: the decisions, the failures, and the evidence behind the claims.",
 };

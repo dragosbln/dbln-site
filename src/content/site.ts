@@ -222,7 +222,7 @@ export const agentic: AgenticSection = {
 export const writing: WritingSection = {
   num: "05",
   title: "Writing",
-  aside: "Architecture decisions, written up in full.",
+  aside: "Notes from production work, written up in full.",
   asideLink: { label: "Read the blog", href: "/blog" },
   featuredCount: 3,
 };
