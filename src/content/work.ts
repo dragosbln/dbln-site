@@ -19,7 +19,7 @@ export const workHero: PageHero = {
 export const workCta: Contact = {
   label: "Start a conversation",
   title: "Want an *in-depth* review for your AI Product?",
-  body: "Two questions, then pick a time. The intro call is 30 minutes.",
+  body: "Pick your situation, pick a time. The intro call is 30 minutes.",
 };
 
 export const caseStudies: CaseStudy[] = [

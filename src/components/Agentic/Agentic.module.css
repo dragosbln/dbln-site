@@ -27,9 +27,16 @@
   padding: 20px 0;
   border-top: 1px solid var(--line);
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 18px;
+  /* Fixed kicker column: all rows share the same two text start points.
+     62px fits the widest kicker (Evidence, 60px) with 2px slack. */
+  grid-template-columns: 62px 1fr;
+  gap: 12px;
   align-items: baseline;
+}
+
+/* Staggered rhythm: rows 1 and 3 indent their text; kickers and rules stay put. */
+.item:nth-child(odd) > div {
+  padding-left: 22px;
 }
 
 .item:last-child {
@@ -61,5 +68,10 @@
   .flex {
     grid-template-columns: 1fr;
     gap: 36px;
+  }
+
+  /* Narrow screens: keep the stagger visible without eating line length. */
+  .item:nth-child(odd) > div {
+    padding-left: 12px;
   }
 }
