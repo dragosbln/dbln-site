@@ -178,29 +178,29 @@ export const testimonials: TestimonialsSection = {
 
 export const agentic: AgenticSection = {
   num: "04",
-  title: "On agentic development",
-  aside: "Where the real work is now that the typing is cheap.",
-  pull: "I use agentic tools, mostly Claude Code, daily on production work. Scaffolding, refactors and exploratory design are nearly free now. But *the judgment doesn't get outsourced; the typing does.* Architecture and review decisions stay with me.",
+  title: "The method",
+  aside: "How AI fits in the work, and why the findings hold.",
+  pull: "I use AI heavily in every review: it reads more outputs, tries more angles, and covers more of the system than I could alone. But *the judgment doesn't get outsourced, and neither does the verification.* Every finding is reproduced by hand before it reaches the report.",
   items: [
     {
-      kicker: "Quality",
-      title: "Evals & AI quality engineering",
-      body: '"Is this output good?" usually means three different questions from three different stakeholders. You have to decide which one you\'re answering before you can measure anything.',
+      kicker: "Search",
+      title: "AI-accelerated analysis",
+      body: "AI reads more of your outputs and your codebase than a human reviewer could. It surfaces candidates: possible failures, suspect paths, patterns worth a look.",
+    },
+    {
+      kicker: "Verify",
+      title: "Candidates become findings",
+      body: "AI-assisted analysis produces findings that are plausible and wrong. So a candidate becomes a finding only when I reproduce it and trace it to a cause. What I can't verify doesn't ship.",
+    },
+    {
+      kicker: "Evidence",
+      title: "Findings you can re-run",
+      body: "Each finding carries its trace and its reproduction steps. Your team can check my work without me in the room.",
     },
     {
       kicker: "Design",
-      title: "Agentic system design",
-      body: "Agents as production components: MCP, multi-agent workflows, permission and trust models.",
-    },
-    {
-      kicker: "Security",
-      title: "AI security",
-      body: "Prompt and indirect injection, agent permission models. The failure modes compound with the auth and security work I already do.",
-    },
-    {
-      kicker: "Systems",
-      title: "Distributed-systems depth",
-      body: "The work agents are worst at, and where the expensive-to-reverse decisions still live.",
+      title: "Down to the decision",
+      body: "Failures get traced to the design decision that allowed them: retrieval, data flow, fallbacks, orchestration. The fix plan changes the system, and the regression set keeps it honest.",
     },
   ],
 };
@@ -217,8 +217,8 @@ export const writing: WritingSection = {
 
 export const contact: Contact = {
   label: "Start a conversation",
-  title: "Have a decision worth *getting right?*",
-  body: "Two questions, then pick a time. The intro call is 30 minutes.",
+  title: "Ready to find out where your AI product *breaks?*",
+  body: "Pick your situation, pick a time. The intro call is 30 minutes.",
 };
 
 /**
@@ -229,43 +229,43 @@ export const contact: Contact = {
  * "What are you weighing?" question lives inside Cal's own booking form.
  */
 export const booking: ContactBooking = {
-  formatStep: "01 · What kind of help are you imagining?",
+  formatStep: "01 · Where are you with your AI feature?",
   timeStep: "02 · Pick a time",
   formats: [
     {
       num: "01",
-      title: "Architecture advisory",
-      desc: "Reviews and second opinions.",
-      value: "consultancy",
-      chip: "Advisory",
+      title: "Live, and misbehaving",
+      desc: "Users or support are flagging it.",
+      value: "live-misbehaving",
+      chip: "Misbehaving",
     },
     {
       num: "02",
-      title: "Hands-on architecture & engineering",
-      desc: "Design and delivery together.",
-      value: "hands-on",
-      chip: "Hands-on",
+      title: "Live, but unmeasured",
+      desc: "Nobody can say how often it fails.",
+      value: "live-unmeasured",
+      chip: "Unmeasured",
     },
     {
       num: "03",
-      title: "Fractional CTO",
-      desc: "Ongoing technical ownership.",
-      value: "cto",
-      chip: "Fractional CTO",
+      title: "Not shipped yet",
+      desc: "You want it reviewed before launch.",
+      value: "pre-launch",
+      chip: "Pre-launch",
     },
     {
       num: "04",
-      title: "Not sure yet",
-      desc: "We can figure it out on the call.",
-      value: "not-sure",
-      chip: "Not sure yet",
+      title: "Something else",
+      desc: "Architecture, CTO work, or not sure.",
+      value: "other",
+      chip: "Other",
     },
   ],
   emailHint: "Prefer email? That works too.",
-  veil: "Pick a format to open the calendar",
+  veil: "Pick your situation to open the calendar",
   veilNote: "The calendar loads from Cal.com.",
   restart: {
-    title: "Switch the format?",
+    title: "Switch your situation?",
     body: "Switching restarts the booking. Anything you entered is lost.",
     confirm: "Switch",
     cancel: "Keep booking",
@@ -273,7 +273,7 @@ export const booking: ContactBooking = {
   confirmed: {
     label: "You're on the calendar",
     title: "Talk soon. The *invite is in your inbox.*",
-    body: "The details are on the right and in your calendar invitation. Bring the decision you're weighing. If something shifts, the invite has the links to move or cancel it.",
+    body: "The details are on the right and in your calendar invitation. Bring what you're seeing: the complaints, the odd outputs, the thing you can't measure. If something shifts, the invite has the links to move or cancel it.",
     focusLabel: "Focus",
     weighingLabel: "Weighing",
     emailHint: "Something to send ahead? Email works.",
@@ -295,7 +295,7 @@ export const booking: ContactBooking = {
     title: "Intro call",
     meta: "30 min · Google Meet",
     calLink: "dragosbln/30min",
-    chipPrefix: "Format: ",
+    chipPrefix: "Situation: ",
   },
 };
 
