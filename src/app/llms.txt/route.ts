@@ -1,4 +1,4 @@
-import { engagements, site } from "@/content/site";
+import { review, site } from "@/content/site";
 import { caseStudies } from "@/content/work";
 import { getPosts } from "@/lib/posts";
 import { postUrl } from "@/lib/urls";
@@ -13,9 +13,11 @@ export function GET() {
     .map((post) => `- [${post.title}](${postUrl(post.slug)}): ${post.excerpt}`)
     .join("\n");
 
-  // Derived from content so a new engagement format or case study can't
+  // Derived from content so a change to the offer or a new case study can't
   // leave this file — the primary AI-crawler surface — stale.
-  const formats = engagements.items.map((i) => i.title).join(", ");
+  const deliverables = (
+    review.steps.find((step) => step.ordered)?.items ?? []
+  ).join(", ");
   // short case names ("Equinet — by Mustad" → "Equinet"), matching CaseNav
   const caseNames = caseStudies.map((c) => c.name.split(/ — | · /)[0]).join(", ");
 
@@ -24,13 +26,13 @@ export function GET() {
 > ${site.role}. ${site.description}
 
 - Based in ${site.location}; works remotely across EU and US time zones.
-- Engagement formats: ${formats}.
+- Offer: ${review.title} — an independent, fixed-scope review of LLM products. Deliverables: ${deliverables}.
 - Engagements run through ${site.company}.
 - Contact: ${site.email}
 
 ## Pages
 
-- [Home](${site.url}/): positioning, selected work, engagement formats, testimonials, writing
+- [Home](${site.url}/): positioning, selected work, the review offer, the method, testimonials, writing
 - [Work](${site.url}/work): ${caseStudies.length} case studies in depth (situation, the expensive-to-reverse decision, approach, outcomes) — ${caseNames}
 - [Writing](${site.url}/blog): all articles; RSS at ${site.url}/feed.xml
 - [Privacy Notice](${site.url}/privacy): what the site collects (no cookies, cookieless analytics, Cal.com only on request)

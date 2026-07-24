@@ -2,10 +2,10 @@ import type {
   AgenticSection,
   Contact,
   ContactBooking,
-  EngagementsSection,
   Hero,
   NavItem,
   NotFound,
+  ReviewSection,
   TestimonialsSection,
   WorkSection,
   WritingSection,
@@ -52,7 +52,7 @@ export const socialLinks: NavItem[] = [
 export const nav: { links: NavItem[]; cta: NavItem } = {
   links: [
     { label: "Work", href: "/#work" },
-    { label: "Engagements", href: "/#engage" },
+    { label: "The review", href: "/#review" },
     { label: "Writing", href: "/#writing" },
   ],
   cta: { label: "Start a conversation", href: "/#contact" },
@@ -120,32 +120,44 @@ export const work: WorkSection = {
   ],
 };
 
-export const engagements: EngagementsSection = {
+/** Landing section 02 (design: engagements-3a): the single lead offer. */
+export const review: ReviewSection = {
   num: "02",
-  title: "How I engage",
-  aside:
-    "I sell engagement formats, not job titles. Each one is scoped around the decisions you're trying to get right.",
-  items: [
+  title: "The AI Reliability Review",
+  scope: {
+    lead: "Fixed scope, two weeks.",
+    note: "+1–3 days if you don't have tracing yet.",
+  },
+  steps: [
     {
-      id: "A",
-      title: "Architecture Advisory",
-      body: "Reviews of your system, infrastructure or roadmap, on retainer or per engagement: boundaries, auth, data, cloud spend, modernization paths.",
-      when: "Best before an expensive-to-reverse call",
-      scope: "System redesigns · auth & data · modernization",
+      eyebrow: "01 · You provide",
+      lead: "Three inputs:",
+      items: [
+        "Repo access",
+        "A slice of real outputs *— or a way to generate them*",
+        "2–3 hours of team time",
+      ],
     },
     {
-      id: "B",
-      title: "Fractional CTO & Tech Lead",
-      body: "Senior technical judgment for early-stage teams that need direction, hiring signal and architectural ownership, without the full-time hire.",
-      when: "For teams scaling past their first decisions",
-      scope: "0→1 · technical direction · team building",
+      eyebrow: "02 · I review",
+      lead: "Both sides of the system:",
+      items: [
+        "**Behavior** *— failures in your real outputs, reproduced and counted*",
+        "**Design** *— the architecture around the model: data flow, retrieval, prompts, fallbacks*",
+        "**The trace** *— each failure tied to the design decision behind it*",
+      ],
     },
     {
-      id: "C",
-      title: "Hands-on Senior Engineering",
-      body: "For complex initiatives that need someone who can design and build: re-architectures, platform builds, modernizations.",
-      when: "When design and delivery can't be separated",
-      scope: "Re-architecture · platform · auth & security",
+      eyebrow: "03 · You leave with",
+      lead: "Five deliverables:",
+      ordered: true,
+      items: [
+        "Failure inventory",
+        "Architecture findings",
+        "Ranked fix roadmap",
+        "Starter regression set",
+        "Executive readout",
+      ],
     },
   ],
 };
