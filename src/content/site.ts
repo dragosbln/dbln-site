@@ -59,10 +59,10 @@ export const nav: { links: NavItem[]; cta: NavItem } = {
 };
 
 export const hero: Hero = {
-  eyebrow: "Independent Software Architect · Fractional CTO",
+  eyebrow: "AI Reliability · Independent reviews of LLM products",
   title:
-    "I help teams get the *expensive-to-reverse* decisions right, then build them.",
-  lede: "Eight years of architecture and platform work across insurance, Web3 and health-tech. I'm hired for judgment on the calls that are hard to undo: auth, data, system boundaries. And for the engineering to ship them.",
+    "I find where your AI product breaks, and the *design decisions* that let it break.",
+  lede: "Independent reviews for teams whose LLM feature is live but unmeasured. I reproduce failures from your real outputs, review the architecture around the model, and trace each one to the design decision behind it. Anything I can't verify stays out of the report.",
   actions: {
     primary: { label: "Start a conversation", href: "/#contact" },
     secondary: { label: "See selected work", href: "/#work" },
@@ -70,14 +70,14 @@ export const hero: Hero = {
   meta: [
     { key: "Based", value: "Cluj-Napoca, RO", detail: "Remote · EU / US" },
     {
-      key: "Core stack",
-      value: "TypeScript · Node · Next",
-      detail: "AWS · GCP · Postgres",
+      key: "The review",
+      value: "Failures · Architecture · Fix plan",
+      detail: "Verified findings · Regression set",
     },
     {
-      key: "Depth",
-      value: "Architecture · Auth · Security",
-      detail: "Event-driven · DDD · Modernization",
+      key: "Background",
+      value: "Software Architect · 8+ years",
+      detail: "TypeScript · Node · AWS / GCP",
     },
   ],
 };
@@ -85,37 +85,37 @@ export const hero: Hero = {
 export const work: WorkSection = {
   num: "01",
   title: "Selected work",
-  aside: "A few engagements where the decision mattered more than the keystrokes.",
+  aside: "The proof behind the reviews: AI products shipped, and the architecture work underneath them.",
   asideLink: { label: "Full case studies", href: "/work" },
   cta: { label: "Read all six case studies, in depth", href: "/work" },
   items: [
+    {
+      period: "2026",
+      title: "Verification-first AI audit tool",
+      role: "Architect & Author · Open source",
+      body: "An open-source audit skill that reviews a codebase's auth layer for vendor lock-in risk. AI does the reading; every finding is quoted from the code and **verified against live runs**, and the harness that tests the auditor is **mutation-tested**. The method behind my reviews, working in public.",
+      tags: ["AI-assisted audit", "Verified evidence", "Mutation testing", "Open source"],
+    },
+    {
+      period: "2024—25",
+      title: "Backend for an AI-agents platform",
+      role: "Lead Backend Architect · Bullseye Web3 Studio",
+      body: "Architected the event-driven microservices backend behind two greenfield products, including A1X, a platform where users create and run their own AI agents. Zero to **150,000+ registered users**; GCP stayed **under $500/month** across 10+ services, mostly by deciding what not to build before product-market fit.",
+      tags: ["AI agents", "Microservices", "GCP", "Cost efficiency"],
+    },
+    {
+      period: "2020—25",
+      title: "LLM chatbot in a health product",
+      role: "Fractional CTO · Parentool",
+      body: "Shipped a production LLM chatbot (OpenAI, structured outputs) inside a health-tech product I ran end to end: **10,000+ users**, **7% paid conversion**, peak at **#3 in App Store Health & Fitness**. A domain where wrong answers carry real cost.",
+      tags: ["LLM chatbot", "OpenAI", "Fractional CTO", "0→1"],
+    },
     {
       period: "2025—26",
       title: "Auth system re-architecture",
       role: "Lead Architect & Engineer · Pie Insurance",
       body: "Owned the authentication track of a unified frontend re-architecture across a Partner Portal of **100+ backend microservices**. Wrote the ADRs (framework, token storage, OAuth, multi-pool Cognito) and migrated the legacy Amplify/SRP auth to a modern OAuth flow on Cognito Managed Login.",
       tags: ["Cognito", "OAuth", "Managed Login", "ADRs", "Multi-pool"],
-    },
-    {
-      period: "2025",
-      title: "Notifications & self-serve documents",
-      role: "System Design · Pie Insurance",
-      body: "Designed a generic notification system that works with **100+ services**, and shipped a self-serve document-generation feature that cut manual support load by **roughly 80%**.",
-      tags: ["Event-driven", "AWS", "Platform"],
-    },
-    {
-      period: "2024—25",
-      title: "Event-driven microservices backend",
-      role: "Lead Backend Architect · Bullseye Web3 Studio",
-      body: "Architected and led the event-driven microservices backend for two greenfield Web3 products, from zero to **150,000+ registered users**. GCP stayed **under $500/month** across 10+ services, mostly by deciding what not to build before product-market fit.",
-      tags: ["Microservices", "GCP", "Event-driven", "Cost efficiency"],
-    },
-    {
-      period: "2020—25",
-      title: "Healthtech, zero to one",
-      role: "Fractional CTO · Parentool",
-      body: "Took a health-tech product from idea to **10,000+ users** and **7% paid conversion**. Peaked at **#3 in App Store Health & Fitness**. Owned stack, team and delivery end to end.",
-      tags: ["Fractional CTO", "React Native", "Firebase", "0→1"],
     },
   ],
 };
