@@ -17,10 +17,10 @@ export default function Home() {
   return (
     <main id="main">
       <Hero />
-      <Work />
       <Review />
-      <Testimonials />
       <Agentic />
+      <Work />
+      <Testimonials />
       <Writing />
       <Contact />
     </main>

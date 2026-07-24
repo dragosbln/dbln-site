@@ -32,7 +32,7 @@ export function GET() {
 
 ## Pages
 
-- [Home](${site.url}/): positioning, selected work, the review offer, the method, testimonials, writing
+- [Home](${site.url}/): positioning, the review offer, the method, selected work, testimonials, writing
 - [Work](${site.url}/work): ${caseStudies.length} case studies in depth (situation, the expensive-to-reverse decision, approach, outcomes) — ${caseNames}
 - [Writing](${site.url}/blog): all articles; RSS at ${site.url}/feed.xml
 - [Privacy Notice](${site.url}/privacy): what the site collects (no cookies, cookieless analytics, Cal.com only on request)

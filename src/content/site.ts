@@ -51,8 +51,8 @@ export const socialLinks: NavItem[] = [
 /** Hrefs are "/#…" (not "#…") so they work from future non-home pages too. */
 export const nav: { links: NavItem[]; cta: NavItem } = {
   links: [
-    { label: "Work", href: "/#work" },
     { label: "The review", href: "/#review" },
+    { label: "Work", href: "/#work" },
     { label: "Writing", href: "/#writing" },
   ],
   cta: { label: "Start a conversation", href: "/#contact" },
@@ -83,7 +83,7 @@ export const hero: Hero = {
 };
 
 export const work: WorkSection = {
-  num: "01",
+  num: "03",
   title: "Selected work",
   aside: "The proof behind the reviews: AI products shipped, and the architecture work underneath them.",
   asideLink: { label: "Full case studies", href: "/work" },
@@ -120,9 +120,9 @@ export const work: WorkSection = {
   ],
 };
 
-/** Landing section 02 (design: engagements-3a): the single lead offer. */
+/** Landing section 01 (design: engagements-3a): the single lead offer. */
 export const review: ReviewSection = {
-  num: "02",
+  num: "01",
   title: "The AI Reliability Review",
   scope: {
     lead: "Fixed scope, two weeks.",
@@ -163,7 +163,7 @@ export const review: ReviewSection = {
 };
 
 export const testimonials: TestimonialsSection = {
-  num: "03",
+  num: "04",
   title: "What teams say",
   aside: "From the people who hired me: enterprise leads, founders, clients.",
   items: [
@@ -189,7 +189,7 @@ export const testimonials: TestimonialsSection = {
 };
 
 export const agentic: AgenticSection = {
-  num: "04",
+  num: "02",
   title: "The method",
   aside: "How AI fits in the work, and why the findings hold.",
   pull: "I use AI heavily in every review: it reads more outputs, tries more angles, and covers more of the system than I could alone. But *the judgment doesn't get outsourced, and neither does the verification.* Every finding is reproduced by hand before it reaches the report.",
