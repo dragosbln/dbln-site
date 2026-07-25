@@ -23,10 +23,10 @@ export const site = {
   company: "Luckylabs Software SRL",
   /** Short brand form, e.g. the header's "/ Luckylabs". */
   companyShort: "Luckylabs",
-  role: "Independent Software Architect & Fractional CTO",
-  title: "Dragos Bilaniuc — Independent Software Architect & Fractional CTO",
+  role: "Independent AI Reliability Reviews · Software Architect",
+  title: "Dragos Bilaniuc — Independent AI Reliability Reviews",
   description:
-    "I help teams get the expensive-to-reverse decisions right, then build them. Eight years of architecture and platform work across insurance, Web3 and health-tech: auth, data, system boundaries.",
+    "I find where AI products break, and the design decisions that let it break. Independent reviews of LLM products: verified findings, architecture review, system-level fix plan.",
   email: "dragos@dbln.me",
   location: "Cluj-Napoca, Romania",
   /** Structured halves of `location`, for the Person schema's PostalAddress. */
@@ -55,7 +55,7 @@ export const nav: { links: NavItem[]; cta: NavItem } = {
     { label: "Work", href: "/#work" },
     { label: "Writing", href: "/#writing" },
   ],
-  cta: { label: "Start a conversation", href: "/#contact" },
+  cta: { label: "Book a call", href: "/#contact" },
 };
 
 export const hero: Hero = {
@@ -64,7 +64,7 @@ export const hero: Hero = {
     "I find where your AI product breaks, and the *design decisions* that let it break.",
   lede: "Independent reviews for teams whose LLM feature is live but unmeasured. I reproduce failures from your real outputs, review the architecture around the model, and trace each one to the design decision behind it. Anything I can't verify stays out of the report.",
   actions: {
-    primary: { label: "Start a conversation", href: "/#contact" },
+    primary: { label: "Book a call", href: "/#contact" },
     secondary: { label: "See selected work", href: "/#work" },
   },
   meta: [
@@ -85,9 +85,9 @@ export const hero: Hero = {
 export const work: WorkSection = {
   num: "03",
   title: "Selected work",
-  aside: "The proof behind the reviews: AI products shipped, and the architecture work underneath them.",
-  asideLink: { label: "Full case studies", href: "/work" },
-  cta: { label: "Read all six case studies, in depth", href: "/work" },
+  aside: "The work behind the reviews: where the architectural and engineering depth comes from.",
+  asideLink: { label: "Read more case studies", href: "/work" },
+  cta: { label: "Read more case studies", href: "/work" },
   items: [
     {
       period: "2026",
@@ -172,18 +172,21 @@ export const testimonials: TestimonialsSection = {
         "Before diving into the code, he takes the time to thoroughly understand the business requirements — that meticulous upfront analysis lets him anticipate complex edge cases and architectural roadblocks long before they reach production. He has the rare maturity to provide constructive pushback when necessary.",
       name: "Shilpi Reddy",
       role: "Engineering Leader · Pie Insurance",
+      href: "https://www.linkedin.com/in/shilpi-reddyreddy-942408a/",
     },
     {
       quote:
-        "One of those valuable developers you'd want to build your team around. A pragmatic problem solver, keen to improve code and product quality while always keeping the user in mind.",
-      name: "Sebastiaan Ordelman",
-      role: "Product Director & CTO",
+        "He helped me transform my initial concepts into clear, structured documentation and provided insights that added real value to the project. What impressed me most was his ability to communicate technical concepts in a way that was accessible to everyone, ensuring alignment across the board. A consummate professional.",
+      name: "Emin Eskiocak",
+      role: "PropTech Entrepreneur",
+      href: "https://www.linkedin.com/in/emineskiocak/",
     },
     {
       quote:
         "He delivered a highly functional, almost bugless solution in the exact timeline we agreed — and could explain to us, non-technical people, everything happening in the backend.",
       name: "Petruța Costea",
       role: "Founder · Parentool",
+      href: "https://www.linkedin.com/in/petru%C8%9Ba-%C8%9Bulig%C4%83/",
     },
   ],
 };
@@ -228,7 +231,7 @@ export const writing: WritingSection = {
 };
 
 export const contact: Contact = {
-  label: "Start a conversation",
+  label: "Book a call",
   title: "Ready to find out where your AI product *breaks?*",
   body: "Pick your situation, pick a time. The intro call is 30 minutes.",
 };

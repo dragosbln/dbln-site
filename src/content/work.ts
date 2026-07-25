@@ -17,7 +17,7 @@ export const workHero: PageHero = {
 };
 
 export const workCta: Contact = {
-  label: "Start a conversation",
+  label: "Book a call",
   title: "Want an *in-depth* review for your AI Product?",
   body: "Pick your situation, pick a time. The intro call is 30 minutes.",
 };
@@ -48,6 +48,7 @@ export const caseStudies: CaseStudy[] = [
         "Before diving into the code, he takes the time to thoroughly understand the business requirements — that meticulous upfront analysis lets him anticipate complex edge cases and architectural roadblocks long before they reach production. He has the rare maturity to provide constructive pushback when necessary.",
       name: "Shilpi Reddy",
       role: "Engineering Leader · Pie Insurance",
+      href: "https://www.linkedin.com/in/shilpi-reddyreddy-942408a/",
     },
     stack: ["TypeScript", "Node.js", "Next.js", "AWS Cognito", "OAuth", "Event-driven"],
     diagram: {
@@ -107,6 +108,7 @@ export const caseStudies: CaseStudy[] = [
         "He delivered a highly functional, almost bugless solution in the exact timeline we agreed — and could explain to us, non-technical people, everything happening in the backend.",
       name: "Petruța Costea",
       role: "Founder · Parentool",
+      href: "https://www.linkedin.com/in/petru%C8%9Ba-%C8%9Bulig%C4%83/",
     },
     stack: ["React Native", "Node.js", "Firebase", "Cloud", "Software Architecture"],
     diagram: {

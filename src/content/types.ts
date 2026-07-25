@@ -64,6 +64,8 @@ export type Testimonial = {
   quote: string;
   name: string;
   role: string;
+  /** Optional link to the author's public profile (LinkedIn). */
+  href?: string;
 };
 
 export type AgenticItem = {

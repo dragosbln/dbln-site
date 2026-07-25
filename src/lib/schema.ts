@@ -29,6 +29,8 @@ export const personSchema = {
   },
   sameAs: Object.values(site.socials),
   knowsAbout: [
+    "AI reliability",
+    "LLM applications",
     "Software architecture",
     "Authentication and security",
     "Event-driven systems",
