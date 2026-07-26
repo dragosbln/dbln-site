@@ -12,13 +12,15 @@
 .eyebrow {
   display: flex;
   gap: 16px;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 40px;
 }
 
 .dot {
+  flex-shrink: 0;
   width: 7px;
   height: 7px;
+  margin-top: 6px; /* centers on the label's first line when it wraps */
   border-radius: 50%;
   background: var(--teal);
   box-shadow: 0 0 0 4px var(--accent-wash);
@@ -33,14 +35,46 @@
   font-weight: 500;
 }
 
+/* Each "·"-separated segment wraps as a unit. */
+.segment {
+  white-space: nowrap;
+}
+
+/* The longest unbreakable segment must fit a 375px viewport. */
+@media (max-width: 480px) {
+  .label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+  }
+
+  .dot {
+    margin-top: 5px;
+  }
+}
+
+/* Content left, meta rail right; single column below 980px. */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 24px 72px;
+  align-items: start;
+}
+
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .title {
   font-family: var(--serif);
   font-weight: 400;
-  font-size: clamp(38px, 6vw, 76px);
-  line-height: 1.04;
+  /* Sized for the two-column hero: the content column, not a ch cap, sets
+     the measure, and the full block must clear an 800px fold at 1440. */
+  font-size: clamp(36px, 4.2vw, 60px);
+  line-height: 1.06;
   letter-spacing: -0.018em;
-  max-width: 16ch;
-  margin-bottom: 34px;
+  margin-bottom: 30px;
 }
 
 .title em {
@@ -98,19 +132,23 @@
 }
 
 .meta {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  overflow: hidden;
-  margin-top: 64px;
+  border-left: 1px solid var(--line);
+  padding-left: 40px;
+  margin-top: 8px;
 }
 
 .metaItem {
-  background: var(--paper);
-  padding: 22px 24px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.metaItem:first-child {
+  padding-top: 0;
+}
+
+.metaItem:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
 }
 
 .metaItem dt {
@@ -135,8 +173,8 @@
   margin-top: 3px;
 }
 
-@media (max-width: 680px) {
+@media (max-width: 980px) {
   .meta {
-    grid-template-columns: 1fr;
+    margin-top: 48px;
   }
 }
