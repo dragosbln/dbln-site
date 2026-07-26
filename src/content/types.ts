@@ -48,15 +48,15 @@ export type WorkItem = {
   tags: string[];
 };
 
-export type Engagement = {
-  /** Single-letter index, e.g. "A". */
-  id: string;
-  title: string;
-  body: string;
-  /** "Best before …" one-liner. */
-  when: string;
-  /** Short scope list, "·"-separated. */
-  scope: string;
+export type ReviewStep = {
+  /** Mono eyebrow, e.g. "01 · You provide". */
+  eyebrow: string;
+  /** Serif lead line, e.g. "Three inputs:". */
+  lead: string;
+  /** Rich text items. */
+  items: string[];
+  /** Numbered markers (ol) when true; em-dash markers (ul) otherwise. */
+  ordered?: boolean;
 };
 
 export type Testimonial = {
@@ -64,6 +64,8 @@ export type Testimonial = {
   quote: string;
   name: string;
   role: string;
+  /** Optional link to the author's public profile (LinkedIn). */
+  href?: string;
 };
 
 export type AgenticItem = {
@@ -131,7 +133,11 @@ export type CaseStudy = {
 };
 
 export type WorkSection = SectionIntro & { items: WorkItem[]; cta?: NavItem };
-export type EngagementsSection = SectionIntro & { items: Engagement[] };
+export type ReviewSection = SectionIntro & {
+  /** The scope strip on top of the card. */
+  scope: { lead: string; note: string };
+  steps: ReviewStep[];
+};
 export type TestimonialsSection = SectionIntro & { items: Testimonial[] };
 export type AgenticSection = SectionIntro & {
   /** Rich text pull quote. */

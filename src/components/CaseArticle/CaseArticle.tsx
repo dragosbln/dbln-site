@@ -57,7 +57,7 @@ export default function CaseArticle({ caseStudy: c, index }: CaseArticleProps) {
             ))}
           </div>
           <div className={styles.spine}>
-            <h3>Situation</h3>
+            <h3>Context</h3>
             <p>{richText(c.situation)}</p>
           </div>
           <div className={`${styles.spine} ${styles.decision}`}>
@@ -77,7 +77,18 @@ export default function CaseArticle({ caseStudy: c, index }: CaseArticleProps) {
                 <p>{c.proof.quote}</p>
               </blockquote>
               <figcaption>
-                <span className={styles.proofName}>{c.proof.name}</span>
+                {c.proof.href ? (
+                  <a
+                    className={styles.proofName}
+                    href={c.proof.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {c.proof.name}
+                  </a>
+                ) : (
+                  <span className={styles.proofName}>{c.proof.name}</span>
+                )}
                 <span className={styles.proofRole}>{c.proof.role}</span>
               </figcaption>
             </figure>

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Agentic from "@/components/Agentic";
 import Contact from "@/components/Contact";
-import Engagements from "@/components/Engagements";
 import Hero from "@/components/Hero";
+import Review from "@/components/Review";
 import Testimonials from "@/components/Testimonials";
 import Work from "@/components/Work";
 import Writing from "@/components/Writing";
@@ -17,10 +17,10 @@ export default function Home() {
   return (
     <main id="main">
       <Hero />
-      <Work />
-      <Engagements />
-      <Testimonials />
+      <Review />
       <Agentic />
+      <Work />
+      <Testimonials />
       <Writing />
       <Contact />
     </main>

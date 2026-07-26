@@ -28,7 +28,18 @@ export default function Testimonials() {
                   <p>{item.quote}</p>
                 </blockquote>
                 <figcaption className={styles.who}>
-                  <span className={styles.name}>{item.name}</span>
+                  {item.href ? (
+                    <a
+                      className={styles.name}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {item.name}
+                    </a>
+                  ) : (
+                    <span className={styles.name}>{item.name}</span>
+                  )}
                   <span className={styles.role}>{item.role}</span>
                 </figcaption>
               </figure>

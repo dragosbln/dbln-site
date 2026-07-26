@@ -117,8 +117,9 @@ silently:
 - Event: `dragosbln/30min` (30 min, Google Meet via the connected Google
   Calendar).
 - Booking field on that event: select `format`, **optional + hidden**, with
-  option values exactly `consultancy` / `hands-on` / `cto` / `not-sure`
-  (mapped in `site.ts` `booking.formats[].value`). A required hidden field
+  option values exactly `live-misbehaving` / `live-unmeasured` / `pre-launch` /
+  `other` (mapped in `site.ts` `booking.formats[].value`; the picker asks for
+  the visitor's situation with their AI feature, not an engagement format). A required hidden field
   would deadlock the booking; the visitor answers on-site instead. The
   "What are you weighing?" question is a **visible** field inside Cal's own
   booking form, not asked on-site.
