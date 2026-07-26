@@ -256,6 +256,20 @@ export type DiscussionContent = {
   posted: string;
   errorGeneric: string;
   errorRate: string;
+  /** Remember-me / sign-in affordance. */
+  signInPrompt: string;
+  signInGoogle: string;
+  signInGithub: string;
+  /** `{name}` interpolates the remembered account name. */
+  signInAs: string;
+  /** `{name}` interpolates the signed-in account name. */
+  postingAs: string;
+  signOut: string;
+  signInFailed: string;
+  deleteLabel: string;
+  deleteConfirm: string;
+  deleteFailed: string;
+  deleteNeedsSignIn: string;
 };
 
 /** One numbered block of the privacy notice. */

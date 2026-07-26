@@ -147,6 +147,7 @@ export class FirestoreStore implements SocialStore {
         status: "visible",
         depth,
         at,
+        verified: input.verified,
       });
       tx.set(
         countersRef,
@@ -164,6 +165,7 @@ export class FirestoreStore implements SocialStore {
         status: "visible",
         depth,
         at: at.toDate().toISOString(),
+        verified: input.verified,
       };
       return { ok: true as const, comment: toPublic(row) };
     });
@@ -183,6 +185,7 @@ export class FirestoreStore implements SocialStore {
         doc.get("at") instanceof Timestamp
           ? (doc.get("at") as Timestamp).toDate().toISOString()
           : new Date(0).toISOString(),
+      verified: doc.get("verified") === true,
     };
   }
 
@@ -310,5 +313,63 @@ export class FirestoreStore implements SocialStore {
       );
       return true;
     });
+  }
+
+  async removeOwnComment(
+    id: string,
+    subject: string,
+  ): Promise<"ok" | "not_found" | "not_owner"> {
+    const ref = this.db.collection("comments").doc(id);
+    const countersRef = this.countersRef();
+    return this.db.runTransaction(async (tx) => {
+      const [snap, countersSnap] = await Promise.all([
+        tx.get(ref),
+        tx.get(countersRef),
+      ]);
+      if (!snap.exists) return "not_found" as const;
+      if ((snap.get("subject") as string) !== subject) {
+        return "not_owner" as const;
+      }
+      if ((snap.get("status") as CommentStatus) === "visible") {
+        const slug = snap.get("slug") as string;
+        const commentCounts =
+          (countersSnap.get("comments") as Record<string, number> | undefined) ??
+          {};
+        tx.update(ref, { status: "removed" });
+        tx.set(
+          countersRef,
+          { comments: { [slug]: Math.max(0, (commentCounts[slug] ?? 0) - 1) } },
+          { merge: true },
+        );
+      }
+      return "ok" as const;
+    });
+  }
+
+  async claimComments(
+    fromSubject: string,
+    toSubject: string,
+  ): Promise<number> {
+    // Not transactional across the whole set (could exceed a transaction's
+    // scope); batched. Counters don't change — attribution only.
+    const snap = await this.db
+      .collection("comments")
+      .where("subject", "==", fromSubject)
+      .get();
+    if (snap.empty) return 0;
+    let moved = 0;
+    let batch = this.db.batch();
+    let inBatch = 0;
+    for (const doc of snap.docs) {
+      batch.update(doc.ref, { subject: toSubject, verified: true });
+      moved += 1;
+      if (++inBatch === 400) {
+        await batch.commit();
+        batch = this.db.batch();
+        inBatch = 0;
+      }
+    }
+    if (inBatch > 0) await batch.commit();
+    return moved;
   }
 }

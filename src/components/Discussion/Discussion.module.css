@@ -358,3 +358,73 @@
     padding-left: 14px;
   }
 }
+
+/* ---------- identity / sign-in row ---------- */
+
+.identity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.signInPrompt,
+.postingAs {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-faint-2);
+}
+
+.postingAs {
+  color: var(--teal-deep);
+}
+
+.providers {
+  display: flex;
+  gap: 8px;
+}
+
+.identityBtn {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition:
+    border-color 0.18s,
+    color 0.18s;
+}
+
+.identityBtn:hover {
+  border-color: var(--teal);
+  color: var(--teal-deep);
+}
+
+.identityBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.deleteLink {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-faint);
+  background: none;
+  border: none;
+  padding: 0;
+  transition: color 0.18s;
+}
+
+.deleteLink:hover {
+  color: var(--red);
+}

@@ -16,7 +16,7 @@ export const privacy: PrivacyNotice = {
     metaDescription:
       "What dbln.me collects and what it doesn't. Cookieless analytics, no cross-site tracking, and a booking flow that contacts Cal.com only when you choose to.",
   },
-  updated: "2026-07-20",
+  updated: "2026-07-26",
   updatedLabel: "Last updated",
   sections: [
     {
@@ -32,7 +32,8 @@ export const privacy: PrivacyNotice = {
       body: [
         "This site sets no cookies. Nothing is stored on your device to track you, and there is no consent banner because there is nothing to consent to.",
         "A few things are held in your browser, each tied to something you did. When you pick a call format in the contact section, that choice stays in session storage so the page can show it back to you after you book. The stored copy never leaves your browser and is gone when you close the tab. The choice itself goes to Cal.com with your booking.",
-        "When you like or comment, your browser keeps a random id, the list of articles you liked, and the name you commented under. The list keeps the button lit. The name saves you retyping it. The id travels with your likes and comments so one browser counts once. None of it says who you are unless your name does. Clear your browsing data and it is all gone.",
+        "When you like or comment, your browser keeps a random id, the list of articles you liked, the name you commented under, and the ids of comments you posted so you can delete them. The list keeps the button lit. The name saves you retyping it. The id travels with your likes and comments so one browser counts once. None of it says who you are unless your name does. Clear your browsing data and it is all gone.",
+        "If you sign in to comment, your browser also remembers your name and account id so it can offer to sign you back in. It never keeps a password or a login token between visits.",
       ],
     },
     {
@@ -59,7 +60,8 @@ export const privacy: PrivacyNotice = {
       body: [
         "Comments are public. The name you choose and what you write are stored by this site's own backend in the EU and shown to every reader. Use any name you like.",
         "Your browser's random id is stored with each comment. No email address and no IP address is stored with it. Every new comment is emailed to me, so unwelcome ones get removed quickly.",
-        "Want a comment of yours gone? Email me which one it is and it goes. The legal basis is legitimate interest.",
+        "You can sign in with Google or GitHub if you want to keep your comments and delete them yourself later. Only then, and only when you click, does your browser contact them to sign you in. Your account id is stored with your comments in place of the random one. I never see your password.",
+        "Want a comment of yours gone? Delete it yourself if you signed in, or email me which one it is and it goes. The legal basis is legitimate interest.",
       ],
     },
     {
@@ -75,8 +77,8 @@ export const privacy: PrivacyNotice = {
       num: "07",
       title: "The admin page",
       body: [
-        "There is a page at /admin where I moderate comments. It is my own tool. Reading or booking never touches it, which is why the two third parties above are all you meet as a visitor.",
-        "Its only button signs in with Google. If you open the page and use it, your browser contacts Google to sign you in, and Google is the third party for that step. Firebase keeps you signed in until you press sign out. Only my account can see anything; anyone else is turned away.",
+        "There is a page at /admin where I moderate comments. It is my own tool. Reading the site never touches it.",
+        "Its only button signs in with Google. If you open the page and use it, your browser contacts Google for that sign-in, the same way the comment sign-in works. Close the page and it signs out on its own. Only my account can see anything; anyone else is turned away.",
       ],
     },
     {

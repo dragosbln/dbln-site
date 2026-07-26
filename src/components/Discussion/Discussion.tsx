@@ -10,12 +10,24 @@ import {
 } from "react";
 import { discussion as copy } from "@/content/site";
 import {
+  firebaseSignOut,
+  signInVisitor,
+  type AuthProvider,
+} from "@/lib/firebaseClient";
+import {
+  claimComments,
+  clearAccount,
   CommentError,
   fetchComments,
+  isMine,
   notifyCommentAdded,
   postComment,
+  removeOwnComment,
+  saveAccount,
+  savedAccount,
   savedName,
   saveName,
+  type Account,
   type PublicComment,
 } from "@/lib/social";
 import styles from "./Discussion.module.css";
@@ -80,21 +92,35 @@ export default function Discussion({ slug }: DiscussionProps) {
   const [notice, setNotice] = useState<Notice | null>(null);
   const [announce, setAnnounce] = useState("");
   const [now, setNow] = useState(() => Date.now());
+  // Session sign-in: `account` is who we're posting as; the token getter
+  // lives in a ref (re-fetched per post, never persisted). A remembered
+  // account (name only) is offered on load but isn't "signed in" until a
+  // fresh popup — Firebase must not load on page view (privacy).
+  const [account, setAccount] = useState<Account | null>(null);
+  const [remembered, setRemembered] = useState<Account | null>(null);
+  const [signingIn, setSigningIn] = useState(false);
 
   const rootRef = useRef<HTMLElement | null>(null);
   const nameRef = useRef<HTMLInputElement | null>(null);
   const replyNameRef = useRef<HTMLInputElement | null>(null);
   const loadedRef = useRef(false);
+  const getTokenRef = useRef<(() => Promise<string>) | null>(null);
   // Synchronous double-submit guard: the button stays enabled while a
   // post is in flight (disabling the focused button would dump keyboard
   // focus onto <body>), so the guard must not wait for a state flush.
   const submittingRef = useRef(false);
 
   // The saved name is filled imperatively (no state): the server renders
-  // an empty input, and hydration must match it.
+  // an empty input, and hydration must match it. Read after mount to
+  // avoid a hydration mismatch (localStorage is client-only).
   useEffect(() => {
     const el = nameRef.current;
     if (el && !el.value) el.value = savedName();
+    // Read the remembered account only after mount: localStorage is
+    // client-only, so reading it during render would mismatch the
+    // server-rendered (empty) markup.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- see above
+    setRemembered(savedAccount());
   }, []);
 
   // Lazy thread fetch on approach — IO plus the scroll fallback for
@@ -204,6 +230,97 @@ export default function Discussion({ slug }: DiscussionProps) {
     window.setTimeout(() => setAnnounce(""), 2000);
   };
 
+  const signIn = async (provider: AuthProvider) => {
+    if (signingIn) return;
+    setSigningIn(true);
+    setNotice(null);
+    try {
+      const user = await signInVisitor(provider);
+      const acct: Account = {
+        uid: user.uid,
+        name: user.name ?? savedName() ?? "",
+      };
+      getTokenRef.current = user.getIdToken;
+      setAccount(acct);
+      setRemembered(acct);
+      saveAccount(acct);
+      // Pre-fill the name if the visitor hasn't typed one.
+      if (nameRef.current && !nameRef.current.value && acct.name) {
+        nameRef.current.value = acct.name;
+      }
+      // Claim this browser's earlier anonymous comments so they're theirs
+      // (and deletable). Best-effort — a failure doesn't block posting.
+      try {
+        const moved = await claimComments(await user.getIdToken());
+        if (moved > 0) {
+          // The loaded thread's `verified` flags predate the claim;
+          // refresh so delete-own picks the right ownership proof.
+          const payload = await fetchComments(slug);
+          setThread(payload.comments);
+          setToken(payload.token);
+          setTokenReady(false);
+        }
+      } catch (err) {
+        console.debug("[dbln social]", err);
+      }
+    } catch (err) {
+      console.debug("[dbln social]", err);
+      setNotice({ scope: "main", text: copy.signInFailed });
+    } finally {
+      setSigningIn(false);
+    }
+  };
+
+  const signOut = () => {
+    getTokenRef.current = null;
+    setAccount(null);
+    setRemembered(null);
+    clearAccount();
+    // Drop Firebase's in-memory session too (fire-and-forget).
+    firebaseSignOut().catch(() => {});
+  };
+
+  const deleteOwn = async (comment: PublicComment) => {
+    setNotice(null);
+    // The proof a comment needs is fixed at post time: a verified comment
+    // is owned by an account (token required); an anonymous one by this
+    // browser's device id. The flag can be stale right after a claim, so
+    // a not_owner answer retries once with the other available proof.
+    const withToken = async () => {
+      const getToken = getTokenRef.current;
+      return getToken ? removeOwnComment(comment.id, await getToken()) : null;
+    };
+    try {
+      if (comment.verified) {
+        if (!account || !getTokenRef.current) {
+          setNotice({ scope: `del:${comment.id}`, text: copy.deleteNeedsSignIn });
+          return;
+        }
+        await withToken();
+      } else {
+        try {
+          await removeOwnComment(comment.id);
+        } catch (err) {
+          const notOwner =
+            err instanceof CommentError && err.code === "not_owner";
+          if (notOwner && account && getTokenRef.current) await withToken();
+          else throw err;
+        }
+      }
+      setThread((cur) =>
+        (cur ?? []).map((c) =>
+          c.id === comment.id
+            ? { ...c, removed: true, name: "", body: "", verified: false }
+            : c,
+        ),
+      );
+      notifyCommentAdded(slug, Math.max(0, total - 1));
+    } catch (err) {
+      console.debug("[dbln social]", err);
+      setNotice({ scope: `del:${comment.id}`, text: copy.deleteFailed });
+    }
+  };
+
   const handleSubmit = async (e: FormEvent, parentId: string | null) => {
     e.preventDefault();
     if (!token || submittingRef.current) return;
@@ -216,7 +333,15 @@ export default function Discussion({ slug }: DiscussionProps) {
     setSubmitting(true);
     setNotice(null);
     try {
-      const posted = await postComment({ slug, parentId, name, body: text, token });
+      const idToken = account ? await getTokenRef.current?.() : undefined;
+      const posted = await postComment({
+        slug,
+        parentId,
+        name,
+        body: text,
+        token,
+        idToken: idToken ?? undefined,
+      });
       setThread((cur) => [...(cur ?? []), posted]);
       saveName(name);
       notifyCommentAdded(slug, total + 1);
@@ -294,26 +419,44 @@ export default function Discussion({ slug }: DiscussionProps) {
               <p className={styles.body}>{c.body}</p>
             </>
           )}
-          {!c.removed && c.depth < REPLY_DEPTH_MAX ? (
+          {!c.removed && (c.depth < REPLY_DEPTH_MAX || isMine(c.id)) ? (
             <div className={styles.actions}>
-              <button
-                type="button"
-                className={styles.replyLink}
-                onClick={() => openReply(c.id)}
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  aria-hidden="true"
-                  focusable="false"
+              {c.depth < REPLY_DEPTH_MAX ? (
+                <button
+                  type="button"
+                  className={styles.replyLink}
+                  onClick={() => openReply(c.id)}
                 >
-                  <path d="M9 17l-5-5 5-5M4 12h11a5 5 0 0 1 5 5v1" />
-                </svg>
-                {copy.replyLabel}
-              </button>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d="M9 17l-5-5 5-5M4 12h11a5 5 0 0 1 5 5v1" />
+                  </svg>
+                  {copy.replyLabel}
+                </button>
+              ) : null}
+              {isMine(c.id) ? (
+                <button
+                  type="button"
+                  className={styles.deleteLink}
+                  onClick={() => {
+                    if (window.confirm(copy.deleteConfirm)) deleteOwn(c);
+                  }}
+                >
+                  {copy.deleteLabel}
+                </button>
+              ) : null}
             </div>
+          ) : null}
+          {notice?.scope === `del:${c.id}` ? (
+            <p className={styles.error} role="status">
+              {notice.text}
+            </p>
           ) : null}
           {openReplyId === c.id ? (
             <form
@@ -428,6 +571,50 @@ export default function Discussion({ slug }: DiscussionProps) {
           >
             {copy.postLabel}
           </button>
+        </div>
+        <div className={styles.identity}>
+          {account ? (
+            <>
+              <span className={styles.postingAs}>
+                {copy.postingAs.replace("{name}", () => account.name)}
+              </span>
+              <button
+                type="button"
+                className={styles.identityBtn}
+                onClick={signOut}
+              >
+                {copy.signOut}
+              </button>
+            </>
+          ) : (
+            <>
+              <span className={styles.signInPrompt}>
+                {remembered
+                  ? copy.signInAs.replace("{name}", () =>
+                      firstName(remembered.name),
+                    )
+                  : copy.signInPrompt}
+              </span>
+              <span className={styles.providers}>
+                <button
+                  type="button"
+                  className={styles.identityBtn}
+                  disabled={signingIn}
+                  onClick={() => signIn("google")}
+                >
+                  {copy.signInGoogle}
+                </button>
+                <button
+                  type="button"
+                  className={styles.identityBtn}
+                  disabled={signingIn}
+                  onClick={() => signIn("github")}
+                >
+                  {copy.signInGithub}
+                </button>
+              </span>
+            </>
+          )}
         </div>
         <p className={styles.error} role="status">
           {notice?.scope === "main" ? notice.text : ""}

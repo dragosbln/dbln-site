@@ -243,7 +243,7 @@ test("admin actions never leak into the public thread payload", async () => {
   for (const c of readers.comments) {
     assert.deepEqual(
       Object.keys(c).sort(),
-      ["at", "body", "depth", "id", "name", "parentId", "removed"],
+      ["at", "body", "depth", "id", "name", "parentId", "removed", "verified"],
       "public payload must not carry subject/status/slug",
     );
   }

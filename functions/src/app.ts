@@ -77,6 +77,11 @@ export type AppOptions = {
   mailer?: Mailer | null;
   /** Turns a bearer token into an admin uid. Absent = admin API off (404). */
   verifyAdmin?: AdminVerifier;
+  /**
+   * Turns a Firebase ID token into a visitor uid (any signed-in user, no
+   * allowlist). Absent = signed-in commenting off; anonymous still works.
+   */
+  verifyVisitor?: (token: string) => Promise<string | null>;
   /** Rate-limit knobs, lowered by tests. */
   limits?: {
     perSubject?: number;
@@ -208,7 +213,7 @@ export function createApp(store: SocialStore, opts: AppOptions = {}) {
         res.status(400).json({ error: "bad_request" });
         return;
       }
-      if (typeof slug !== "string" || typeof subject !== "string") {
+      if (typeof slug !== "string") {
         res.status(400).json({ error: "bad_request" });
         return;
       }
@@ -216,7 +221,8 @@ export function createApp(store: SocialStore, opts: AppOptions = {}) {
         res.status(400).json({ error: "unknown_slug" });
         return;
       }
-      if (!SUBJECT_RE.test(subject)) {
+      const idToken = typeof raw.idToken === "string" ? raw.idToken : null;
+      if (!idToken && (typeof subject !== "string" || !SUBJECT_RE.test(subject))) {
         res.status(400).json({ error: "bad_subject" });
         return;
       }
@@ -249,11 +255,36 @@ export function createApp(store: SocialStore, opts: AppOptions = {}) {
         res.status(400).json({ error: "token" });
         return;
       }
+      // Client + global windows fire BEFORE the ID-token verification:
+      // checkRevoked makes verifyVisitor an external auth round-trip, and
+      // an expensive call must never sit in front of the cheap gates
+      // unthrottled. The subject windows follow once the subject is known.
+      if (!commentsPerClient.hit(clientKey(req)) || !commentsGlobal.hit("*")) {
+        res.status(429).json({ error: "rate_limited" });
+        return;
+      }
+      // Signed-in posts carry a Firebase ID token; the subject is derived
+      // from the VERIFIED uid (never a client-supplied one), so a caller
+      // can't attribute a comment to someone else's account. Anonymous
+      // posts carry a random `d_<uuid>` subject as before.
+      let effectiveSubject: string;
+      let verified = false;
+      if (idToken) {
+        const uid = opts.verifyVisitor
+          ? await opts.verifyVisitor(idToken)
+          : null;
+        if (!uid) {
+          res.status(401).json({ error: "auth" });
+          return;
+        }
+        effectiveSubject = `u_${uid}`;
+        verified = true;
+      } else {
+        effectiveSubject = subject as string;
+      }
       if (
-        !commentCooldown.hit(subject) ||
-        !commentsPerSubject.hit(subject) ||
-        !commentsPerClient.hit(clientKey(req)) ||
-        !commentsGlobal.hit("*")
+        !commentCooldown.hit(effectiveSubject) ||
+        !commentsPerSubject.hit(effectiveSubject)
       ) {
         res.status(429).json({ error: "rate_limited" });
         return;
@@ -263,7 +294,8 @@ export function createApp(store: SocialStore, opts: AppOptions = {}) {
         parentId,
         name,
         body,
-        subject,
+        subject: effectiveSubject,
+        verified,
       });
       res.set("Cache-Control", "no-store");
       if (!result.ok) {
@@ -284,6 +316,87 @@ export function createApp(store: SocialStore, opts: AppOptions = {}) {
             (parentId ? ` (reply to ${parentId})` : ""),
         })
         .catch((err) => console.error("[notify]", err));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Author deletes their own comment (soft-remove). Authed users prove
+  // ownership with their ID token (subject u_<uid>); anonymous users with
+  // their own device id (d_<uuid>), which no other browser can know since
+  // it is never exposed in the public thread.
+  app.post("/api/comments/mine/remove", async (req, res, next) => {
+    try {
+      const raw = (req.body ?? {}) as Record<string, unknown>;
+      const id = raw.id;
+      if (typeof id !== "string" || !/^[A-Za-z0-9]{1,40}$/.test(id)) {
+        res.status(400).json({ error: "bad_request" });
+        return;
+      }
+      const idToken = typeof raw.idToken === "string" ? raw.idToken : null;
+      if (
+        !idToken &&
+        (typeof raw.subject !== "string" || !SUBJECT_RE.test(raw.subject))
+      ) {
+        res.status(400).json({ error: "bad_subject" });
+        return;
+      }
+      // Limiters before the (expensive, checkRevoked) token verification.
+      if (!commentsPerClient.hit(clientKey(req)) || !commentsGlobal.hit("*")) {
+        res.status(429).json({ error: "rate_limited" });
+        return;
+      }
+      let ownerSubject: string;
+      if (idToken) {
+        const uid = opts.verifyVisitor
+          ? await opts.verifyVisitor(idToken)
+          : null;
+        if (!uid) {
+          res.status(401).json({ error: "auth" });
+          return;
+        }
+        ownerSubject = `u_${uid}`;
+      } else {
+        ownerSubject = raw.subject as string;
+      }
+      res.set("Cache-Control", "no-store");
+      const outcome = await store.removeOwnComment(id, ownerSubject);
+      if (outcome === "ok") {
+        res.json({ ok: true });
+      } else if (outcome === "not_found") {
+        res.status(404).json({ error: "not_found" });
+      } else {
+        res.status(403).json({ error: "not_owner" });
+      }
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // On first sign-in, claim this browser's anonymous comments into the
+  // account so the author keeps (and can delete) them.
+  app.post("/api/account/claim", async (req, res, next) => {
+    try {
+      const raw = (req.body ?? {}) as Record<string, unknown>;
+      const idToken = typeof raw.idToken === "string" ? raw.idToken : null;
+      const deviceId = raw.deviceId;
+      if (!idToken || typeof deviceId !== "string" || !SUBJECT_RE.test(deviceId)) {
+        res.status(400).json({ error: "bad_request" });
+        return;
+      }
+      // Limiters before the (expensive, checkRevoked) token verification.
+      if (!commentsPerClient.hit(clientKey(req)) || !commentsGlobal.hit("*")) {
+        res.status(429).json({ error: "rate_limited" });
+        return;
+      }
+      const uid = opts.verifyVisitor ? await opts.verifyVisitor(idToken) : null;
+      if (!uid) {
+        res.status(401).json({ error: "auth" });
+        return;
+      }
+      res.set("Cache-Control", "no-store");
+      const moved = await store.claimComments(deviceId, `u_${uid}`);
+      res.json({ moved });
     } catch (err) {
       next(err);
     }

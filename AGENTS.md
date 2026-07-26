@@ -319,6 +319,47 @@ Admin panel (/admin + /api/admin): the owner's moderation tool.
 - Local dev: the harness's verifier accepts the fixed token "dev-admin";
   AdminPanel uses localStorage "dbln:admin-dev-token" on localhost only.
 
+Signed-in commenting ("remember me", phase 4): optional identity on top
+of anonymous comments.
+- A visitor may sign in with Google or GitHub from the comment form
+  (`signInVisitor` in `src/lib/firebaseClient.ts`). Sign-in is
+  SESSION-SCOPED and click-to-load: Firebase must never load or restore a
+  session on page view (it would contact Google — the same privacy
+  boundary as Cal and /admin). The SDK is dynamic-imported behind the
+  sign-in click; verify it stays out of every page's eager chunks (grep
+  built `out/` for `identitytoolkit`). Session scoping is ENFORCED with
+  `initializeAuth(app, { persistence: inMemoryPersistence })` — getAuth's
+  default would persist a refresh token to indexedDB, which /privacy
+  explicitly denies ("never keeps a password or a login token between
+  visits"). Never switch to persistent auth without rewriting /privacy.
+  This applies to /admin too: its session also ends when the page closes.
+  What persists between visits is only `dbln:account` (uid + display
+  name, NO token) so the form can offer one-click re-sign-in.
+- Route ordering is a cost boundary: `verifyVisitor` uses
+  `checkRevoked: true`, an external auth round-trip, so the cheap gates
+  (shape checks, the HMAC page token) and the client+global limiters run
+  BEFORE it in every route that takes an idToken. Don't reorder.
+- Authed posts carry the Firebase ID token; the route derives the subject
+  as `u_<uid>` from the VERIFIED token (never a client-supplied subject),
+  so a caller can't attribute a comment to another account. `verified` is
+  stored + in the public payload but the reader UI shows no badge on it
+  (a self-chosen name + a checkmark would invite impersonation) — it's
+  there for the author's own tools and future use.
+- Anonymous posts still use `d_<uuid>`. Ownership for delete-own: authed
+  via the token (`u_<uid>`), anonymous via the device id — safe because
+  the public payload never exposes `subject`, so no other browser can
+  know your `d_` id.
+- On sign-in the client calls `/api/account/claim` to reassign THIS
+  browser's `d_<uuid>` comments to `u_<uid>` (comments only — likeEvents
+  stay immutable), so prior anonymous comments become the account's and
+  stay deletable. `dbln:mine` (local ids) drives which delete buttons
+  show; the server enforces ownership regardless.
+- `verifyVisitor` in index.ts is plain `verifyIdToken(token, true)` (any
+  signed-in user, no allowlist, checkRevoked). Reuses the phase-2/3
+  secrets — no new secret. Console: enable BOTH Google and GitHub
+  providers (GitHub needs an OAuth app) with the same authorized-domain +
+  redirect-URI setup as /admin.
+
 Client side: `src/lib/social.ts` (the storage keys, enumerated in
 /privacy, + fetch helpers; liked flags are an external store consumed via
 useSyncExternalStore, with an in-memory overlay so hardened private modes

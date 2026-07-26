@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useRef, useState } from "react";
-import { signInWithGoogle, signOutAdmin } from "@/lib/firebaseClient";
+import { firebaseSignOut, signInWithGoogle } from "@/lib/firebaseClient";
 import styles from "./AdminPanel.module.css";
 
 /**
@@ -130,7 +130,7 @@ export default function AdminPanel() {
   };
 
   const signOut = async () => {
-    await signOutAdmin().catch(() => {});
+    await firebaseSignOut().catch(() => {});
     tokenRef.current = null;
     setUid(null);
     setData(null);

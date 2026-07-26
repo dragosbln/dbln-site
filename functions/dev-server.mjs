@@ -34,6 +34,13 @@ app.use(
     limits: { commentCooldownMs: 2000 },
     verifyAdmin: async (token) =>
       token === "dev-admin" ? "dev-admin-uid" : null,
+    // Dev sign-in: any token shaped "devuid:<id>" authenticates as <id>,
+    // so authed commenting / claim / delete-own are testable without
+    // Firebase Auth.
+    verifyVisitor: async (token) => {
+      const m = /^devuid:([A-Za-z0-9]{1,40})$/.exec(token ?? "");
+      return m ? m[1] : null;
+    },
   }),
 );
 app.get("/__dump", (req, res) => res.json(store.dump()));

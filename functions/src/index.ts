@@ -3,6 +3,7 @@ import { getFirestore } from "firebase-admin/firestore";
 import { defineSecret } from "firebase-functions/params";
 import { onRequest } from "firebase-functions/v2/https";
 import type { Express } from "express";
+import { getAuth } from "firebase-admin/auth";
 import { firebaseAdminVerifier } from "./admin";
 import { createApp } from "./app";
 import { FirestoreStore } from "./firestoreStore";
@@ -56,6 +57,16 @@ export const api = onRequest(
         tokenKey: tokenKey.value(),
         mailer: gmailMailer(gmailUser.value(), gmailPass.value(), NOTIFY_TO),
         verifyAdmin: firebaseAdminVerifier(adminUids.value().split(",")),
+        // Any signed-in Firebase user (no allowlist) may comment as
+        // themselves. checkRevoked so a revoked session stops posting.
+        verifyVisitor: async (token) => {
+          try {
+            const decoded = await getAuth().verifyIdToken(token, true);
+            return decoded.uid;
+          } catch {
+            return null;
+          }
+        },
       });
     }
     return app(req, res);

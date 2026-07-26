@@ -32,6 +32,8 @@ export type StoredComment = {
   status: CommentStatus;
   depth: number;
   at: string; // ISO timestamp
+  /** True when posted while signed in (subject is `u_<uid>`). */
+  verified: boolean;
 };
 
 /**
@@ -47,6 +49,8 @@ export type PublicComment = {
   removed: boolean;
   name: string;
   body: string;
+  /** Posted by a signed-in visitor (shows a subtle verified marker). */
+  verified: boolean;
 };
 
 export type AddCommentInput = {
@@ -55,6 +59,8 @@ export type AddCommentInput = {
   name: string;
   body: string;
   subject: string;
+  /** Set by the route only after verifying a Firebase ID token. */
+  verified: boolean;
 };
 
 export type AddCommentResult =
@@ -121,6 +127,21 @@ export interface SocialStore {
   purgeComment(id: string): Promise<boolean>;
   /** Admin: recent like events, newest first. */
   listLikeEvents(limit?: number): Promise<LikeEventRecord[]>;
+  /**
+   * Author deletes their own comment: soft-removes it only when the
+   * comment's subject matches (ownership check). Returns the outcome so
+   * the route can 404 vs 403 vs succeed.
+   */
+  removeOwnComment(
+    id: string,
+    subject: string,
+  ): Promise<"ok" | "not_found" | "not_owner">;
+  /**
+   * Reassigns a browser's comments to a signed-in account on first
+   * sign-in (subject `d_<uuid>` → `u_<uid>`). Comments only — likeEvents
+   * stay immutable. Returns how many moved.
+   */
+  claimComments(fromSubject: string, toSubject: string): Promise<number>;
 }
 
 export function toPublic(row: StoredComment): PublicComment {
@@ -133,6 +154,7 @@ export function toPublic(row: StoredComment): PublicComment {
     removed,
     name: removed ? "" : row.name,
     body: removed ? "" : row.body,
+    verified: removed ? false : row.verified === true,
   };
 }
 
@@ -226,6 +248,7 @@ export class MemoryStore implements SocialStore {
       status: "visible",
       depth,
       at: new Date().toISOString(),
+      verified: input.verified,
     };
     this.comments.push(row);
     this.commentCounts.set(
@@ -275,6 +298,38 @@ export class MemoryStore implements SocialStore {
       Math.max(0, (this.commentCounts.get(target.slug) ?? 0) - visibleDeleted),
     );
     return true;
+  }
+
+  async removeOwnComment(
+    id: string,
+    subject: string,
+  ): Promise<"ok" | "not_found" | "not_owner"> {
+    const row = this.comments.find((c) => c.id === id);
+    if (!row) return "not_found";
+    if (row.subject !== subject) return "not_owner";
+    if (row.status === "visible") {
+      row.status = "removed";
+      this.commentCounts.set(
+        row.slug,
+        Math.max(0, (this.commentCounts.get(row.slug) ?? 0) - 1),
+      );
+    }
+    return "ok";
+  }
+
+  async claimComments(
+    fromSubject: string,
+    toSubject: string,
+  ): Promise<number> {
+    let moved = 0;
+    for (const c of this.comments) {
+      if (c.subject === fromSubject) {
+        c.subject = toSubject;
+        c.verified = true;
+        moved += 1;
+      }
+    }
+    return moved;
   }
 
   async listLikeEvents(limit = 100): Promise<LikeEventRecord[]> {

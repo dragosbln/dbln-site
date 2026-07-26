@@ -257,6 +257,17 @@ export const discussion: DiscussionContent = {
   posted: "Posted.",
   errorGeneric: "That didn't post. Try again in a moment.",
   errorRate: "Too fast. Give it a few seconds.",
+  signInPrompt: "Want to keep and manage your comments? Sign in.",
+  signInGoogle: "Google",
+  signInGithub: "GitHub",
+  signInAs: "Sign in as {name}",
+  postingAs: "Posting as {name}",
+  signOut: "Sign out",
+  signInFailed: "Sign-in didn't finish. You can still comment as a guest.",
+  deleteLabel: "Delete",
+  deleteConfirm: "Delete your comment?",
+  deleteFailed: "Couldn't delete that. Try again.",
+  deleteNeedsSignIn: "Sign in first. This comment belongs to your account.",
 };
 
 /**

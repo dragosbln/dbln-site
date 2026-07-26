@@ -9,11 +9,18 @@
  *   button stays lit across visits without asking the server.
  * - localStorage "dbln:name": the name last commented under, so the
  *   form remembers it.
+ * - localStorage "dbln:account": a signed-in visitor's { uid, name }, so
+ *   the form can offer to sign them back in by name. No token is kept;
+ *   the Firebase session is re-established on the next sign-in click.
+ * - localStorage "dbln:mine": ids of comments this browser posted, so the
+ *   author can delete their own. Ownership is still enforced server-side.
  */
 
 const DEVICE_KEY = "dbln:device";
 const LIKED_KEY = "dbln:liked";
 const NAME_KEY = "dbln:name";
+const ACCOUNT_KEY = "dbln:account";
+const MINE_KEY = "dbln:mine";
 
 export type LikeResponse = { likes: number; liked: boolean };
 
@@ -30,7 +37,10 @@ export type PublicComment = {
   removed: boolean;
   name: string;
   body: string;
+  verified: boolean;
 };
+
+export type Account = { uid: string; name: string };
 
 export type CommentsPayload = { comments: PublicComment[]; token: string };
 
@@ -139,6 +149,58 @@ export function saveName(name: string): void {
   writeStorage(NAME_KEY, name);
 }
 
+export function savedAccount(): Account | null {
+  try {
+    const parsed: unknown = JSON.parse(readStorage(ACCOUNT_KEY) ?? "null");
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      typeof (parsed as Account).uid === "string" &&
+      typeof (parsed as Account).name === "string"
+    ) {
+      return parsed as Account;
+    }
+  } catch {
+    // Corrupt entry: treat as no remembered account.
+  }
+  return null;
+}
+
+export function saveAccount(account: Account): void {
+  writeStorage(ACCOUNT_KEY, JSON.stringify(account));
+}
+
+export function clearAccount(): void {
+  try {
+    window.localStorage.removeItem(ACCOUNT_KEY);
+  } catch {
+    // Nothing to do if storage is unavailable.
+  }
+}
+
+function readMine(): string[] {
+  try {
+    const parsed: unknown = JSON.parse(readStorage(MINE_KEY) ?? "[]");
+    if (Array.isArray(parsed)) return parsed.filter((x) => typeof x === "string");
+  } catch {
+    // Corrupt entry: treat as empty.
+  }
+  return [];
+}
+
+export function isMine(id: string): boolean {
+  return readMine().includes(id);
+}
+
+export function markMine(id: string): void {
+  const ids = readMine();
+  if (!ids.includes(id)) {
+    ids.push(id);
+    // Cap the local list so it can't grow unbounded on a heavy commenter.
+    writeStorage(MINE_KEY, JSON.stringify(ids.slice(-500)));
+  }
+}
+
 /** slug → count maps. Missing slugs mean zero. */
 export async function fetchCounts(): Promise<SocialCounts> {
   const res = await fetch("/api/social/counts");
@@ -191,13 +253,18 @@ export async function postComment(input: {
   name: string;
   body: string;
   token: string;
+  /** When present, the comment is posted as the signed-in account. */
+  idToken?: string;
 }): Promise<PublicComment> {
+  const { idToken, ...rest } = input;
   const res = await fetch("/api/comments", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
-      ...input,
-      subject: mintDeviceId(),
+      ...rest,
+      // Signed-in: the server derives the subject from the token.
+      // Anonymous: the browser's random id.
+      ...(idToken ? { idToken } : { subject: mintDeviceId() }),
       // Honeypot: humans never see this field, so it posts empty.
       website: "",
     }),
@@ -209,5 +276,36 @@ export async function postComment(input: {
   if (!res.ok || !data.comment) {
     throw new CommentError(data.error ?? String(res.status));
   }
+  markMine(data.comment.id);
   return data.comment;
+}
+
+/** Author deletes their own comment. Signed-in → token; else device id. */
+export async function removeOwnComment(
+  id: string,
+  idToken?: string,
+): Promise<void> {
+  const res = await fetch("/api/comments/mine/remove", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(
+      idToken ? { id, idToken } : { id, subject: mintDeviceId() },
+    ),
+  });
+  if (!res.ok) {
+    const data = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new CommentError(data.error ?? String(res.status));
+  }
+}
+
+/** Reassign this browser's anonymous comments to the account. */
+export async function claimComments(idToken: string): Promise<number> {
+  const res = await fetch("/api/account/claim", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ idToken, deviceId: mintDeviceId() }),
+  });
+  if (!res.ok) throw new CommentError(String(res.status));
+  const data = (await res.json()) as { moved: number };
+  return data.moved;
 }
