@@ -4,6 +4,7 @@ import {
   type Firestore,
 } from "firebase-admin/firestore";
 import {
+  collectSubtree,
   DEPTH_LIMIT,
   THREAD_LIMIT,
   toPublic,
@@ -199,9 +200,23 @@ export class FirestoreStore implements SocialStore {
   async listComments(
     opts: { slug?: string; limit?: number } = {},
   ): Promise<StoredComment[]> {
-    let query: FirebaseFirestore.Query = this.db.collection("comments");
-    if (opts.slug) query = query.where("slug", "==", opts.slug);
-    query = query.orderBy("at", "desc");
+    if (opts.slug) {
+      // Equality-only query + in-memory sort (parity with getComments):
+      // a where(slug)+orderBy(at) shape would need a composite index that
+      // isn't deployed. Per-article threads are small.
+      const snap = await this.db
+        .collection("comments")
+        .where("slug", "==", opts.slug)
+        .get();
+      const rows = snap.docs
+        .map((doc) => this.rowFromDoc(doc))
+        .sort((a, b) => b.at.localeCompare(a.at) || b.id.localeCompare(a.id));
+      return opts.limit ? rows.slice(0, opts.limit) : rows;
+    }
+    // Unfiltered: orderBy(at) uses the auto single-field index.
+    let query: FirebaseFirestore.Query = this.db
+      .collection("comments")
+      .orderBy("at", "desc");
     if (opts.limit) query = query.limit(opts.limit);
     const snap = await query.get();
     return snap.docs.map((doc) => this.rowFromDoc(doc));
@@ -211,23 +226,41 @@ export class FirestoreStore implements SocialStore {
     const ref = this.db.collection("comments").doc(id);
     const countersRef = this.countersRef();
     return this.db.runTransaction(async (tx) => {
-      const [snap, countersSnap] = await Promise.all([
-        tx.get(ref),
-        tx.get(countersRef),
-      ]);
+      // Reads first (transaction rule), then all writes.
+      const snap = await tx.get(ref);
       if (!snap.exists) return false;
-      if ((snap.get("status") as CommentStatus) === "visible") {
-        const slug = snap.get("slug") as string;
-        const commentCounts =
-          (countersSnap.get("comments") as Record<string, number> | undefined) ??
-          {};
-        tx.set(
-          countersRef,
-          { comments: { [slug]: Math.max(0, (commentCounts[slug] ?? 0) - 1) } },
-          { merge: true },
-        );
+      const slug = snap.get("slug") as string;
+      const siblingsSnap = await tx.get(
+        this.db.collection("comments").where("slug", "==", slug),
+      );
+      const countersSnap = await tx.get(countersRef);
+
+      // Purge the whole subtree — a bare delete would orphan visible
+      // replies (unrenderable, but still counted).
+      const rows = siblingsSnap.docs.map((doc) => ({
+        id: doc.id,
+        parentId: (doc.get("parentId") as string | null) ?? null,
+        status: doc.get("status") as CommentStatus,
+      }));
+      const subtree = collectSubtree(id, rows);
+      const visibleDeleted = rows.filter(
+        (r) => subtree.has(r.id) && r.status === "visible",
+      ).length;
+      const commentCounts =
+        (countersSnap.get("comments") as Record<string, number> | undefined) ??
+        {};
+      tx.set(
+        countersRef,
+        {
+          comments: {
+            [slug]: Math.max(0, (commentCounts[slug] ?? 0) - visibleDeleted),
+          },
+        },
+        { merge: true },
+      );
+      for (const sid of subtree) {
+        tx.delete(this.db.collection("comments").doc(sid));
       }
-      tx.delete(ref);
       return true;
     });
   }

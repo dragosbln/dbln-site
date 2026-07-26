@@ -279,11 +279,15 @@ Comments (instant post, no review queue — Dragos's call): POST
 - Every comment is emailed to Dragos via HIS OWN Gmail (nodemailer, app
   password) — deliberately no third-party mail service. Sends are
   fire-and-forget AFTER the response; mail failure never fails a post.
-- Secrets (one-time, BEFORE the phase-2 deploy — deploys fail while any
-  is missing):
+- Secrets (one-time, BEFORE the social-branch deploy — deploys fail while
+  any is missing):
   `firebase functions:secrets:set SOCIAL_TOKEN_KEY` (openssl rand -hex 32),
   `firebase functions:secrets:set GMAIL_USER`,
-  `firebase functions:secrets:set GMAIL_APP_PASSWORD`.
+  `firebase functions:secrets:set GMAIL_APP_PASSWORD`,
+  `firebase functions:secrets:set ADMIN_UIDS` (comma-separated Firebase
+  Auth uids; empty admits no one — fails closed. Bootstrap: set any
+  placeholder, sign in at /admin once, copy the uid from the "not on the
+  allowlist" notice, re-set the secret, redeploy).
   CI needs Secret Manager access on top of the deploy roles: firebase-tools
   validates secret versions on EVERY deploy and grants the runtime SA
   access on the first secret-attaching deploy. Do the FIRST deploy from a
@@ -291,6 +295,29 @@ Comments (instant post, no review queue — Dragos's call): POST
   service account `roles/secretmanager.viewer` for the validation calls on
   later deploys (or `roles/secretmanager.admin` if CI must ever attach new
   secrets itself).
+
+Admin panel (/admin + /api/admin): the owner's moderation tool.
+- The page is deliberately undiscoverable: noindexed, disallowed in
+  robots.ts, absent from sitemap/llms.txt/nav — the "Adding a page"
+  recipe is skipped on purpose. Its static HTML is only a sign-in gate.
+- Auth: Google popup via `src/lib/firebaseClient.ts` (Firebase web SDK,
+  dynamic-imported behind the click — it must NEVER load on a public
+  page view; that would add third-party requests /privacy denies).
+  `authDomain` is dbln.me itself (Hosting auto-serves /__/auth/* on the
+  custom domain). Console one-time (all three, or the popup fails):
+  enable the Google provider; add dbln.me under Auth → Authorized domains;
+  AND add `https://dbln.me/__/auth/handler` to the auto-created OAuth web
+  client's Authorized redirect URIs (Google Cloud → Credentials) —
+  connecting the custom domain does not add it, and its absence throws
+  redirect_uri_mismatch.
+- The API verifies the Firebase ID token per request against the
+  ADMIN_UIDS secret (functions/src/admin.ts) — no sessions, no cookies,
+  fails closed when the allowlist is empty. Routes: overview (counts +
+  all comments incl. removed + recent like events), comments/remove,
+  comments/restore, comments/purge (hard delete, the GDPR path; counters
+  adjust transactionally in every case).
+- Local dev: the harness's verifier accepts the fixed token "dev-admin";
+  AdminPanel uses localStorage "dbln:admin-dev-token" on localhost only.
 
 Client side: `src/lib/social.ts` (the storage keys, enumerated in
 /privacy, + fetch helpers; liked flags are an external store consumed via

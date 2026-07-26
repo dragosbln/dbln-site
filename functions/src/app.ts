@@ -314,12 +314,24 @@ export function createApp(store: SocialStore, opts: AppOptions = {}) {
 
     admin.get("/overview", async (req, res, next) => {
       try {
-        const [counts, comments, likeEvents] = await Promise.all([
+        // Fetch one past the shown cap to detect (and report) truncation
+        // rather than silently presenting a partial list as the whole.
+        const COMMENTS_SHOWN = 200;
+        const EVENTS_SHOWN = 100;
+        const [counts, commentsRaw, likeRaw] = await Promise.all([
           store.getCounts(),
-          store.listComments({ limit: 200 }),
-          store.listLikeEvents(100),
+          store.listComments({ limit: COMMENTS_SHOWN + 1 }),
+          store.listLikeEvents(EVENTS_SHOWN + 1),
         ]);
-        res.json({ counts, comments, likeEvents });
+        res.json({
+          counts,
+          comments: commentsRaw.slice(0, COMMENTS_SHOWN),
+          likeEvents: likeRaw.slice(0, EVENTS_SHOWN),
+          hasMore: {
+            comments: commentsRaw.length > COMMENTS_SHOWN,
+            likeEvents: likeRaw.length > EVENTS_SHOWN,
+          },
+        });
       } catch (err) {
         next(err);
       }

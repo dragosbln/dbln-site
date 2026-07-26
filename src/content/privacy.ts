@@ -12,7 +12,7 @@ export const privacy: PrivacyNotice = {
   hero: {
     eyebrow: "Privacy",
     title: "What this site collects, *and what it doesn't.*",
-    lede: "No cookies. No tracking across sites. Two third parties, and one of them only wakes up when you ask for it.",
+    lede: "No cookies. No tracking across sites. As you read, two third parties, and one of them only wakes up when you ask for it.",
     metaDescription:
       "What dbln.me collects and what it doesn't. Cookieless analytics, no cross-site tracking, and a booking flow that contacts Cal.com only when you choose to.",
   },
@@ -73,13 +73,21 @@ export const privacy: PrivacyNotice = {
     },
     {
       num: "07",
+      title: "The admin page",
+      body: [
+        "There is a page at /admin where I moderate comments. It is my own tool. Reading or booking never touches it, which is why the two third parties above are all you meet as a visitor.",
+        "Its only button signs in with Google. If you open the page and use it, your browser contacts Google to sign you in, and Google is the third party for that step. Firebase keeps you signed in until you press sign out. Only my account can see anything; anyone else is turned away.",
+      ],
+    },
+    {
+      num: "08",
       title: "Email",
       body: [
         "If you email me, I keep the message so I can reply and pick the thread up later. It stays in my mailbox. You are not added to a list. There is no list.",
       ],
     },
     {
-      num: "08",
+      num: "09",
       title: "Your rights",
       body: [
         "You can ask what I hold about you, ask for a copy, ask for it to be corrected or deleted, and object to any of it. The analytics are aggregate, so nothing in them points to you and I cannot pull your visit out of them.",
@@ -88,7 +96,7 @@ export const privacy: PrivacyNotice = {
     },
   ],
   contact: {
-    num: "09",
+    num: "10",
     title: "Questions",
     body: ["Anything on this page, ask. A plain answer comes back."],
     emailHint: "Questions about this notice, or a request about your data.",

@@ -18,7 +18,10 @@ export function firebaseAdminVerifier(allowUids: string[]): AdminVerifier {
   return async (token: string) => {
     if (allow.size === 0) return null;
     try {
-      const decoded = await getAuth().verifyIdToken(token);
+      // checkRevoked: a disabled user or revoked session is refused within
+      // seconds, instead of the ID token staying valid until its ~1h
+      // expiry — the difference matters for the irreversible purge route.
+      const decoded = await getAuth().verifyIdToken(token, true);
       return allow.has(decoded.uid) ? decoded.uid : null;
     } catch {
       return null;

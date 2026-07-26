@@ -73,6 +73,29 @@ export const DEPTH_LIMIT = 4;
 /** Hard per-article ceiling so a thread can't grow without bound. */
 export const THREAD_LIMIT = 1000;
 
+/**
+ * The id + every descendant, from a flat {id, parentId} list. Used by
+ * purge, which must take the whole subtree — deleting one node while
+ * leaving its replies would orphan them (counted but unrenderable).
+ */
+export function collectSubtree(
+  rootId: string,
+  rows: { id: string; parentId: string | null }[],
+): Set<string> {
+  const subtree = new Set<string>([rootId]);
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const r of rows) {
+      if (r.parentId && subtree.has(r.parentId) && !subtree.has(r.id)) {
+        subtree.add(r.id);
+        grew = true;
+      }
+    }
+  }
+  return subtree;
+}
+
 export interface SocialStore {
   toggleLike(
     slug: string,
@@ -240,15 +263,17 @@ export class MemoryStore implements SocialStore {
   }
 
   async purgeComment(id: string): Promise<boolean> {
-    const idx = this.comments.findIndex((c) => c.id === id);
-    if (idx === -1) return false;
-    const [row] = this.comments.splice(idx, 1);
-    if (row.status === "visible") {
-      this.commentCounts.set(
-        row.slug,
-        Math.max(0, (this.commentCounts.get(row.slug) ?? 0) - 1),
-      );
-    }
+    const target = this.comments.find((c) => c.id === id);
+    if (!target) return false;
+    const subtree = collectSubtree(id, this.comments);
+    const visibleDeleted = this.comments.filter(
+      (c) => subtree.has(c.id) && c.status === "visible",
+    ).length;
+    this.comments = this.comments.filter((c) => !subtree.has(c.id));
+    this.commentCounts.set(
+      target.slug,
+      Math.max(0, (this.commentCounts.get(target.slug) ?? 0) - visibleDeleted),
+    );
     return true;
   }
 

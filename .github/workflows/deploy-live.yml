@@ -35,7 +35,7 @@ jobs:
       # Prereqs (one-time, console): Blaze billing, Firestore DB in
       # europe-west1, this service account granted Cloud Functions Admin +
       # Service Account User + Firebase Rules Admin + Secret Manager
-      # Viewer (secret-version validation runs on every deploy), the three
+      # Viewer (secret-version validation runs on every deploy), the four
       # function secrets set (see AGENTS.md "Social backend"), and the
       # FIRST deploy run from a logged-in owner machine (it grants the
       # runtime SA access to those secrets).
