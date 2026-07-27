@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Functions workspace: own tsconfig (strict) + node --test suite; the
+    // Next lint setup doesn't apply to it and its deps aren't installed
+    // when root lint runs in CI.
+    "functions/**",
   ]),
 ]);
 

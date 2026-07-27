@@ -2,6 +2,7 @@ import type {
   AgenticSection,
   Contact,
   ContactBooking,
+  DiscussionContent,
   Hero,
   NavItem,
   NotFound,
@@ -234,6 +235,48 @@ export const contact: Contact = {
   label: "Book a call",
   title: "Ready to find out where your AI product *breaks?*",
   body: "Pick your situation, pick a time. The intro call is 30 minutes.",
+};
+
+/**
+ * Discussion (comments) copy. Taken from the blog-social design where it
+ * exists; `hint` replaces the prototype's "Stored in your browser. Be
+ * decent." (comments are no longer browser-local) — DRAFT for Dragos.
+ */
+export const discussion: DiscussionContent = {
+  heading: "Discussion",
+  namePlaceholder: "Your name",
+  bodyPlaceholder:
+    "Add to the discussion — push back, ask, or share where you've seen this play out.",
+  hint: "Posted publicly. Be decent.",
+  postLabel: "Post comment",
+  replyLabel: "Reply",
+  cancelLabel: "Cancel",
+  replyPlaceholder: "Reply to {name}…",
+  removedLabel: "Comment removed",
+  empty: "No comments yet — start the discussion.",
+  posted: "Posted.",
+  errorGeneric: "That didn't post. Try again in a moment.",
+  errorRate: "Too fast. Give it a few seconds.",
+  signInPrompt: "Want to keep and manage your comments? Sign in.",
+  signInGoogle: "Google",
+  signInGithub: "GitHub",
+  signInAs: "Sign in as {name}",
+  postingAs: "Posting as {name}",
+  signOut: "Sign out",
+  signInFailed: "Sign-in didn't finish. You can still comment as a guest.",
+  deleteLabel: "Delete",
+  deleteConfirm: "Delete your comment?",
+  deleteFailed: "Couldn't delete that. Try again.",
+  deleteNeedsSignIn: "Sign in first. This comment belongs to your account.",
+  badgeAuthor: "Author",
+  badgeMember: "Signed in",
+  badgeGuest: "Guest",
+  anonTitle: "Post as a guest?",
+  anonBody:
+    "You are not signed in. A guest comment can't be edited or deleted later, and it isn't tied to you. Sign in to keep and manage it.",
+  anonSignIn: "Sign in",
+  anonPostAnyway: "Post as guest",
+  anonCancel: "Cancel",
 };
 
 /**

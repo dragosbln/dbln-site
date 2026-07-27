@@ -1,4 +1,15 @@
 {
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "predeploy": ["npm --prefix functions run build"],
+      "ignore": ["node_modules", ".git", "*.log", "test", "dev-server.mjs"]
+    }
+  ],
+  "firestore": {
+    "rules": "firestore.rules"
+  },
   "hosting": {
     "public": "out",
     "ignore": [
@@ -8,6 +19,15 @@
     ],
     "cleanUrls": true,
     "trailingSlash": false,
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "function": {
+          "functionId": "api",
+          "region": "europe-west1"
+        }
+      }
+    ],
     "headers": [
       {
         "source": "**",

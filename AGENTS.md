@@ -231,6 +231,202 @@ a consent banner first.
   the tracker ships in the site's own bundle, so an adblocker won't filter
   it for you.
 
+## Social backend (/api)
+
+First-party likes (comments to follow) served by one Cloud Function — the
+`functions/` workspace, gen2 `api` in europe-west1 — behind the Firebase
+Hosting rewrite `/api/**` in firebase.json. Design source:
+`../claude_websie/blog-social/article.html` (engage bar + discussion).
+
+Invariants. These are privacy boundaries: breaking any of them makes
+/privacy wrong (a compliance problem, see below).
+- **Same-origin only.** The visitor's browser talks to dbln.me and nothing
+  else. A new third-party request is a /privacy change, not a tweak.
+- **No person-identifying data on likes.** The subject is `d_<uuid>` from
+  localStorage (`dbln:device`, minted on the first like press — never on
+  page view). No IP is ever persisted (rate limiting in
+  `functions/src/ratelimit.ts` is memory-only by design), no UA, no names.
+  Limits are three-tier: per subject, per client (keyed on the two
+  RIGHTMOST X-Forwarded-For entries — the infra-appended ones; never
+  trust the left of XFF or express `trust proxy: true` + `req.ip`, the
+  caller controls those), and a global per-instance write ceiling that
+  bounds what a determined caller can do before admin cleanup.
+- **Records are append-only.** `likeEvents` is never updated or deleted by
+  code. `meta/counters` is written in the same transaction as the state
+  doc + event record, so displayed counts always equal what the records
+  add up to. Never write counts outside that transaction.
+- **Firestore has no client surface.** firestore.rules denies everything;
+  only the function's Admin SDK reads or writes. Keep it that way.
+- **Counts render only when ≥ 1** — a real zero shows nothing. Fake or
+  seeded counts were explicitly rejected; never add them.
+
+Comments (instant post, no review queue — Dragos's call): POST
+/api/comments goes public immediately; the guardrails replace the queue.
+- Server: honeypot field `website` (must arrive empty), HMAC
+  proof-of-page-visit token from GET /api/comments (functions/src/token.ts,
+  ripens after 5s, dies after 2h — stateless, any instance verifies),
+  30s per-subject cooldown, per-subject/per-client/global comment windows,
+  name ≤ 60 / body ≤ 1200 / ≤ 3 links, control chars stripped (newlines
+  kept), nested replies to depth 4 with the parent required to be visible
+  on the same slug, 1000-comment thread cap. GET /api/comments is
+  no-store (it carries the token and must read back instantly after a
+  post); only the counts endpoint is CDN-cached.
+- Removal is SOFT (`status: "removed"`, admin in phase 3): the doc stays,
+  the visible counter decrements in the same transaction, and the reader
+  view (shared `toPublicThread`) keeps a bare placeholder only while a
+  visible descendant needs it for thread shape. Replying to a removed
+  parent is refused.
+- Every comment is emailed to Dragos via HIS OWN Gmail (nodemailer, app
+  password) — deliberately no third-party mail service. Sends are
+  fire-and-forget AFTER the response; mail failure never fails a post.
+- Secrets (one-time, BEFORE the social-branch deploy — deploys fail while
+  any is missing):
+  `firebase functions:secrets:set SOCIAL_TOKEN_KEY` (openssl rand -hex 32),
+  `firebase functions:secrets:set GMAIL_USER`,
+  `firebase functions:secrets:set GMAIL_APP_PASSWORD`,
+  `firebase functions:secrets:set ADMIN_UIDS` (comma-separated Firebase
+  Auth uids; empty admits no one — fails closed. Bootstrap: set any
+  placeholder, sign in at /admin once, copy the uid from the "not on the
+  allowlist" notice, re-set the secret, then `npm run deploy:backend`).
+  Secrets bind at deploy time (gen2), so changing one takes effect on the
+  next `npm run deploy:backend`. No CI IAM to configure: the backend
+  deploys from the owner's own logged-in machine, which already has the
+  Secret Manager and gen2 permissions (see "Deploy split" below).
+
+Admin panel (/admin + /api/admin): the owner's moderation tool.
+- The page is deliberately undiscoverable: noindexed, disallowed in
+  robots.ts, absent from sitemap/llms.txt/nav — the "Adding a page"
+  recipe is skipped on purpose. Its static HTML is only a sign-in gate.
+- Auth: Google popup via `src/lib/firebaseClient.ts` (Firebase web SDK,
+  dynamic-imported behind the click — it must NEVER load on a public
+  page view; that would add third-party requests /privacy denies).
+  `authDomain` is dbln.me itself (Hosting auto-serves /__/auth/* on the
+  custom domain). Console one-time (all three, or the popup fails):
+  enable the Google provider; add dbln.me under Auth → Authorized domains;
+  AND add `https://dbln.me/__/auth/handler` to the auto-created OAuth web
+  client's Authorized redirect URIs (Google Cloud → Credentials) —
+  connecting the custom domain does not add it, and its absence throws
+  redirect_uri_mismatch.
+- The API verifies the Firebase ID token per request against the
+  ADMIN_UIDS secret (functions/src/admin.ts) — no sessions, no cookies,
+  fails closed when the allowlist is empty. Routes: overview (counts +
+  all comments incl. removed + recent like events), comments/remove,
+  comments/restore, comments/purge (hard delete, the GDPR path; counters
+  adjust transactionally in every case).
+- Local dev: the harness's verifier accepts the fixed token "dev-admin";
+  AdminPanel uses localStorage "dbln:admin-dev-token" on localhost only.
+
+Signed-in commenting ("remember me", phase 4): optional identity on top
+of anonymous comments.
+- A visitor may sign in with Google or GitHub from the comment form
+  (`signInVisitor` in `src/lib/firebaseClient.ts`). Sign-in is
+  SESSION-SCOPED and click-to-load: Firebase must never load or restore a
+  session on page view (it would contact Google — the same privacy
+  boundary as Cal and /admin). The SDK is dynamic-imported behind the
+  sign-in click; verify it stays out of every page's eager chunks (grep
+  built `out/` for `identitytoolkit`). Session scoping is ENFORCED with
+  `initializeAuth(app, { persistence: inMemoryPersistence })` — getAuth's
+  default would persist a refresh token to indexedDB, which /privacy
+  explicitly denies ("never keeps a password or a login token between
+  visits"). Never switch to persistent auth without rewriting /privacy.
+  This applies to /admin too: its session also ends when the page closes.
+  What persists between visits is only `dbln:account` (uid + display
+  name, NO token) so the form can offer one-click re-sign-in.
+- Route ordering is a cost boundary: `verifyVisitor` uses
+  `checkRevoked: true`, an external auth round-trip, so the cheap gates
+  (shape checks, the HMAC page token) and the client+global limiters run
+  BEFORE it in every route that takes an idToken. Don't reorder.
+- Authed posts carry the Firebase ID token; the route derives the subject
+  as `u_<uid>` from the VERIFIED token (never a client-supplied subject),
+  so a caller can't attribute a comment to another account.
+- Comment badges (three states): `author` (teal, trustworthy) > `verified`
+  ("Signed in") > neither ("Guest"). `author` is computed at READ TIME
+  from `subject ∈ ADMIN_UIDS` (`isAuthor` in app.ts, fed by the same
+  `adminUids` list as the admin allowlist) — never client-set, so it can't
+  be forged, and changing the list reflows past comments. It is in the
+  public payload. The "Signed in" badge is deliberately NOT a checkmark
+  and does NOT assert identity (the name is self-chosen even when signed
+  in); only the UID-gated `author` badge is a real identity claim, which
+  is what makes author-impersonation impossible. Don't relabel "Signed in"
+  as "Verified".
+- Anonymous posts still use `d_<uuid>`. Ownership for delete-own: authed
+  via the token (`u_<uid>`), anonymous via the device id — safe because
+  the public payload never exposes `subject`, so no other browser can
+  know your `d_` id.
+- On sign-in the client calls `/api/account/claim` to reassign THIS
+  browser's `d_<uuid>` comments to `u_<uid>` (comments only — likeEvents
+  stay immutable), so prior anonymous comments become the account's and
+  stay deletable. `dbln:mine` (local ids) drives which delete buttons
+  show; the server enforces ownership regardless.
+- `verifyVisitor` in index.ts is plain `verifyIdToken(token, true)` (any
+  signed-in user, no allowlist, checkRevoked). Reuses the phase-2/3
+  secrets — no new secret. Console: enable BOTH Google and GitHub
+  providers (GitHub needs an OAuth app) with the same authorized-domain +
+  redirect-URI setup as /admin.
+
+Client side: `src/lib/social.ts` (the storage keys, enumerated in
+/privacy, + fetch helpers; liked flags are an external store consumed via
+useSyncExternalStore, with an in-memory overlay so hardened private modes
+still toggle) and `EngageBar` (client leaf in ArticleView): lazy count
+fetch on approach (IO + scroll fallback — IO delivers nothing in
+throttled tabs; the GET only fills a count no POST response has set yet),
+optimistic presses serialized through a promise chain. Count model:
+displayed = last server count + net delta of unresolved presses; a failed
+press removes only its own delta, and only the NEWEST press's response
+may move the button. Don't "simplify" this back to setLikes(res.likes) —
+that wipes queued presses' deltas and drifts the count when one fails.
+Plausible event: `Like` (needs a one-time goal in the dashboard; /privacy
+discloses that likes are counted by analytics — remove that line if the
+event ever goes).
+`Discussion` (client leaf in ArticleView) renders the thread: lazy fetch
+on approach, top-level newest-first / replies oldest-first, one reply
+form open at a time, saved name in localStorage `dbln:name` filled
+imperatively (never via state — hydration must match the empty input).
+Cross-component count sync: posting calls `notifyCommentAdded(slug)`;
+EngageBar subscribes and bumps its Comment count, and its Comment button
+scrolls to #discussion and focuses #comment-body. /blog index rows fetch
+the counts once on mount and show heart/bubble stats when ≥ 1.
+Anonymous-post warning: `handleSubmit` (main form AND replies) intercepts
+a submit when `getTokenRef.current` is null and opens a native `<dialog>`
+warning that guest comments can't be managed; "Post as guest" sets a
+session ref (`anonAcceptedRef`) so it only nags once, "Sign in" runs the
+popup and auto-continues the post. `doSubmit` keys on the token getter
+(not `account` state), so the auto-continue after in-dialog sign-in isn't
+raced by React's state flush.
+
+Slug allowlist: `functions/src/slugs.ts` is generated from
+`src/content/posts/*.md` by `functions/scripts/gen-slugs.mjs` (prebuild
+hook, output gitignored). Publishing an article picks it up on the next
+deploy; likes for unknown slugs are 400s.
+
+Local dev: the Firestore emulator needs Java, which the dev machine lacks.
+Unit tests and the browser run against `MemoryStore` (same semantics as
+`FirestoreStore`): `npm --prefix functions run serve` serves the built
+site from out/ plus the real API app on :4610, with GET /__dump exposing
+the stored records. Real Firestore semantics are exercised on deploy.
+
+Deploy split (deliberate): CI (`deploy-live.yml`) deploys ONLY hosting on
+every push to main, using the existing service-account secret it already
+had. The backend (`functions` + `firestore:rules`) is deployed by the
+owner from their own machine with **`npm run deploy:backend`** (runs the
+functions tests, then `firebase deploy --only functions,firestore:rules`).
+Rationale: gen2 functions deploy needs a broad, sensitive role set (Cloud
+Run + Cloud Build + Artifact Registry + Secret Manager) that we do NOT
+want on a CI-stored credential, gen2 CI deploys are flaky, and the backend
+changes rarely; a logged-in owner has every permission already, so the
+manual path needs no IAM setup. CI still builds + tests the functions
+workspace as a merge gate — it just doesn't ship it.
+One-time console prereqs: Blaze billing (confirmed) and the `(default)`
+Firestore database in an EU location (it exists, in **eur3** — the EU
+multi-region; a Firestore location is permanent and need NOT match the
+function's region).
+Bootstrap order: hosting deploys resolve the `/api/**` rewrite against the
+project's EXISTING functions, so until `npm run deploy:backend` has run
+once, any hosting deploy — PR previews included — ships a dead /api (404s;
+the engage bar degrades to share-only). Run `npm run deploy:backend` once
+after creating the DB and setting the secrets, then previews and live both
+route /api correctly. Whenever the backend changes, run it again (CI won't).
+
 ## Privacy notice (/privacy)
 
 `src/content/privacy.ts` → `PrivacyNotice` component → `/privacy`, linked

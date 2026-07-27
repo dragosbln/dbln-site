@@ -31,22 +31,41 @@ if (!existsSync(chrome)) {
   throw new Error(`render-cover-png: Chrome not found at ${chrome} (set CHROME_BIN)`);
 }
 
-/** The latin-subset Spline Sans Mono woff2 from the built CSS. */
-function findFontFile(): string {
+/** The site faces a cover may use; latin-subset woff2s from the built CSS. */
+const faces = [
+  { family: "Newsreader", style: "normal", weight: "200 800" },
+  { family: "Newsreader", style: "italic", weight: "200 800" },
+  { family: "Hanken Grotesk", style: "normal", weight: "100 900" },
+  { family: "Spline Sans Mono", style: "normal", weight: "300 700" },
+] as const;
+
+function findFontFiles(): { family: string; style: string; weight: string; file: string }[] {
   if (!existsSync(chunksDir)) {
     throw new Error("render-cover-png: no build output — run `npm run build` first");
   }
+  const blocks: string[] = [];
   for (const file of readdirSync(chunksDir).filter((f) => f.endsWith(".css"))) {
     const css = readFileSync(path.join(chunksDir, file), "utf8");
-    const match = css.match(
-      /@font-face\{font-family:Spline Sans Mono;[^}]*src:url\(([^)]+)\)[^}]*unicode-range:U\+\?\?/,
-    );
-    if (match) return path.resolve(chunksDir, match[1]);
+    blocks.push(...(css.match(/@font-face\{[^}]*\}/g) ?? []));
   }
-  throw new Error("render-cover-png: Spline Sans Mono not found in built CSS");
+  return faces.map((face) => {
+    const block = blocks.find(
+      (b) =>
+        b.includes(`font-family:${face.family};`) &&
+        b.includes(`font-style:${face.style};`) &&
+        b.includes("unicode-range:U+??"),
+    );
+    const src = block?.match(/src:url\(([^)]+)\)/);
+    if (!block || !src) {
+      throw new Error(
+        `render-cover-png: ${face.family} (${face.style}, latin) not found in built CSS`,
+      );
+    }
+    return { ...face, file: path.resolve(chunksDir, src[1]) };
+  });
 }
 
-const fontFile = findFontFile();
+const fontFiles = findFontFiles();
 const only = process.argv[2];
 const covers = readdirSync(coversDir).filter(
   (f) => f.endsWith(".svg") && (!only || f === `${only}.svg`),
@@ -60,11 +79,17 @@ try {
   for (const cover of covers) {
     const svg = readFileSync(path.join(coversDir, cover), "utf8");
     const wrapper = path.join(tmp, cover.replace(/\.svg$/, ".html"));
+    const fontCss = fontFiles
+      .map(
+        (f) => `@font-face { font-family: '${f.family}'; font-style: ${f.style};
+                     font-weight: ${f.weight};
+                     src: url('file://${f.file}') format('woff2'); }`,
+      )
+      .join("\n        ");
     writeFileSync(
       wrapper,
       `<!doctype html><meta charset="utf-8"><style>
-        @font-face { font-family: 'Spline Sans Mono';
-                     src: url('file://${fontFile}') format('woff2'); }
+        ${fontCss}
         * { margin: 0 } svg { display: block }
       </style>${svg}`,
     );

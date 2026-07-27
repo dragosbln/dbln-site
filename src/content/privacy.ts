@@ -12,11 +12,11 @@ export const privacy: PrivacyNotice = {
   hero: {
     eyebrow: "Privacy",
     title: "What this site collects, *and what it doesn't.*",
-    lede: "No cookies. No tracking across sites. Two third parties, and one of them only wakes up when you ask for it.",
+    lede: "No cookies. No tracking across sites. As you read, two third parties, and one of them only wakes up when you ask for it.",
     metaDescription:
       "What dbln.me collects and what it doesn't. Cookieless analytics, no cross-site tracking, and a booking flow that contacts Cal.com only when you choose to.",
   },
-  updated: "2026-07-16",
+  updated: "2026-07-26",
   updatedLabel: "Last updated",
   sections: [
     {
@@ -31,36 +31,65 @@ export const privacy: PrivacyNotice = {
       title: "No cookies",
       body: [
         "This site sets no cookies. Nothing is stored on your device to track you, and there is no consent banner because there is nothing to consent to.",
-        "One thing is held in your browser. When you pick a call format in the contact section, that choice stays in session storage so the page can show it back to you after you book. It never leaves your browser. It is gone when you close the tab.",
+        "A few things are held in your browser, each tied to something you did. When you pick a call format in the contact section, that choice stays in session storage so the page can show it back to you after you book. The stored copy never leaves your browser and is gone when you close the tab. The choice itself goes to Cal.com with your booking.",
+        "When you like or comment, your browser keeps a random id, the list of articles you liked, the name you commented under, and the ids of comments you posted so you can delete them. The list keeps the button lit. The name saves you retyping it. The id travels with your likes and comments so one browser counts once. None of it says who you are unless your name does. Clear your browsing data and it is all gone.",
+        "If you sign in to comment, your browser also remembers your name and account id so it can offer to sign you back in. It never keeps a password or a login token between visits.",
       ],
     },
     {
       num: "03",
       title: "Analytics",
       body: [
-        "Traffic stats come from Plausible Analytics, hosted in the EU. It is cookieless and it counts in aggregate: pages viewed, referrers, countries, browsers, and how far down an article people read.",
+        "Traffic stats come from Plausible Analytics, hosted in the EU. It is cookieless and it counts in aggregate: pages viewed, referrers, countries, browsers, how far down an article people read, and which articles get liked.",
         "Your IP address is used to work out a country and to derive a rotating one-way hash that tells one visit from another. Plausible discards it. It is never stored, and no profile of you exists at either end.",
         "The legal basis is legitimate interest. I need to know which articles are worth writing and where readers come from. Any content blocker stops it.",
       ],
     },
     {
       num: "04",
-      title: "Booking a call",
+      title: "Liking an article",
       body: [
-        "The contact section embeds Cal.com. Nothing is requested from Cal.com until you pick a call format. Scroll past the section and no third party is contacted at all.",
-        "Once you pick a format, Cal.com loads and the booking form is theirs. Your name, your email and your answer about what you are weighing go to Cal.com so the call can be scheduled, and they reach my calendar. Cal.com's own privacy policy covers their side of it.",
-        "The legal basis is taking steps at your request before a contract.",
+        "Likes go to this site's own backend, hosted in the EU. The like itself is stored by this site alone, and the count you see is the count that is stored. A like is also counted as an event by the analytics above.",
+        "Every time you like or unlike an article, a small record is kept: the article, the action, the time, and your browser's random id. The records keep the counts honest and let me clean up abuse. No name, no email address and no IP address is stored with them.",
+        "The legal basis is legitimate interest. If you want your likes removed, email me and they go.",
       ],
     },
     {
       num: "05",
+      title: "Commenting",
+      body: [
+        "Comments are public. The name you choose and what you write are stored by this site's own backend in the EU and shown to every reader. Use any name you like.",
+        "Your browser's random id is stored with each comment. No email address and no IP address is stored with it. Every new comment is emailed to me, so unwelcome ones get removed quickly.",
+        "You can sign in with Google or GitHub if you want to keep your comments and delete them yourself later. Only then, and only when you click, does your browser contact them to sign you in. Your account id is stored with your comments in place of the random one. I never see your password.",
+        "Want a comment of yours gone? Delete it yourself if you signed in, or email me which one it is and it goes. The legal basis is legitimate interest.",
+      ],
+    },
+    {
+      num: "06",
+      title: "Booking a call",
+      body: [
+        "The contact section embeds Cal.com. Nothing is requested from Cal.com until you pick a call format. Scroll past the section and no third party is contacted at all.",
+        "Once you pick a format, Cal.com loads and the booking form is theirs. Your name, your email, the format you picked and your answer about what you are weighing go to Cal.com so the call can be scheduled, and they reach my calendar. Cal.com's own privacy policy covers their side of it.",
+        "The legal basis is taking steps at your request before a contract.",
+      ],
+    },
+    {
+      num: "07",
+      title: "The admin page",
+      body: [
+        "There is a page at /admin where I moderate comments. It is my own tool. Reading the site never touches it.",
+        "Its only button signs in with Google. If you open the page and use it, your browser contacts Google for that sign-in, the same way the comment sign-in works. Close the page and it signs out on its own. Only my account can see anything; anyone else is turned away.",
+      ],
+    },
+    {
+      num: "08",
       title: "Email",
       body: [
         "If you email me, I keep the message so I can reply and pick the thread up later. It stays in my mailbox. You are not added to a list. There is no list.",
       ],
     },
     {
-      num: "06",
+      num: "09",
       title: "Your rights",
       body: [
         "You can ask what I hold about you, ask for a copy, ask for it to be corrected or deleted, and object to any of it. The analytics are aggregate, so nothing in them points to you and I cannot pull your visit out of them.",
@@ -69,7 +98,7 @@ export const privacy: PrivacyNotice = {
     },
   ],
   contact: {
-    num: "07",
+    num: "10",
     title: "Questions",
     body: ["Anything on this page, ask. A plain answer comes back."],
     emailHint: "Questions about this notice, or a request about your data.",

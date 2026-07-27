@@ -1,0 +1,566 @@
+/* Discussion (comments) — adapted from blog-social/blog.css. */
+
+.comments {
+  max-width: var(--prose);
+  margin: 0 auto;
+  padding: 56px 0 90px;
+}
+
+.head {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 26px;
+}
+
+.head b {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* ---------- form ---------- */
+
+.form {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 40px;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.form input,
+.form textarea {
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 11px 14px;
+  width: 100%;
+  transition: border-color 0.18s;
+}
+
+.form input:focus,
+.form textarea:focus {
+  outline: none;
+  border-color: var(--teal);
+}
+
+.form textarea {
+  resize: vertical;
+  min-height: 92px;
+  line-height: 1.55;
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.hint {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-faint-2);
+}
+
+.postBtn {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--paper);
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition:
+    background-color 0.18s,
+    border-color 0.18s;
+}
+
+.postBtn:hover {
+  background: var(--teal-deep);
+  border-color: var(--teal-deep);
+}
+
+.postBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Always-mounted live region inside each form; collapses when empty. */
+.error {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--red);
+  margin: 10px 0 0;
+}
+
+.error:empty {
+  display: none;
+}
+
+/* Visually-hidden live region for success announcements. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus target after a posted reply (programmatic focus only). */
+.comment:focus {
+  outline: none;
+}
+
+/* ---------- list ---------- */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.empty {
+  font-family: var(--mono);
+  font-size: 13.5px;
+  color: var(--ink-faint);
+  padding: 8px 0 4px;
+}
+
+.comment {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 16px;
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+}
+
+.comment:first-child {
+  border-top: none;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+  background: var(--teal);
+}
+
+.top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.who {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.when {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-faint);
+}
+
+.body {
+  font-size: 16px;
+  line-height: 1.62;
+  color: var(--ink-body);
+  white-space: pre-wrap;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+.removedNote {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-style: italic;
+  color: var(--ink-faint);
+  padding-top: 9px;
+}
+
+.actions {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.replyLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-faint);
+  background: none;
+  border: none;
+  padding: 0;
+  transition: color 0.18s;
+}
+
+.replyLink svg {
+  width: 14px;
+  height: 14px;
+}
+
+.replyLink:hover {
+  color: var(--teal);
+}
+
+/* ---------- threaded replies ---------- */
+
+.replies {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  padding-left: 22px;
+  border-left: 2px solid var(--line);
+}
+
+.replies .comment {
+  padding: 16px 0;
+  grid-template-columns: 32px 1fr;
+  gap: 13px;
+}
+
+.replies .comment:first-child {
+  border-top: none;
+}
+
+.replies .avatar {
+  width: 32px;
+  height: 32px;
+  font-size: 13px;
+  background: var(--teal-deep);
+}
+
+/* ---------- inline reply form ---------- */
+
+.replyForm {
+  margin-top: 14px;
+}
+
+.replyForm textarea {
+  font-family: var(--sans);
+  font-size: 14.5px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 10px 12px;
+  width: 100%;
+  resize: vertical;
+  min-height: 64px;
+  line-height: 1.5;
+  transition: border-color 0.18s;
+}
+
+.replyForm textarea:focus,
+.replyForm input:focus {
+  outline: none;
+  border-color: var(--teal);
+}
+
+.rfFoot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.replyForm input {
+  font-family: var(--sans);
+  font-size: 13.5px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 9px 12px;
+  max-width: 180px;
+  transition: border-color 0.18s;
+}
+
+.rfBtn {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--paper);
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  padding: 8px 18px;
+  cursor: pointer;
+  transition:
+    background-color 0.18s,
+    border-color 0.18s;
+}
+
+.rfBtn:hover {
+  background: var(--teal-deep);
+  border-color: var(--teal-deep);
+}
+
+.rfBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rfCancel {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-faint);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.rfCancel:hover {
+  color: var(--ink);
+}
+
+@media (max-width: 680px) {
+  .row {
+    flex-direction: column;
+  }
+
+  .replies {
+    padding-left: 14px;
+  }
+}
+
+/* ---------- identity / sign-in row ---------- */
+
+.identity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.signInPrompt,
+.postingAs {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-faint-2);
+}
+
+.postingAs {
+  color: var(--teal-deep);
+}
+
+.providers {
+  display: flex;
+  gap: 8px;
+}
+
+.identityBtn {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition:
+    border-color 0.18s,
+    color 0.18s;
+}
+
+.identityBtn:hover {
+  border-color: var(--teal);
+  color: var(--teal-deep);
+}
+
+.identityBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.deleteLink {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-faint);
+  background: none;
+  border: none;
+  padding: 0;
+  transition: color 0.18s;
+}
+
+.deleteLink:hover {
+  color: var(--red);
+}
+
+/* ---------- badges ---------- */
+
+.badge {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.badgeAuthor {
+  color: #fff;
+  background: var(--teal);
+  border-color: var(--teal);
+}
+
+.badgeMember {
+  color: var(--teal-deep);
+  background: var(--accent-wash);
+  border-color: var(--accent-wash);
+}
+
+.badgeGuest {
+  color: var(--ink-faint);
+}
+
+/* ---------- anonymous-post warning dialog ---------- */
+
+/* Centered on the viewport (top-layer modal): explicit inset + auto
+   margins so a transformed ancestor can't pull it into a corner. */
+.anonDialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(400px, calc(100% - 40px));
+  height: fit-content;
+  max-height: calc(100% - 40px);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 28px 24px;
+  text-align: center;
+}
+
+.anonDialog::backdrop {
+  background: rgba(23, 25, 28, 0.32);
+}
+
+.anonTitle {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0 0 10px;
+}
+
+.anonBody {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin: 0 0 22px;
+}
+
+.anonButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* "Post as guest" — the navbar "Book a call" pill (outline, fills on hover). */
+.anonGuestCta {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.anonGuestCta:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* The two provider sign-ins — filled dark pills. */
+.anonSignInBtn {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--paper);
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition:
+    background-color 0.18s,
+    border-color 0.18s;
+}
+
+.anonSignInBtn:hover {
+  background: var(--teal-deep);
+  border-color: var(--teal-deep);
+}
+
+.anonSignInBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.anonCancel {
+  align-self: center;
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--ink-faint);
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.anonCancel:hover {
+  color: var(--ink);
+}

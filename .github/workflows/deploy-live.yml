@@ -28,6 +28,15 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      # The functions workspace is built + tested here as a merge gate, but
+      # NOT deployed from CI. Deploying gen2 functions needs a broad,
+      # sensitive role set (Cloud Run + Cloud Build + Artifact Registry +
+      # Secret Manager) on this stored credential, and gen2 CI deploys are
+      # finicky. The backend changes rarely, so it is deployed by the owner
+      # from their own machine — `npm run deploy:backend` — which needs no
+      # extra IAM. See AGENTS.md "Social backend".
+      - run: npm --prefix functions ci
+      - run: npm --prefix functions test
       # SHA-pinned (this action receives the production deploy credential; a
       # floating @v0 tag would let a compromised release publish to live).
       - uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0.11.0
