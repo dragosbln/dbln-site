@@ -14,9 +14,17 @@ import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const express = require("express");
+const { initializeApp } = require("firebase-admin/app");
+const { getAuth } = require("firebase-admin/auth");
 const { createApp } = require("./lib/app.js");
 const { consoleMailer } = require("./lib/notify.js");
 const { MemoryStore } = require("./lib/store.js");
+
+// No credentials on purpose: verifying an ID token's signature only needs
+// Google's public certs + the project id, so a REAL sign-in on the site
+// (popup against production Firebase Auth) is testable locally. What this
+// cannot do without credentials is checkRevoked — acceptable in dev.
+initializeApp({ projectId: "dbln-b56ec" });
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const out = path.join(here, "..", "out");
@@ -32,14 +40,26 @@ app.use(
   createApp(store, {
     mailer: consoleMailer(),
     limits: { commentCooldownMs: 2000 },
+    // Author badge locally: set DBLN_ADMIN_UIDS to a comma-separated list
+    // of uids (your real Firebase uid, or a "devuid:" test id) to see
+    // those comments badged "Author".
+    adminUids: (process.env.DBLN_ADMIN_UIDS ?? "").split(","),
     verifyAdmin: async (token) =>
       token === "dev-admin" ? "dev-admin-uid" : null,
-    // Dev sign-in: any token shaped "devuid:<id>" authenticates as <id>,
-    // so authed commenting / claim / delete-own are testable without
-    // Firebase Auth.
+    // Dev sign-in, two tiers: "devuid:<id>" fakes a user for scripted
+    // tests, and anything else is verified as a REAL Firebase ID token
+    // (so signing in with the actual Google/GitHub popup works against
+    // the harness too).
     verifyVisitor: async (token) => {
       const m = /^devuid:([A-Za-z0-9]{1,40})$/.exec(token ?? "");
-      return m ? m[1] : null;
+      if (m) return m[1];
+      try {
+        const decoded = await getAuth().verifyIdToken(token);
+        return decoded.uid;
+      } catch (err) {
+        console.log("[auth] id token rejected:", err.code ?? err.message);
+        return null;
+      }
     },
   }),
 );

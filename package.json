@@ -9,7 +9,8 @@
     "build": "next build",
     "lint": "eslint --max-warnings=0",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "node --test 'test/**/*.test.mjs'"
+    "test": "node --test 'test/**/*.test.mjs'",
+    "deploy:backend": "npm --prefix functions test && firebase deploy --only functions,firestore:rules --project dbln-b56ec"
   },
   "engines": {
     "node": ">=24"

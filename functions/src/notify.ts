@@ -11,7 +11,14 @@ export type Mailer = {
   send(msg: { subject: string; text: string }): Promise<void>;
 };
 
-export function gmailMailer(user: string, pass: string, to: string): Mailer {
+export function gmailMailer(
+  user: string,
+  pass: string,
+  to: string = user,
+): Mailer {
+  // Default recipient is the sending account itself, so the notification
+  // address lives only in the GMAIL_USER secret — never in source (the
+  // repo may be public; a hardcoded personal address invites spam).
   const transport = nodemailer.createTransport({
     service: "gmail",
     auth: { user, pass },

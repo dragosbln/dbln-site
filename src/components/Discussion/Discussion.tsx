@@ -109,6 +109,12 @@ export default function Discussion({ slug }: DiscussionProps) {
   // post is in flight (disabling the focused button would dump keyboard
   // focus onto <body>), so the guard must not wait for a state flush.
   const submittingRef = useRef(false);
+  // Anonymous-post warning: which form is pending confirmation, whether
+  // the visitor already accepted guest-posting this session, and the
+  // <dialog> node.
+  const anonDialogRef = useRef<HTMLDialogElement | null>(null);
+  const pendingParentIdRef = useRef<string | null>(null);
+  const anonAcceptedRef = useRef(false);
 
   // The saved name is filled imperatively (no state): the server renders
   // an empty input, and hydration must match it. Read after mount to
@@ -321,8 +327,24 @@ export default function Discussion({ slug }: DiscussionProps) {
     }
   };
 
-  const handleSubmit = async (e: FormEvent, parentId: string | null) => {
+  const handleSubmit = (e: FormEvent, parentId: string | null) => {
     e.preventDefault();
+    if (!token || submittingRef.current) return;
+    const nameEl = parentId ? replyNameRef.current : nameRef.current;
+    const name = (nameEl?.value ?? "").trim();
+    const text = (parentId ? (replyDrafts[parentId] ?? "") : body).trim();
+    if (!name || !text) return;
+    // Anonymous poster: warn once per session that a guest comment can't
+    // be managed later. Signed-in posters skip straight through.
+    if (!getTokenRef.current && !anonAcceptedRef.current) {
+      pendingParentIdRef.current = parentId;
+      anonDialogRef.current?.showModal();
+      return;
+    }
+    void doSubmit(parentId);
+  };
+
+  const doSubmit = async (parentId: string | null) => {
     if (!token || submittingRef.current) return;
     const nameEl = parentId ? replyNameRef.current : nameRef.current;
     const name = (nameEl?.value ?? "").trim();
@@ -333,7 +355,10 @@ export default function Discussion({ slug }: DiscussionProps) {
     setSubmitting(true);
     setNotice(null);
     try {
-      const idToken = account ? await getTokenRef.current?.() : undefined;
+      // Key on the token getter, not `account` state: after a sign-in from
+      // the warning dialog the ref is set before React flushes the state.
+      const getToken = getTokenRef.current;
+      const idToken = getToken ? await getToken() : undefined;
       const posted = await postComment({
         slug,
         parentId,
@@ -377,6 +402,21 @@ export default function Discussion({ slug }: DiscussionProps) {
     }
   };
 
+  // Warning-dialog choices. Guest: accept for the session, then post.
+  // Sign in: run the popup, and if it succeeds continue the post as the
+  // now-signed-in account (getTokenRef is set synchronously on success).
+  const postAsGuest = () => {
+    anonAcceptedRef.current = true;
+    anonDialogRef.current?.close();
+    void doSubmit(pendingParentIdRef.current);
+  };
+
+  const dialogSignIn = async (provider: AuthProvider) => {
+    await signIn(provider);
+    anonDialogRef.current?.close();
+    if (getTokenRef.current) void doSubmit(pendingParentIdRef.current);
+  };
+
   const openReply = (id: string) => {
     setOpenReplyId((cur) => (cur === id ? null : id));
   };
@@ -409,6 +449,19 @@ export default function Discussion({ slug }: DiscussionProps) {
             <>
               <div className={styles.top}>
                 <span className={styles.who}>{c.name}</span>
+                {c.author ? (
+                  <span className={`${styles.badge} ${styles.badgeAuthor}`}>
+                    {copy.badgeAuthor}
+                  </span>
+                ) : c.verified ? (
+                  <span className={`${styles.badge} ${styles.badgeMember}`}>
+                    {copy.badgeMember}
+                  </span>
+                ) : (
+                  <span className={`${styles.badge} ${styles.badgeGuest}`}>
+                    {copy.badgeGuest}
+                  </span>
+                )}
                 <span
                   className={styles.when}
                   title={new Date(c.at).toLocaleString("en-US")}
@@ -627,6 +680,49 @@ export default function Discussion({ slug }: DiscussionProps) {
           <div className={styles.list}>{roots.map(renderComment)}</div>
         )
       ) : null}
+      <dialog
+        ref={anonDialogRef}
+        className={styles.anonDialog}
+        // Click on the backdrop (the dialog element itself) dismisses it.
+        onClick={(e) => {
+          if (e.target === anonDialogRef.current) anonDialogRef.current.close();
+        }}
+      >
+        <h3 className={styles.anonTitle}>{copy.anonTitle}</h3>
+        <p className={styles.anonBody}>{copy.anonBody}</p>
+        <div className={styles.anonButtons}>
+          <button
+            type="button"
+            className={styles.anonGuestCta}
+            onClick={postAsGuest}
+          >
+            {copy.anonPostAnyway}
+          </button>
+          <button
+            type="button"
+            className={styles.anonSignInBtn}
+            disabled={signingIn}
+            onClick={() => dialogSignIn("google")}
+          >
+            {copy.anonSignIn} · {copy.signInGoogle}
+          </button>
+          <button
+            type="button"
+            className={styles.anonSignInBtn}
+            disabled={signingIn}
+            onClick={() => dialogSignIn("github")}
+          >
+            {copy.anonSignIn} · {copy.signInGithub}
+          </button>
+          <button
+            type="button"
+            className={styles.anonCancel}
+            onClick={() => anonDialogRef.current?.close()}
+          >
+            {copy.anonCancel}
+          </button>
+        </div>
+      </dialog>
     </section>
   );
 }

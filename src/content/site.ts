@@ -268,6 +268,15 @@ export const discussion: DiscussionContent = {
   deleteConfirm: "Delete your comment?",
   deleteFailed: "Couldn't delete that. Try again.",
   deleteNeedsSignIn: "Sign in first. This comment belongs to your account.",
+  badgeAuthor: "Author",
+  badgeMember: "Signed in",
+  badgeGuest: "Guest",
+  anonTitle: "Post as a guest?",
+  anonBody:
+    "You are not signed in. A guest comment can't be edited or deleted later, and it isn't tied to you. Sign in to keep and manage it.",
+  anonSignIn: "Sign in",
+  anonPostAnyway: "Post as guest",
+  anonCancel: "Cancel",
 };
 
 /**

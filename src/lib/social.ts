@@ -37,7 +37,10 @@ export type PublicComment = {
   removed: boolean;
   name: string;
   body: string;
+  /** Posted while signed in. */
   verified: boolean;
+  /** Posted by the site author (uid on the ADMIN_UIDS allowlist). */
+  author: boolean;
 };
 
 export type Account = { uid: string; name: string };

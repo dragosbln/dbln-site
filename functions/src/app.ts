@@ -82,6 +82,13 @@ export type AppOptions = {
    * allowlist). Absent = signed-in commenting off; anonymous still works.
    */
   verifyVisitor?: (token: string) => Promise<string | null>;
+  /**
+   * Firebase Auth uids of the site author(s). A comment gets the "author"
+   * badge when its subject is `u_<uid>` for one of these — computed at
+   * read time, so changing the list reflows past comments. Same list the
+   * admin API allowlists.
+   */
+  adminUids?: string[];
   /** Rate-limit knobs, lowered by tests. */
   limits?: {
     perSubject?: number;
@@ -120,6 +127,13 @@ export function createApp(store: SocialStore, opts: AppOptions = {}) {
     1,
     opts.limits?.commentCooldownMs ?? 30_000,
   );
+
+  // Author badge: subject `u_<uid>` whose uid is on the admin allowlist.
+  const authorSet = new Set(
+    (opts.adminUids ?? []).map((u) => u.trim()).filter(Boolean),
+  );
+  const isAuthor = (subject: string) =>
+    subject.startsWith("u_") && authorSet.has(subject.slice(2));
 
   const app = express();
   app.disable("x-powered-by");
@@ -194,7 +208,7 @@ export function createApp(store: SocialStore, opts: AppOptions = {}) {
         res.status(400).json({ error: "unknown_slug" });
         return;
       }
-      const comments = await store.getComments(slug);
+      const comments = await store.getComments(slug, isAuthor);
       // no-store: the response carries a fresh post token, and a thread
       // must read back instantly consistent after a post.
       res.set("Cache-Control", "no-store");
@@ -304,7 +318,11 @@ export function createApp(store: SocialStore, opts: AppOptions = {}) {
           .json({ error: result.error });
         return;
       }
-      res.json({ comment: result.comment });
+      // The stored row has no author flag (read-time only); set it on the
+      // echoed comment so the poster's optimistic insert shows the badge.
+      res.json({
+        comment: { ...result.comment, author: isAuthor(effectiveSubject) },
+      });
       // After the response: a mail outage must never fail a post.
       opts.mailer
         ?.send({

@@ -287,14 +287,11 @@ Comments (instant post, no review queue — Dragos's call): POST
   `firebase functions:secrets:set ADMIN_UIDS` (comma-separated Firebase
   Auth uids; empty admits no one — fails closed. Bootstrap: set any
   placeholder, sign in at /admin once, copy the uid from the "not on the
-  allowlist" notice, re-set the secret, redeploy).
-  CI needs Secret Manager access on top of the deploy roles: firebase-tools
-  validates secret versions on EVERY deploy and grants the runtime SA
-  access on the first secret-attaching deploy. Do the FIRST deploy from a
-  logged-in owner machine (it performs the IAM grant), and give the CI
-  service account `roles/secretmanager.viewer` for the validation calls on
-  later deploys (or `roles/secretmanager.admin` if CI must ever attach new
-  secrets itself).
+  allowlist" notice, re-set the secret, then `npm run deploy:backend`).
+  Secrets bind at deploy time (gen2), so changing one takes effect on the
+  next `npm run deploy:backend`. No CI IAM to configure: the backend
+  deploys from the owner's own logged-in machine, which already has the
+  Secret Manager and gen2 permissions (see "Deploy split" below).
 
 Admin panel (/admin + /api/admin): the owner's moderation tool.
 - The page is deliberately undiscoverable: noindexed, disallowed in
@@ -341,10 +338,17 @@ of anonymous comments.
   BEFORE it in every route that takes an idToken. Don't reorder.
 - Authed posts carry the Firebase ID token; the route derives the subject
   as `u_<uid>` from the VERIFIED token (never a client-supplied subject),
-  so a caller can't attribute a comment to another account. `verified` is
-  stored + in the public payload but the reader UI shows no badge on it
-  (a self-chosen name + a checkmark would invite impersonation) — it's
-  there for the author's own tools and future use.
+  so a caller can't attribute a comment to another account.
+- Comment badges (three states): `author` (teal, trustworthy) > `verified`
+  ("Signed in") > neither ("Guest"). `author` is computed at READ TIME
+  from `subject ∈ ADMIN_UIDS` (`isAuthor` in app.ts, fed by the same
+  `adminUids` list as the admin allowlist) — never client-set, so it can't
+  be forged, and changing the list reflows past comments. It is in the
+  public payload. The "Signed in" badge is deliberately NOT a checkmark
+  and does NOT assert identity (the name is self-chosen even when signed
+  in); only the UID-gated `author` badge is a real identity claim, which
+  is what makes author-impersonation impossible. Don't relabel "Signed in"
+  as "Verified".
 - Anonymous posts still use `d_<uuid>`. Ownership for delete-own: authed
   via the token (`u_<uid>`), anonymous via the device id — safe because
   the public payload never exposes `subject`, so no other browser can
@@ -382,6 +386,13 @@ Cross-component count sync: posting calls `notifyCommentAdded(slug)`;
 EngageBar subscribes and bumps its Comment count, and its Comment button
 scrolls to #discussion and focuses #comment-body. /blog index rows fetch
 the counts once on mount and show heart/bubble stats when ≥ 1.
+Anonymous-post warning: `handleSubmit` (main form AND replies) intercepts
+a submit when `getTokenRef.current` is null and opens a native `<dialog>`
+warning that guest comments can't be managed; "Post as guest" sets a
+session ref (`anonAcceptedRef`) so it only nags once, "Sign in" runs the
+popup and auto-continues the post. `doSubmit` keys on the token getter
+(not `account` state), so the auto-continue after in-dialog sign-in isn't
+raced by React's state flush.
 
 Slug allowlist: `functions/src/slugs.ts` is generated from
 `src/content/posts/*.md` by `functions/scripts/gen-slugs.mjs` (prebuild
@@ -394,19 +405,27 @@ Unit tests and the browser run against `MemoryStore` (same semantics as
 site from out/ plus the real API app on :4610, with GET /__dump exposing
 the stored records. Real Firestore semantics are exercised on deploy.
 
-Deploy: CI installs + tests the workspace, then runs
-`firebase deploy --only functions,firestore:rules` BEFORE the hosting
-deploy (the rewrite needs the function to exist). One-time console
-prereqs: Blaze billing (confirmed), a Firestore database created in
-europe-west1, and the CI service account granted Cloud Functions Admin +
-Service Account User + Firebase Rules Admin (or Editor).
-Bootstrap order (once): hosting deploys resolve the `/api/**` rewrite
-against the project's EXISTING functions, so until the `api` function has
-been deployed for the first time, any hosting deploy — PR previews
-included — ships a dead /api (404s; the engage bar degrades to
-share-only). After creating the Firestore DB, run
-`firebase deploy --only functions,firestore:rules` once from a logged-in
-machine, then previews and live both route /api correctly.
+Deploy split (deliberate): CI (`deploy-live.yml`) deploys ONLY hosting on
+every push to main, using the existing service-account secret it already
+had. The backend (`functions` + `firestore:rules`) is deployed by the
+owner from their own machine with **`npm run deploy:backend`** (runs the
+functions tests, then `firebase deploy --only functions,firestore:rules`).
+Rationale: gen2 functions deploy needs a broad, sensitive role set (Cloud
+Run + Cloud Build + Artifact Registry + Secret Manager) that we do NOT
+want on a CI-stored credential, gen2 CI deploys are flaky, and the backend
+changes rarely; a logged-in owner has every permission already, so the
+manual path needs no IAM setup. CI still builds + tests the functions
+workspace as a merge gate — it just doesn't ship it.
+One-time console prereqs: Blaze billing (confirmed) and the `(default)`
+Firestore database in an EU location (it exists, in **eur3** — the EU
+multi-region; a Firestore location is permanent and need NOT match the
+function's region).
+Bootstrap order: hosting deploys resolve the `/api/**` rewrite against the
+project's EXISTING functions, so until `npm run deploy:backend` has run
+once, any hosting deploy — PR previews included — ships a dead /api (404s;
+the engage bar degrades to share-only). Run `npm run deploy:backend` once
+after creating the DB and setting the secrets, then previews and live both
+route /api correctly. Whenever the backend changes, run it again (CI won't).
 
 ## Privacy notice (/privacy)
 

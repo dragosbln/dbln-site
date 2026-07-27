@@ -49,9 +49,18 @@ export type PublicComment = {
   removed: boolean;
   name: string;
   body: string;
-  /** Posted by a signed-in visitor (shows a subtle verified marker). */
+  /** Posted while signed in (subject is `u_<uid>`). */
   verified: boolean;
+  /**
+   * Posted by an account on the ADMIN_UIDS allowlist — the site's author.
+   * Computed at read time from the current allowlist (never client-set),
+   * so it can't be forged and tracks changes to the list.
+   */
+  author: boolean;
 };
+
+/** True when a stored comment's subject belongs to the site author. */
+export type IsAuthor = (subject: string) => boolean;
 
 export type AddCommentInput = {
   slug: string;
@@ -114,8 +123,11 @@ export interface SocialStore {
     comments: Record<string, number>;
   }>;
   addComment(input: AddCommentInput): Promise<AddCommentResult>;
-  /** Reader view of a thread (visible + structural placeholders). */
-  getComments(slug: string): Promise<PublicComment[]>;
+  /**
+   * Reader view of a thread (visible + structural placeholders).
+   * `isAuthor` marks author comments; default = nobody is an author.
+   */
+  getComments(slug: string, isAuthor?: IsAuthor): Promise<PublicComment[]>;
   /** Admin (phase 3) + tests. Adjusts the visible counter. */
   setCommentStatus(id: string, status: CommentStatus): Promise<boolean>;
   /** Admin: every comment (removed included), newest first. */
@@ -144,7 +156,10 @@ export interface SocialStore {
   claimComments(fromSubject: string, toSubject: string): Promise<number>;
 }
 
-export function toPublic(row: StoredComment): PublicComment {
+export function toPublic(
+  row: StoredComment,
+  isAuthor: IsAuthor = () => false,
+): PublicComment {
   const removed = row.status === "removed";
   return {
     id: row.id,
@@ -155,6 +170,7 @@ export function toPublic(row: StoredComment): PublicComment {
     name: removed ? "" : row.name,
     body: removed ? "" : row.body,
     verified: removed ? false : row.verified === true,
+    author: removed ? false : isAuthor(row.subject),
   };
 }
 
@@ -163,7 +179,10 @@ export function toPublic(row: StoredComment): PublicComment {
  * plus removed ones that still have a visible descendant (rendered as
  * placeholders so the thread keeps its shape), sorted oldest-first.
  */
-export function toPublicThread(rows: StoredComment[]): PublicComment[] {
+export function toPublicThread(
+  rows: StoredComment[],
+  isAuthor: IsAuthor = () => false,
+): PublicComment[] {
   const children = new Map<string, StoredComment[]>();
   for (const row of rows) {
     if (row.parentId) {
@@ -179,7 +198,7 @@ export function toPublicThread(rows: StoredComment[]): PublicComment[] {
   return rows
     .filter((r) => r.status === "visible" || hasVisibleDescendant(r.id))
     .sort((a, b) => a.at.localeCompare(b.at) || a.id.localeCompare(b.id))
-    .map(toPublic);
+    .map((row) => toPublic(row, isAuthor));
 }
 
 /** In-memory mirror of the Firestore semantics, for tests + harness. */
@@ -258,8 +277,14 @@ export class MemoryStore implements SocialStore {
     return { ok: true, comment: toPublic(row) };
   }
 
-  async getComments(slug: string): Promise<PublicComment[]> {
-    return toPublicThread(this.comments.filter((c) => c.slug === slug));
+  async getComments(
+    slug: string,
+    isAuthor?: IsAuthor,
+  ): Promise<PublicComment[]> {
+    return toPublicThread(
+      this.comments.filter((c) => c.slug === slug),
+      isAuthor,
+    );
   }
 
   async setCommentStatus(id: string, status: CommentStatus): Promise<boolean> {

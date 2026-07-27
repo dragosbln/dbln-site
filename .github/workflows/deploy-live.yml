@@ -28,24 +28,15 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      # The functions workspace is built + tested here as a merge gate, but
+      # NOT deployed from CI. Deploying gen2 functions needs a broad,
+      # sensitive role set (Cloud Run + Cloud Build + Artifact Registry +
+      # Secret Manager) on this stored credential, and gen2 CI deploys are
+      # finicky. The backend changes rarely, so it is deployed by the owner
+      # from their own machine — `npm run deploy:backend` — which needs no
+      # extra IAM. See AGENTS.md "Social backend".
       - run: npm --prefix functions ci
       - run: npm --prefix functions test
-      # Backend deploys BEFORE hosting: the /api/** rewrite in the new
-      # hosting release must point at a function that already exists.
-      # Prereqs (one-time, console): Blaze billing, Firestore DB in
-      # europe-west1, this service account granted Cloud Functions Admin +
-      # Service Account User + Firebase Rules Admin + Secret Manager
-      # Viewer (secret-version validation runs on every deploy), the four
-      # function secrets set (see AGENTS.md "Social backend"), and the
-      # FIRST deploy run from a logged-in owner machine (it grants the
-      # runtime SA access to those secrets).
-      - name: Deploy backend (functions + Firestore rules)
-        run: |
-          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-sa.json"
-          npx firebase-tools@15 deploy --only functions,firestore:rules --project dbln-b56ec --non-interactive --force
-        env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DBLN_B56EC }}
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-sa.json
       # SHA-pinned (this action receives the production deploy credential; a
       # floating @v0 tag would let a compromised release publish to live).
       - uses: FirebaseExtended/action-hosting-deploy@500ac625ca2dd40cbd15f7659af953801858032a # v0.11.0

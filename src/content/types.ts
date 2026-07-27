@@ -270,6 +270,16 @@ export type DiscussionContent = {
   deleteConfirm: string;
   deleteFailed: string;
   deleteNeedsSignIn: string;
+  /** Comment badges. */
+  badgeAuthor: string;
+  badgeMember: string;
+  badgeGuest: string;
+  /** Warning dialog shown before an anonymous post. */
+  anonTitle: string;
+  anonBody: string;
+  anonSignIn: string;
+  anonPostAnyway: string;
+  anonCancel: string;
 };
 
 /** One numbered block of the privacy notice. */

@@ -32,7 +32,7 @@ function start(app) {
 
 after(() => servers.forEach((s) => s.close()));
 
-function mkApp(store) {
+function mkApp(store, opts = {}) {
   return createApp(store, {
     tokenKey: KEY,
     limits: { commentCooldownMs: 0 },
@@ -40,6 +40,7 @@ function mkApp(store) {
       const m = /^devuid:([A-Za-z0-9]{1,40})$/.exec(token ?? "");
       return m ? m[1] : null;
     },
+    ...opts,
   });
 }
 
@@ -78,6 +79,47 @@ test("signed-in post derives subject from the verified uid, marks verified", asy
   });
   assert.equal(r2.status, 200);
   assert.equal((await store.listComments())[0].subject, "u_ada");
+});
+
+test("author badge: computed at read time from the admin allowlist", async () => {
+  const store = new MemoryStore();
+  // "ada" is on the allowlist → author; "bob" is signed-in but not.
+  const base = await start(mkApp(store, { adminUids: ["ada"] }));
+
+  const authorPost = await post(base, { name: "Ada", body: "hi", idToken: "devuid:ada" });
+  assert.equal(authorPost.body.comment.author, true);
+  assert.equal(authorPost.body.comment.verified, true);
+
+  const memberPost = await post(base, { name: "Bob", body: "yo", idToken: "devuid:bob" });
+  assert.equal(memberPost.body.comment.author, false);
+  assert.equal(memberPost.body.comment.verified, true);
+
+  const guestPost = await post(base, { name: "Cat", body: "meow", subject: DEVICE });
+  assert.equal(guestPost.body.comment.author, false);
+  assert.equal(guestPost.body.comment.verified, false);
+
+  const thread = (await (await fetch(`${base}/api/comments?slug=${SLUG}`)).json())
+    .comments;
+  const byName = Object.fromEntries(thread.map((c) => [c.name, c]));
+  assert.equal(byName.Ada.author, true);
+  assert.equal(byName.Bob.author, false);
+  assert.equal(byName.Cat.author, false);
+});
+
+test("author badge reflows: same comment, list flipped", async () => {
+  const store = new MemoryStore();
+  // Not an author when posted.
+  await start(mkApp(store));
+  const nobody = await start(mkApp(store));
+  const posted = await post(nobody, { name: "Ada", body: "hi", idToken: "devuid:ada" });
+  assert.equal(posted.body.comment.author, false);
+
+  // A second app instance WITH ada on the allowlist marks the same stored
+  // comment as author — proving read-time computation, not stored state.
+  const withAuthor = await start(mkApp(store, { adminUids: ["ada"] }));
+  const thread = (await (await fetch(`${withAuthor}/api/comments?slug=${SLUG}`)).json())
+    .comments;
+  assert.equal(thread.find((c) => c.name === "Ada").author, true);
 });
 
 test("bad or absent visitor token: 401 with a token, anon still allowed", async () => {

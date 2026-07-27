@@ -17,6 +17,8 @@ initializeApp();
  *   string, e.g. `openssl rand -hex 32`).
  * - GMAIL_USER / GMAIL_APP_PASSWORD: the Gmail account + app password
  *   that sends comment notifications (kept out of the repo on purpose).
+ *   The notification is delivered to GMAIL_USER itself, so that address
+ *   is the inbox that receives them.
  * - ADMIN_UIDS: comma-separated Firebase Auth uids allowed into /admin.
  *   Empty/missing = the admin API admits no one (fails closed).
  * Deploys fail until all four exist.
@@ -26,9 +28,6 @@ const gmailUser = defineSecret("GMAIL_USER");
 const gmailPass = defineSecret("GMAIL_APP_PASSWORD");
 const adminUids = defineSecret("ADMIN_UIDS");
 
-/** Public on the site already (site.ts) — not a secret. */
-const NOTIFY_TO = "dragos@dbln.me";
-
 const store = new FirestoreStore(getFirestore());
 
 // Secret values are only readable at runtime, so the express app is
@@ -37,9 +36,13 @@ let app: Express | null = null;
 
 /**
  * Single HTTP function behind the /api/** hosting rewrite. europe-west1
- * to keep the data path in the EU (pair the Firestore location with it).
- * maxInstances caps the blast radius of any traffic surge — this backend
- * is likes and comments, not something worth autoscaling for.
+ * keeps the data path in the EU. The Firestore database is the project's
+ * `(default)` in **eur3** (the EU multi-region: europe-west1 +
+ * europe-west4), which `getFirestore()` reaches regardless of this
+ * function's region — europe-west1 just happens to be one of eur3's own
+ * replica regions, so the hop is local. maxInstances caps the blast
+ * radius of any traffic surge — this backend is likes and comments, not
+ * something worth autoscaling for.
  */
 export const api = onRequest(
   {
@@ -52,11 +55,14 @@ export const api = onRequest(
   },
   (req, res) => {
     if (!app) {
+      const adminList = adminUids.value().split(",");
       app = createApp(store, {
         enforceHost: true,
         tokenKey: tokenKey.value(),
-        mailer: gmailMailer(gmailUser.value(), gmailPass.value(), NOTIFY_TO),
-        verifyAdmin: firebaseAdminVerifier(adminUids.value().split(",")),
+        mailer: gmailMailer(gmailUser.value(), gmailPass.value()),
+        verifyAdmin: firebaseAdminVerifier(adminList),
+        // Same allowlist drives the "author" comment badge.
+        adminUids: adminList,
         // Any signed-in Firebase user (no allowlist) may comment as
         // themselves. checkRevoked so a revoked session stops posting.
         verifyVisitor: async (token) => {

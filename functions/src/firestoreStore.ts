@@ -12,6 +12,7 @@ import {
   type AddCommentInput,
   type AddCommentResult,
   type CommentStatus,
+  type IsAuthor,
   type LikeAction,
   type LikeEventRecord,
   type PublicComment,
@@ -189,7 +190,10 @@ export class FirestoreStore implements SocialStore {
     };
   }
 
-  async getComments(slug: string): Promise<PublicComment[]> {
+  async getComments(
+    slug: string,
+    isAuthor?: IsAuthor,
+  ): Promise<PublicComment[]> {
     // Equality-only query: ordering + the placeholder rule are applied in
     // memory (shared toPublicThread), which keeps parity with MemoryStore
     // and avoids composite-index management for a per-article thread.
@@ -197,7 +201,10 @@ export class FirestoreStore implements SocialStore {
       .collection("comments")
       .where("slug", "==", slug)
       .get();
-    return toPublicThread(snap.docs.map((doc) => this.rowFromDoc(doc)));
+    return toPublicThread(
+      snap.docs.map((doc) => this.rowFromDoc(doc)),
+      isAuthor,
+    );
   }
 
   async listComments(
