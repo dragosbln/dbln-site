@@ -43,6 +43,19 @@ export const metadata: Metadata = {
     title: site.title,
     description: site.description,
     locale: "en_US",
+    // Site-wide og:image (link scrapers show a generic stock photo without
+    // one). Lives with the blog covers to reuse their SVG→PNG pipeline:
+    // edit site.svg, then `node scripts/render-cover-png.mts site`.
+    // NOTE: pages that export their own `openGraph` (e.g. /work) replace
+    // this whole object and must re-declare `images` if they want one.
+    images: [
+      {
+        url: "/blog/covers/site.png",
+        width: 1200,
+        height: 630,
+        alt: `${site.name} — Independent AI Reliability Reviews`,
+      },
+    ],
   },
   // Card type only: title/description here would shadow every page's own
   // (twitter.* merges shallowly and X falls back to og:* anyway). Article
