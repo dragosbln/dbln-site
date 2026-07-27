@@ -82,7 +82,7 @@ export default function AdminPanel() {
   // started before the mutation ignores its own (now stale) response.
   const dataGenRef = useRef(0);
 
-  const load = useCallback(async (who: string) => {
+  const load = useCallback(async () => {
     const getToken = tokenRef.current;
     if (!getToken) return;
     const gen = dataGenRef.current;
@@ -92,9 +92,11 @@ export default function AdminPanel() {
         headers: { authorization: `Bearer ${await getToken()}` },
       });
       if (res.status === 401) {
-        // The bootstrap path: the uid shown here is what goes into the
-        // ADMIN_UIDS secret.
-        setNotice(`Signed in as ${who}, but this uid is not on the ADMIN_UIDS allowlist.`);
+        // Deliberately generic: don't surface the uid or name the gate to
+        // whoever signed in. To authorize a new admin, read their uid from
+        // Firebase Console → Authentication → Users and add it to
+        // ADMIN_UIDS (see AGENTS.md "Social backend").
+        setNotice("This account isn't authorized to open the admin panel.");
         return;
       }
       if (!res.ok) throw new Error(`overview ${res.status}`);
@@ -116,13 +118,13 @@ export default function AdminPanel() {
       if (dev) {
         tokenRef.current = async () => dev;
         setUid("dev");
-        await load("dev");
+        await load();
         return;
       }
       const user = await signInWithGoogle();
       tokenRef.current = user.getIdToken;
       setUid(user.uid);
-      await load(user.uid);
+      await load();
     } catch (err) {
       console.debug("[dbln admin]", err);
       setNotice("Sign-in didn't complete.");
@@ -278,7 +280,7 @@ export default function AdminPanel() {
             type="button"
             className={styles.refresh}
             disabled={anyBusy}
-            onClick={() => load(uid)}
+            onClick={() => load()}
           >
             Refresh
           </button>

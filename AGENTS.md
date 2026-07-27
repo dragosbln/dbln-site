@@ -285,9 +285,12 @@ Comments (instant post, no review queue — Dragos's call): POST
   `firebase functions:secrets:set GMAIL_USER`,
   `firebase functions:secrets:set GMAIL_APP_PASSWORD`,
   `firebase functions:secrets:set ADMIN_UIDS` (comma-separated Firebase
-  Auth uids; empty admits no one — fails closed. Bootstrap: set any
-  placeholder, sign in at /admin once, copy the uid from the "not on the
-  allowlist" notice, re-set the secret, then `npm run deploy:backend`).
+  Auth uids; empty admits no one — fails closed. To authorize an admin:
+  they sign in once at /admin (creating their Firebase Auth user), then
+  read their uid from Firebase Console → Authentication → Users, add it to
+  ADMIN_UIDS, and `npm run deploy:backend`. The /admin panel deliberately
+  does NOT print the uid — a non-admin who signs in sees only a generic
+  "not authorized").
   Secrets bind at deploy time (gen2), so changing one takes effect on the
   next `npm run deploy:backend`. No CI IAM to configure: the backend
   deploys from the owner's own logged-in machine, which already has the
