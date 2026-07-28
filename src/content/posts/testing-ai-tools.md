@@ -10,7 +10,9 @@ coverAlt: "An AI tool writes audit.json, and two markdown reports derive from th
 
 My first AI tool was ready, and in typical AI-era fashion, I rushed to publish it. After all, it worked. Or at least when I ran it, the output looked right to me.
 
-But one scenario kept haunting me: I recommend it to a client, they run it and challenge one of its findings. Then they ask "What makes it trustworthy? Did it check, or did it guess? How do you know?" I didn't have a good answer. "My prompt was really good" - not quite what you'd expect from a senior architect.
+But one scenario kept haunting me: I recommend it to a client, they run it and challenge one of its findings. Then they ask "What makes it trustworthy? Did it check, or did it guess? How do you know?" 
+
+I didn't have a good answer. "My prompt was really good" - not quite what you'd expect from a senior architect.
 
 This article is about building a better answer, and how building it changes the tool itself.
 
