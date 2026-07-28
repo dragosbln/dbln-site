@@ -63,7 +63,7 @@ export const hero: Hero = {
   eyebrow: "AI Reliability · Independent reviews of LLM products · Software Architecture & Development",
   title:
     "I find where your AI product breaks, and *the design decisions* that let it break.",
-  lede: "Independent reviews for teams whose LLM feature is live but unmeasured. I reproduce failures from your real outputs, review the architecture around the model, and trace each one to the design decision behind it. Anything I can't verify stays out of the report.",
+  lede: "Independent reviews for teams whose LLM feature is live but unmeasured. I reproduce failures from your real outputs, review the architecture around the model, and trace each one to the design decision behind it. You leave with a full report, a system-level fix plan, and a starter regression set. Anything I can't verify stays out of the report.",
   actions: {
     primary: { label: "Book a call", href: "/#contact" },
     secondary: { label: "See selected work", href: "/#work" },
