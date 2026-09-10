@@ -1,0 +1,552 @@
+/* Repository pane for article code references. Design twin (same rules,
+   `cp-` prefixed): ../../../../claude_websie/blog-social/code-peek.css.
+   The chip styling of the prose links lives in src/styles/prose.css. */
+
+/* ---------- desktop pane (≥ 1100px, hover-capable) ---------- */
+.pane {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 80;
+  width: var(--pane, 480px);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  background: var(--paper);
+  border-left: 1px solid var(--line);
+  box-shadow: -18px 0 40px -30px rgba(23, 25, 28, 0.3);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pane {
+    animation: paneIn 0.18s ease-out;
+  }
+}
+
+@keyframes paneIn {
+  from {
+    transform: translateX(12px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* resize handle straddling the left edge */
+.handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -6px;
+  width: 12px;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.grip {
+  width: 3px;
+  height: 40px;
+  border-radius: 2px;
+  background: var(--line);
+  transition: background 0.18s;
+}
+
+.handle:hover .grip,
+.handle:focus-visible .grip,
+.handle[data-dragging] .grip {
+  background: var(--teal);
+}
+
+.handle:focus-visible {
+  outline: none;
+}
+
+/* ---------- header ---------- */
+.head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px 12px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.title {
+  flex: 1;
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.repo {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.repoMeta {
+  color: var(--ink-faint);
+}
+
+.close {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    border-color 0.18s,
+    color 0.18s;
+}
+
+.close:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+/* ---------- file tabs (one per distinct file, by first mention) ---------- */
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 10px 12px 0;
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px 10px;
+  margin-bottom: -1px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: color 0.18s;
+}
+
+.tab:hover {
+  color: var(--teal);
+}
+
+.tab[aria-current="true"] {
+  color: var(--ink);
+  border-bottom-color: var(--teal);
+}
+
+.count {
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  background: var(--paper-2);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.tab[aria-current="true"] .count {
+  color: var(--teal-deep);
+  background: var(--accent-wash);
+}
+
+/* ---------- path line ---------- */
+.path {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  min-width: 0;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-faint-2); /* AA on the --paper-2 band */
+  background: var(--paper-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.pathDir {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pathFile {
+  color: var(--ink);
+}
+
+.range {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.range[data-ranged] {
+  color: var(--teal-deep);
+}
+
+/* ---------- code ---------- */
+.code {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  position: relative;
+  padding: 8px 0;
+  overscroll-behavior: contain;
+}
+
+.code:focus-visible {
+  outline-offset: -2px;
+}
+
+/* fades only where content is hidden on that side (set on scroll) */
+.code[data-fade="top"] {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 28px);
+  mask-image: linear-gradient(to bottom, transparent, #000 28px);
+}
+
+.code[data-fade="bottom"] {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 36px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 36px), transparent);
+}
+
+.code[data-fade="both"] {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 28px,
+    #000 calc(100% - 36px),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 28px,
+    #000 calc(100% - 36px),
+    transparent
+  );
+}
+
+.line {
+  display: flex;
+  padding: 0 16px;
+  line-height: 1.75;
+  white-space: pre;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--ink-faint);
+}
+
+.gutter {
+  width: 30px;
+  flex-shrink: 0;
+  text-align: right;
+  margin-right: 16px;
+  font-size: 11.5px;
+  user-select: none;
+}
+
+.kw {
+  font-weight: 500;
+  font-style: normal;
+  color: var(--teal-deep);
+}
+
+.cm {
+  font-style: italic;
+}
+
+.lineHi {
+  color: var(--ink);
+  background: var(--accent-wash);
+  box-shadow: inset 3px 0 0 var(--teal);
+}
+
+.lineHi .gutter {
+  color: var(--teal);
+  font-weight: 600;
+}
+
+/* loading skeleton: ~12 line-height rows */
+.skeleton {
+  padding: 8px 16px;
+}
+
+.skeleton span {
+  display: block;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--paper-2);
+  margin: 11.875px 0 0 46px; /* (12.5px × 1.75) − 10px */
+}
+
+.skeleton span:nth-child(3n) {
+  width: 42%;
+}
+
+.skeleton span:nth-child(3n + 1) {
+  width: 68%;
+}
+
+.skeleton span:nth-child(3n + 2) {
+  width: 55%;
+}
+
+.error {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-faint);
+  padding: 20px;
+}
+
+/* ---------- footer ---------- */
+.foot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+}
+
+.open {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  border-bottom: 2px solid var(--teal);
+  padding-bottom: 3px;
+  transition: color 0.2s;
+}
+
+.open:hover {
+  color: var(--teal);
+}
+
+.copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.18s;
+}
+
+.copy:hover,
+.copy[data-copied] {
+  color: var(--teal);
+}
+
+/* ---------- phone sheet (≤ 1100px, or any touch device) ---------- */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(23, 25, 28, 0.18);
+}
+
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 81;
+  display: flex;
+  flex-direction: column;
+  max-height: 62dvh; /* the citing paragraph stays visible */
+  background: var(--paper);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -18px 50px -20px rgba(23, 25, 28, 0.4);
+}
+
+.sheet[data-height="full"] {
+  top: 24px;
+  max-height: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sheet {
+    animation: sheetIn 0.22s ease-out;
+  }
+}
+
+@keyframes sheetIn {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.grabber {
+  display: grid;
+  place-items: center;
+  padding: 10px 0 4px;
+  touch-action: none;
+  cursor: grab;
+}
+
+.grabber span {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+}
+
+.sheet .head {
+  gap: 10px;
+  padding: 4px 14px 12px 20px;
+}
+
+.sheet[data-height="full"] .head {
+  padding-bottom: 10px;
+  border-bottom: none;
+}
+
+.sheet .close {
+  width: 36px; /* touch size */
+  height: 36px;
+}
+
+/* half-sheet header: path + range on one line, repo on the next */
+.file {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dir {
+  color: var(--ink-faint);
+}
+
+.fileRange {
+  color: var(--teal-deep);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  margin-left: 6px;
+}
+
+.repoLine {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+/* expanded sheet: tabs + path line as desktop, tighter */
+.sheet .tabs {
+  gap: 2px;
+  padding: 6px 12px 0;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+}
+
+.sheet .tab {
+  gap: 7px;
+  padding: 10px 10px 12px;
+}
+
+.sheet .path {
+  padding: 9px 20px;
+}
+
+.sheet .code {
+  scrollbar-width: none;
+}
+
+.sheet .code::-webkit-scrollbar {
+  display: none;
+}
+
+.sheet .line {
+  font-size: 12px;
+  padding: 0 14px;
+}
+
+.sheet .gutter {
+  width: 24px;
+  margin-right: 12px;
+  font-size: 11px;
+}
+
+.excerpt {
+  padding: 8px 0 30px; /* last line clears the footer gradient */
+}
+
+.sheet .foot {
+  padding: 12px 20px max(22px, env(safe-area-inset-bottom));
+}
+
+.sheet .foot::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  height: 26px;
+  background: linear-gradient(to top, var(--paper), transparent);
+  pointer-events: none;
+}
+
+.copyRound {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  gap: 0;
+  color: var(--ink-soft);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+
+.copyRound:hover,
+.copyRound[data-copied] {
+  border-color: var(--teal);
+}

@@ -104,6 +104,14 @@ To publish:
    defined in `src/lib/markdown.ts` (colors inlined at build, no client-side
    highlighting ever); the `.prose pre` container is styled in
    `src/styles/prose.css`.
+6. Code references: link to a GitHub **blob** URL and the link becomes a
+   mono chip that opens the file in the repository pane (`CodePeek`; design
+   in `../claude_websie/blog-social/code-peek.js` + `design_handoff_code_peek/`).
+   `…/blob/<ref>/<path>` shows the whole file, `#L50-L53` a range, `#L12` one
+   line. Link text is the writer's; the convention is the filename plus the
+   range (`retry.ts#L50-L53`, `classify.ts`). Prefer a commit sha as `<ref>`
+   so the cited lines never drift; the pane shows the short sha. The link
+   still works as a plain link (and always on modifier/middle click).
 
 ## Contact booking (Cal.com)
 

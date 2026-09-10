@@ -282,6 +282,35 @@ export type DiscussionContent = {
   anonCancel: string;
 };
 
+/**
+ * Copy for the article code-reference pane (CodePeek). `{path}`, `{start}`,
+ * `{end}` and `{line}` interpolate in the dialog labels.
+ */
+export type CodePeekContent = {
+  /** Mono eyebrow above the repo line. */
+  eyebrow: string;
+  /** Range slot for a reference without a line range. */
+  wholeFile: string;
+  openOnGithub: string;
+  copyPermalink: string;
+  /** Transient label after a copy. */
+  copied: string;
+  loadError: string;
+  /** Close-button labels: desktop pane / phone sheet. */
+  closePane: string;
+  closeSheet: string;
+  /** aria-label of the file-tabs nav. */
+  filesLabel: string;
+  resizeLabel: string;
+  resizeHint: string;
+  /** aria-labels of the round copy button (phone). */
+  copyLabel: string;
+  copiedLabel: string;
+  /** Dialog labels. */
+  rangeLabel: string;
+  lineLabel: string;
+};
+
 /** One numbered block of the privacy notice. */
 export type PrivacySection = {
   /** Two-digit index shown in the mono kicker ("01"). */

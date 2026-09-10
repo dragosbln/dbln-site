@@ -1,6 +1,7 @@
 import Link from "next/link";
 import ArrowIcon from "@/components/ArrowIcon";
 import ArticlePeek from "@/components/ArticlePeek";
+import CodePeek from "@/components/CodePeek";
 import DiagramLightbox from "@/components/DiagramLightbox";
 import Discussion from "@/components/Discussion";
 import EngageBar from "@/components/EngageBar";
@@ -55,6 +56,9 @@ export default function ArticleView({ post, html, related }: ArticleViewProps) {
         <HeadingAnchors />
         {html.includes("dg-figure") ? <DiagramLightbox /> : null}
         {html.includes('href="/blog/') ? <ArticlePeek /> : null}
+        {html.includes('href="https://github.com/') && html.includes("/blob/") ? (
+          <CodePeek />
+        ) : null}
         <div className={styles.engage}>
           <EngageBar slug={post.slug} />
         </div>
