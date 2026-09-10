@@ -175,6 +175,46 @@
   color: var(--ink-faint);
 }
 
+/* ---------- code references (CodePeek chips) ---------- */
+/* A link to a GitHub blob URL is a code reference: it renders as a mono chip
+   with or without JS, and CodePeek wires it to the repository pane. Design:
+   ../../../claude_websie/blog-social/code-peek.css (chip). */
+
+.prose a[href^="https://github.com/"][href*="/blob/"] {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.86em;
+  line-height: 1.5; /* keeps wrapped lines from colliding on phones */
+  color: var(--teal-deep);
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 1px 6px;
+  transition:
+    border-color 0.18s,
+    background 0.18s,
+    color 0.18s;
+}
+
+.prose a[href^="https://github.com/"][href*="/blob/"]:hover {
+  border-color: var(--teal);
+}
+
+/* the reference the pane is currently showing */
+.prose a[href^="https://github.com/"][href*="/blob/"][aria-current="true"] {
+  color: var(--paper);
+  background: var(--teal-deep);
+  border-color: var(--teal-deep);
+}
+
+/* `filename.ts` inside the link: the chip is the box, not the code span */
+.prose a[href^="https://github.com/"][href*="/blob/"] code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+}
+
 /* ---------- heading anchor copy buttons (HeadingAnchors) ---------- */
 
 .prose :is(h2, h3, h4) {

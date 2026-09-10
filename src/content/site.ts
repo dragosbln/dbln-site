@@ -1,5 +1,6 @@
 import type {
   AgenticSection,
+  CodePeekContent,
   Contact,
   ContactBooking,
   DiscussionContent,
@@ -277,6 +278,28 @@ export const discussion: DiscussionContent = {
   anonSignIn: "Sign in",
   anonPostAnyway: "Post as guest",
   anonCancel: "Cancel",
+};
+
+/**
+ * The code-reference pane on articles (design: claude_websie/blog-social/
+ * code-peek.js, `COPY`; spec in claude_websie/design_handoff_code_peek).
+ */
+export const codePeek: CodePeekContent = {
+  eyebrow: "Referenced in this article",
+  wholeFile: "whole file",
+  openOnGithub: "Open on GitHub",
+  copyPermalink: "copy permalink",
+  copied: "copied",
+  loadError: "Couldn't load this file",
+  closePane: "Close pane",
+  closeSheet: "Close",
+  filesLabel: "Files",
+  resizeLabel: "Resize pane",
+  resizeHint: "Drag to resize · double-click to reset",
+  copyLabel: "Copy permalink",
+  copiedLabel: "Link copied",
+  rangeLabel: "{path}, lines {start} to {end}",
+  lineLabel: "{path}, line {line}",
 };
 
 /**
