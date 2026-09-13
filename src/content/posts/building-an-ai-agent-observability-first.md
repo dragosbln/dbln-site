@@ -5,7 +5,7 @@ tags: ["ai", "agents", "observability", "architecture"]
 excerpt: "Observability is the bedrock of reliability, so I designed and implemented the full tracing layer for an AI agent before writing a single line of the agent loop. Three benefits, two drawbacks, and the span tree that turned out to be the loop's control flow."
 cover: "/blog/covers/building-an-ai-agent-observability-first.svg"
 coverAlt: "An in-process trace sits at the centre, its rows reading turn, model call and tool. A solid teal arrow points left to evals, labelled machines and source. A dashed arrow crosses a red boundary line to the right, reaching Langfuse, labelled humans and sink. Below, an empty dashed box marked agent loop, annotated as not implemented and deliberately left for phase 2."
-# TODO(dragos): add the dev.to URL of this article's cross-post (devto: "…")
+devto: "https://dev.to/dragosbln/putting-the-trace-before-the-loop-5hcp"
 ---
 
 _An observability-first approach for building an AI agent, and what it bought me._

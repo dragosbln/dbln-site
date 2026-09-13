@@ -1,4 +1,5 @@
 import Link from "next/link";
+import HashLink from "@/components/HashLink";
 import Logo from "@/components/Logo";
 import { nav, site } from "@/content/site";
 import styles from "./Header.module.css";
@@ -16,13 +17,13 @@ export default function Header() {
         </Link>
         <nav className={styles.nav} aria-label="Main">
           {nav.links.map((link) => (
-            <Link key={link.href} className={styles.link} href={link.href}>
+            <HashLink key={link.href} className={styles.link} href={link.href}>
               {link.label}
-            </Link>
+            </HashLink>
           ))}
-          <Link className={styles.cta} href={nav.cta.href}>
+          <HashLink className={styles.cta} href={nav.cta.href}>
             {nav.cta.label}
-          </Link>
+          </HashLink>
         </nav>
       </div>
     </header>
