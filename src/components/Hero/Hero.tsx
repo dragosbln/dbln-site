@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { Fragment } from "react";
 import ArrowIcon from "@/components/ArrowIcon";
+import HashLink from "@/components/HashLink";
 import { hero } from "@/content/site";
 import { richText } from "@/lib/richText";
 import styles from "./Hero.module.css";
@@ -32,12 +32,18 @@ export default function Hero() {
             <h1 className={styles.title}>{richText(hero.title)}</h1>
             <p className={styles.lede}>{hero.lede}</p>
             <div className={styles.actions}>
-              <Link className={styles.primary} href={hero.actions.primary.href}>
+              <HashLink
+                className={styles.primary}
+                href={hero.actions.primary.href}
+              >
                 {hero.actions.primary.label} <ArrowIcon />
-              </Link>
-              <Link className={styles.ghost} href={hero.actions.secondary.href}>
+              </HashLink>
+              <HashLink
+                className={styles.ghost}
+                href={hero.actions.secondary.href}
+              >
                 {hero.actions.secondary.label} <ArrowIcon size={13} />
-              </Link>
+              </HashLink>
             </div>
           </div>
           <dl className={styles.meta}>

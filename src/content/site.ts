@@ -50,7 +50,10 @@ export const socialLinks: NavItem[] = [
   { label: "x", href: site.socials.x },
 ];
 
-/** Hrefs are "/#…" (not "#…") so they work from future non-home pages too. */
+/**
+ * Hrefs are "/#…" (not "#…") so they work from non-home pages too. Render
+ * them with `HashLink`, which relativizes them on the page they target.
+ */
 export const nav: { links: NavItem[]; cta: NavItem } = {
   links: [
     { label: "The review", href: "/#review" },

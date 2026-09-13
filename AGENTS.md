@@ -42,6 +42,21 @@ it updates rather than remounts). Give each branch a distinct `key` (see
 Symptom to recognize: one Reveal lacks `in` while its siblings — whose
 className props didn't change — still have it.
 
+## In-page links: render `/#section` hrefs with `HashLink`
+
+Section hrefs in content stay `/#contact` (they must work from every page).
+Render them with `HashLink` (Header, Hero), never a bare `Link` or `<a>`.
+It relativizes the href to `#contact` on the page it targets and falls back
+to `Link` elsewhere. Why: Next's router only performs a hash jump when the
+target's query string equals the current one, so a `Link` to `/#contact`
+on `/?fbclid=…` (Facebook, LinkedIn, any utm link) updates the URL and
+never scrolls: the button looks dead. A native `<a href="#…">` is not the
+fix either: its history entry carries no router state, so Back from a later
+client-side navigation shows the wrong page under the right URL (CaseNav's
+chips have this today). `HashLink` also handles the click while the URL
+already has the hash, which the router treats as a same-URL navigation and
+doesn't scroll.
+
 ## Adding a section to a page
 
 1. Add the copy to `src/content/site.ts`, typed with a shape from
