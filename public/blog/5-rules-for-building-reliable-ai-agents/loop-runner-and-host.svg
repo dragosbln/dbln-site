@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" role="img" aria-label="The seam between a host and the loop runner. On the left, the HTTP host sits next to the handler and guarantees the loop's preconditions: it holds the conversation lock, reads the environment into the runner config, initializes the dependencies and wraps the outcome in the response envelope. On the right, in teal, the loop runner holds the invariants: it calls the model, runs the tools and returns an outcome. The host calls runTurn with the customer message and gets an outcome back. Below the HTTP host, an eval host is drawn in dashed outline, not built yet: it would seed the dependencies and pick its own config to create one world per case, and call the very same runTurn. Teal dashes stream along whichever host's edges are live: into the runner on the runTurn edge, back to the host on the outcome edge. The figure previews that future: the eval host and its edges draw in solid and the stream moves to them, taking the runner's seat, while the HTTP host's edges fade to dashed remnants; then the figure returns to rest. The loop runner never changes; the host is what changes.">
+  <title>Loop runner and host</title>
+  <desc>The host guarantees the preconditions (lock, config, dependencies, envelope); the loop runner holds the invariants (model, tools, outcome). A staged crossfade previews an eval host, not built yet, taking the same runner's seat.</desc>
+  <defs>
+    <marker id="lr-ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 L8 4 L0 8 Z" fill="#8a8c8f"/>
+    </marker>
+  </defs>
+
+  <text class="dg-band" x="20" y="26">host · guarantees the preconditions</text>
+  <text class="dg-band live" x="700" y="26" text-anchor="end">loop runner · holds the invariants</text>
+
+  <!-- the seam -->
+  <path id="seam" d="M370 44 V 88 M370 106 V 140 M370 160 V 232 M370 250 V 284 M370 302 V 320" fill="none" stroke="#d9d5cb" stroke-width="1"/>
+
+  <!-- HTTP host (the host that exists) -->
+  <g class="dg-node" id="n1">
+    <rect x="20" y="60" width="280" height="116" rx="8"/>
+    <text class="t" x="160" y="84">HTTP host</text>
+    <text class="s" x="160" y="100">next to the handler</text>
+  </g>
+  <g class="dg-chip plain" id="h1">
+    <rect x="34" y="110" width="120" height="22" rx="11"/>
+    <text x="94" y="125" text-anchor="middle">conversation lock</text>
+  </g>
+  <g class="dg-chip plain" id="h2">
+    <rect x="162" y="110" width="96" height="22" rx="11"/>
+    <text x="210" y="125" text-anchor="middle">env → config</text>
+  </g>
+  <g class="dg-chip plain" id="h3">
+    <rect x="34" y="140" width="94" height="22" rx="11"/>
+    <text x="81" y="155" text-anchor="middle">dependencies</text>
+  </g>
+  <g class="dg-chip plain" id="h4">
+    <rect x="136" y="140" width="122" height="22" rx="11"/>
+    <text x="197" y="155" text-anchor="middle">response envelope</text>
+  </g>
+
+  <!-- HTTP host ↔ runner: dashed remnants (static), solid edges recede during the preview -->
+  <path class="dg-edge legacy" id="r1" d="M300 108 H 434" marker-end="url(#lr-ah)"/>
+  <path class="dg-edge legacy" id="r2" d="M440 136 H 306" marker-end="url(#lr-ah)"/>
+  <g class="dg-recede staged">
+    <path class="dg-edge" id="e1" d="M300 108 H 434" marker-end="url(#lr-ah)"/>
+    <path class="dg-edge" id="e2" d="M440 136 H 306" marker-end="url(#lr-ah)"/>
+    <path class="dg-flow run" d="M300 108 H 434"/>
+    <path class="dg-flow run" d="M440 136 H 306"/>
+  </g>
+  <text class="dg-note" x="370" y="100" text-anchor="middle">runTurn(message)</text>
+  <text class="dg-note" x="370" y="152" text-anchor="middle">outcome</text>
+
+  <!-- Eval host: dashed at rest (not built yet) -->
+  <g class="dg-node legacy" id="n3">
+    <rect x="20" y="204" width="280" height="116" rx="8"/>
+    <text class="t" x="160" y="228">Eval host</text>
+    <text class="s" x="160" y="244">a new host</text>
+  </g>
+  <g class="dg-chip plain" id="v1">
+    <rect x="34" y="254" width="132" height="22" rx="11"/>
+    <text x="100" y="269" text-anchor="middle">seeded dependencies</text>
+  </g>
+  <g class="dg-chip plain" id="v2">
+    <rect x="174" y="254" width="100" height="22" rx="11"/>
+    <text x="224" y="269" text-anchor="middle">its own config</text>
+  </g>
+  <g class="dg-chip plain" id="v3">
+    <rect x="34" y="284" width="126" height="22" rx="11"/>
+    <text x="97" y="299" text-anchor="middle">one world per case</text>
+  </g>
+  <path class="dg-edge legacy" id="e3" d="M300 252 H 434" marker-end="url(#lr-ah)"/>
+  <path class="dg-edge legacy" id="e4" d="M440 280 H 306" marker-end="url(#lr-ah)"/>
+  <text class="dg-note" x="370" y="244" text-anchor="middle">runTurn(message)</text>
+  <text class="dg-note" x="370" y="296" text-anchor="middle">outcome</text>
+
+  <!-- the preview: the eval host takes the runner's seat -->
+  <g class="dg-appear staged" id="n3p">
+    <g class="dg-node">
+      <rect x="20" y="204" width="280" height="116" rx="8"/>
+      <text class="t" x="160" y="228">Eval host</text>
+      <text class="s" x="160" y="244">a new host</text>
+    </g>
+    <g class="dg-chip plain">
+      <rect x="34" y="254" width="132" height="22" rx="11"/>
+      <text x="100" y="269" text-anchor="middle">seeded dependencies</text>
+    </g>
+    <g class="dg-chip plain">
+      <rect x="174" y="254" width="100" height="22" rx="11"/>
+      <text x="224" y="269" text-anchor="middle">its own config</text>
+    </g>
+    <g class="dg-chip plain">
+      <rect x="34" y="284" width="126" height="22" rx="11"/>
+      <text x="97" y="299" text-anchor="middle">one world per case</text>
+    </g>
+    <path class="dg-edge" d="M300 252 H 434" marker-end="url(#lr-ah)"/>
+    <path class="dg-edge" d="M440 280 H 306" marker-end="url(#lr-ah)"/>
+    <path class="dg-flow run" d="M300 252 H 434"/>
+    <path class="dg-flow run" d="M440 280 H 306"/>
+  </g>
+
+  <!-- what the eval host is, at rest and in the preview -->
+  <g class="dg-recede staged">
+    <text class="dg-note" x="160" y="340" text-anchor="middle">not built yet</text>
+  </g>
+  <g class="dg-appear staged">
+    <text class="dg-note" x="370" y="340" text-anchor="middle">drives the runner</text>
+  </g>
+
+  <!-- Loop runner (the one thing that never changes) -->
+  <g class="dg-node key" id="n2">
+    <rect x="440" y="60" width="260" height="260" rx="8"/>
+    <text class="t" x="570" y="140">Loop runner</text>
+    <text class="s" x="570" y="156">runTurn</text>
+  </g>
+  <g class="dg-cell" id="c1">
+    <rect x="456" y="168" width="228" height="24" rx="6"/>
+    <text x="570" y="184" text-anchor="middle">calls the model</text>
+  </g>
+  <g class="dg-cell" id="c2">
+    <rect x="456" y="198" width="228" height="24" rx="6"/>
+    <text x="570" y="214" text-anchor="middle">runs the tools</text>
+  </g>
+  <g class="dg-cell" id="c3">
+    <rect x="456" y="228" width="228" height="24" rx="6"/>
+    <text x="570" y="244" text-anchor="middle">returns an outcome</text>
+  </g>
+
+  <text class="dg-note" x="360" y="376" text-anchor="middle">the runner never changes; the host is what changes</text>
+</svg>
