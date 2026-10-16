@@ -91,7 +91,8 @@ doesn't scroll.
 ## Publishing an article
 
 Articles are markdown files in `src/content/posts/<slug>.md` with frontmatter
-(`title`, `date`, `tags`, `excerpt`, `cover`, `coverAlt`, optional `devto`).
+(`title`, `date`, `tags`, `excerpt`, `cover`, `coverAlt`, optional
+`syndication`).
 Everything downstream is automatic — the pages, the landing Writing cards,
 `sitemap.ts`, `llms.txt`, `/feed.xml`, and the raw-markdown twin at
 `/blog/<slug>.md` (copied to `public/blog/` by `scripts/export-post-markdown.mjs`
@@ -127,6 +128,14 @@ To publish:
    range (`retry.ts#L50-L53`, `classify.ts`). Prefer a commit sha as `<ref>`
    so the cited lines never drift; the pane shows the short sha. The link
    still works as a plain link (and always on modifier/middle click).
+7. Cross-posts (dev.to, a Medium publication…): once a copy is public AND
+   its own canonical points back here, add its URL to the frontmatter list
+   `syndication`. It feeds the article's JSON-LD `sameAs` and nothing else:
+   copies are deliberately not linked on the page, so readers stay where the
+   likes and comments live. Verify the copy's canonical first (a post still
+   in a moderation queue, or behind a login, serves crawlers no canonical);
+   Medium publications move the story to their own domain on acceptance, so
+   list the publication URL. The old single `devto` field fails the build.
 
 ## Contact booking (Cal.com)
 

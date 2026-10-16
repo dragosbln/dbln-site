@@ -5,7 +5,9 @@ tags: ["ai", "agents", "reliability", "architecture"]
 excerpt: "Five ground rules for building an AI agent loop with reliability at its core, learned building Kept: lay down the state machine before the code, separate the loop runner from the host, turn errors into outcomes, keep the history atomic, and assert every transition three ways."
 cover: "/blog/covers/5-rules-for-building-reliable-ai-agents.svg"
 coverAlt: "A host box labelled HTTP and eval, stamped one turn at a time, wraps a dark agent loop block that takes message and history and returns outcome and history. A customerInput message enters from the left. Three outcome pills exit on the right: replied in teal, failed in red, conversation_full dashed. Below the loop sit a history store and a trace. The caption reads: the loop assumes; the host guarantees."
-# TODO(dragos): add the dev.to URL of this article's cross-post (devto: "…")
+syndication:
+  - "https://dev.to/dragosbln/reliability-at-the-core-five-ground-rules-for-building-an-agent-loop-1fld"
+  - "https://pub.towardsai.net/reliability-at-the-core-five-ground-rules-for-building-an-agent-loop-d99df50f9dbf"
 ---
 
 A couple of months ago I started developing Kept, an open-source post-order support agent for e-commerce stores, that can perform sensitive actions (refunds, returns). Because of those sensitive actions, **reliability** has to be a core part of Kept. So, beyond getting it ready for production, Kept is my excuse for investing time and effort into researching what it means for an agent to have _reliability at its core_.

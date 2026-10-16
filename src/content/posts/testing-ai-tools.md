@@ -5,7 +5,8 @@ tags: ["ai", "agents", "testing"]
 excerpt: "My first AI tool worked, or at least the output looked right when I ran it. Then I pictured a client asking what makes it trustworthy: did it check, or did it guess? This is how I built a real answer, and how designing the output for testing made the tool harder to lie with."
 cover: "/blog/covers/testing-ai-tools.svg"
 coverAlt: "An AI tool writes audit.json, and two markdown reports derive from that json. The json enters a panel of mechanical tests, free and about two seconds: shape passes, invariants fails in red, expectations and agreement still pending. A teal thread carries on to the paid live run, three dollars and eight minutes, which ends in a check mark."
-# TODO(dragos): add the dev.to URL of this article's cross-post (devto: "…")
+syndication:
+  - "https://dev.to/dragosbln/did-it-check-or-did-it-guess-testing-a-tool-whose-output-is-written-by-an-llm-1i4c"
 ---
 
 My first AI tool was ready, and in typical AI-era fashion, I rushed to publish it. After all, it worked. Or at least when I ran it, the output looked right to me.

@@ -48,8 +48,13 @@ for (const file of files) {
     for (const t of data.tags ?? []) {
       assert.equal(typeof t, "string", `each tag must be a string`);
     }
-    if (data.devto !== undefined) {
-      assert.equal(typeof data.devto, "string", `"devto" must be a string`);
+    assert.equal(data.devto, undefined, `"devto" was renamed: list cross-posts under "syndication"`);
+    if (data.syndication !== undefined) {
+      assert.ok(Array.isArray(data.syndication), `"syndication" must be a list of URLs`);
+      for (const url of data.syndication) {
+        assert.match(String(url), /^https:\/\/[^/]+\//, `syndication entry must be an absolute https URL: ${url}`);
+      }
+      assert.equal(new Set(data.syndication).size, data.syndication.length, `"syndication" lists a URL twice`);
     }
   });
 
