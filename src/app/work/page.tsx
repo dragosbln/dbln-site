@@ -7,6 +7,7 @@ import PageHero from "@/components/PageHero";
 import { site } from "@/content/site";
 import { caseStudies, workCta, workHero } from "@/content/work";
 import { workBreadcrumbSchema } from "@/lib/schema";
+import { siteOgImage } from "@/lib/urls";
 
 export const metadata: Metadata = {
   title: "Work",
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
     url: "/work",
     siteName: site.name,
     locale: "en_US",
+    images: [siteOgImage],
     title: "Work",
     description: workHero.metaDescription,
   },

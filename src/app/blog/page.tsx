@@ -6,6 +6,7 @@ import { blogHero } from "@/content/blog";
 import { site } from "@/content/site";
 import { getPosts } from "@/lib/posts";
 import { blogBreadcrumbSchema } from "@/lib/schema";
+import { siteOgImage } from "@/lib/urls";
 
 export const metadata: Metadata = {
   title: "Writing",
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
     url: "/blog",
     siteName: site.name,
     locale: "en_US",
+    images: [siteOgImage],
     title: "Writing",
     description: blogHero.metaDescription,
   },

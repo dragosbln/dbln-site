@@ -5,6 +5,7 @@ import PrivacyNotice from "@/components/PrivacyNotice";
 import { privacy } from "@/content/privacy";
 import { site } from "@/content/site";
 import { privacyBreadcrumbSchema } from "@/lib/schema";
+import { siteOgImage } from "@/lib/urls";
 
 export const metadata: Metadata = {
   title: "Privacy Notice",
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
     url: "/privacy",
     siteName: site.name,
     locale: "en_US",
+    images: [siteOgImage],
     title: "Privacy Notice",
     description: privacy.hero.metaDescription,
   },
