@@ -76,10 +76,15 @@ export const api = onRequest(
         // Same allowlist drives the "author" comment badge.
         adminUids: adminList,
         // Any signed-in Firebase user (no allowlist) may comment as
-        // themselves. checkRevoked so a revoked session stops posting.
+        // themselves. Signature + expiry check only (local, after the
+        // public certs are cached): checkRevoked was a network round-trip
+        // to Firebase Auth on every signed-in post, delete and claim — one
+        // more thing that could be slow or fail — and sessions here are
+        // in-memory and die with the tab anyway. The admin verifier keeps
+        // it: the purge route is irreversible.
         verifyVisitor: async (token) => {
           try {
-            const decoded = await getAuth().verifyIdToken(token, true);
+            const decoded = await getAuth().verifyIdToken(token);
             return decoded.uid;
           } catch {
             return null;

@@ -178,7 +178,7 @@ test("token gate: young, old, tampered, missing", async () => {
 
 test("cooldown: second immediate post from the same subject is 429", async () => {
   const base = await start(
-    createApp(new MemoryStore(), { tokenKey: KEY }), // real 30s cooldown
+    createApp(new MemoryStore(), { tokenKey: KEY }), // real (2s) cooldown
   );
   const first = await postComment(base, { name: "A", body: "one" });
   assert.equal(first.status, 200);

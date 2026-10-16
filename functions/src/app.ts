@@ -127,9 +127,12 @@ export function createApp(store: SocialStore, opts: AppOptions = {}) {
     opts.limits?.commentsGlobal ?? 120,
     windowMs,
   );
+  // Per-subject cooldown: double-submit protection only. It was 30s, which
+  // mostly hit the author answering several comments in a row; volume is
+  // bounded by the per-subject window above.
   const commentCooldown = new SlidingWindow(
     1,
-    opts.limits?.commentCooldownMs ?? 30_000,
+    opts.limits?.commentCooldownMs ?? 2_000,
   );
 
   // Author badge: subject `u_<uid>` whose uid is on the admin allowlist.

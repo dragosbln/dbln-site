@@ -142,7 +142,7 @@ test("a post-deploy article gets a working Discussion and like button", async ()
   assert.equal(res.status, 200);
   assert.equal(typeof (await res.json()).token, "string");
 
-  // A ripe token, as the existing comment tests mint it.
+  // A ripe token, as the comment tests mint it.
   const token = mintToken("k", Date.now() - TOKEN_MIN_AGE_MS - 500);
   const post = await fetch(`${base}/api/comments`, {
     method: "POST",
