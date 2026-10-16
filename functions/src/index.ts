@@ -8,8 +8,16 @@ import { firebaseAdminVerifier } from "./admin";
 import { createApp } from "./app";
 import { FirestoreStore } from "./firestoreStore";
 import { gmailMailer } from "./notify";
+import { slugCatalog } from "./slugCatalog";
 
 initializeApp();
+
+/**
+ * Articles published after this deploy are learned from the live sitemap
+ * (hosting ships on every push; this backend only on a manual deploy).
+ * One instance-wide catalog, so the learned slugs outlive the lazy app.
+ */
+const slugExists = slugCatalog({ sitemapUrl: "https://dbln.me/sitemap.xml" });
 
 /**
  * Secrets (set once with `firebase functions:secrets:set <NAME>`):
@@ -19,8 +27,11 @@ initializeApp();
  *   that sends comment notifications (kept out of the repo on purpose).
  *   The notification is delivered to GMAIL_USER itself, so that address
  *   is the inbox that receives them.
- * - ADMIN_UIDS: comma-separated Firebase Auth uids allowed into /admin.
- *   Empty/missing = the admin API admits no one (fails closed).
+ * - ADMIN_UIDS: comma-separated Firebase Auth uids allowed into /admin,
+ *   and the uids whose comments carry the "Author" badge. Each sign-in
+ *   provider is its own Firebase account here (Google and GitHub logins of
+ *   the same person have different uids), so list every one the author
+ *   uses. Empty/missing = the admin API admits no one (fails closed).
  * Deploys fail until all four exist.
  */
 const tokenKey = defineSecret("SOCIAL_TOKEN_KEY");
@@ -58,6 +69,7 @@ export const api = onRequest(
       const adminList = adminUids.value().split(",");
       app = createApp(store, {
         enforceHost: true,
+        slugExists,
         tokenKey: tokenKey.value(),
         mailer: gmailMailer(gmailUser.value(), gmailPass.value()),
         verifyAdmin: firebaseAdminVerifier(adminList),

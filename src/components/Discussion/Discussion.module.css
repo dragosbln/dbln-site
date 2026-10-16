@@ -200,6 +200,17 @@
   overflow-wrap: anywhere;
 }
 
+/* Links in comment bodies: same treatment as article prose links. */
+.body a {
+  color: var(--teal-deep);
+  border-bottom: 1px solid color-mix(in srgb, var(--teal) 40%, transparent);
+  transition: border-color 0.2s;
+}
+
+.body a:hover {
+  border-color: var(--teal);
+}
+
 .removedNote {
   font-family: var(--mono);
   font-size: 12.5px;

@@ -298,8 +298,12 @@ Comments (instant post, no review queue — Dragos's call): POST
   proof-of-page-visit token from GET /api/comments (functions/src/token.ts,
   ripens after 5s, dies after 2h — stateless, any instance verifies),
   30s per-subject cooldown, per-subject/per-client/global comment windows,
-  name ≤ 60 / body ≤ 1200 / ≤ 3 links, control chars stripped (newlines
-  kept), nested replies to depth 4 with the parent required to be visible
+  name ≤ 60 / body ≤ 1200 / ≤ 3 links (counted as "http(s)://"), control
+  chars stripped (newlines kept). Bodies are stored as typed; at render,
+  `[words](https://…)` and bare http(s) URLs become links
+  (`src/lib/commentLinks.ts`, no HTML ever injected, nothing but absolute
+  http(s) hrefs; outbound links open a new tab as `ugc nofollow`). Nested
+  replies to depth 4 with the parent required to be visible
   on the same slug, 1000-comment thread cap. GET /api/comments is
   no-store (it carries the token and must read back instantly after a
   post); only the counts endpoint is CDN-cached.
@@ -379,7 +383,10 @@ of anonymous comments.
   from `subject ∈ ADMIN_UIDS` (`isAuthor` in app.ts, fed by the same
   `adminUids` list as the admin allowlist) — never client-set, so it can't
   be forged, and changing the list reflows past comments. It is in the
-  public payload. The "Signed in" badge is deliberately NOT a checkmark
+  public payload. Each sign-in provider is a separate Firebase account in
+  this project (Dragos's Google and GitHub logins have different uids), so
+  ADMIN_UIDS must list every uid he signs in with, or comments posted
+  through the missing one show "Signed in" instead of "Author". The "Signed in" badge is deliberately NOT a checkmark
   and does NOT assert identity (the name is self-chosen even when signed
   in); only the UID-gated `author` badge is a real identity claim, which
   is what makes author-impersonation impossible. Don't relabel "Signed in"
@@ -431,8 +438,17 @@ raced by React's state flush.
 
 Slug allowlist: `functions/src/slugs.ts` is generated from
 `src/content/posts/*.md` by `functions/scripts/gen-slugs.mjs` (prebuild
-hook, output gitignored). Publishing an article picks it up on the next
-deploy; likes for unknown slugs are 400s.
+hook, output gitignored) and baked in at backend deploy. Articles published
+after that deploy are learned at runtime from the live
+`https://dbln.me/sitemap.xml` (`functions/src/slugCatalog.ts`), so a
+hosting-only publish gets working likes and comments without a backend
+deploy. Before this, a new article's Discussion was silently dead (GET
+/api/comments → `unknown_slug`, no token, disabled Post button). Bounds:
+known slugs never fetch, malformed slugs never fetch, misses fetch the
+sitemap at most once per 30s per instance, and a failed fetch fails closed.
+Slugs absent from the sitemap stay 400s. Keep the sitemap listing every
+article at `https://dbln.me/blog/<slug>`, or new posts lose their
+Discussion.
 
 Local dev: the Firestore emulator needs Java, which the dev machine lacks.
 Unit tests and the browser run against `MemoryStore` (same semantics as

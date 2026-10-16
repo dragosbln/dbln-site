@@ -8,7 +8,8 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
-import { discussion as copy } from "@/content/site";
+import { discussion as copy, site } from "@/content/site";
+import { parseCommentLinks } from "@/lib/commentLinks";
 import {
   firebaseSignOut,
   signInVisitor,
@@ -55,6 +56,35 @@ const initials = (name: string) =>
     .toUpperCase() || "?";
 
 const firstName = (name: string) => name.trim().split(/\s+/)[0] || name;
+
+const SITE_HOST = new URL(site.url).host;
+
+/**
+ * A comment body with its links made clickable (src/lib/commentLinks).
+ * Links into this site stay in the tab; links out open a new one and are
+ * marked user-generated (ugc nofollow), as any visitor can post them.
+ */
+function CommentBody({ text }: { text: string }) {
+  return parseCommentLinks(text).map((part, i) => {
+    if (part.type === "text") return part.value;
+    const host = new URL(part.href).host;
+    const internal = host === SITE_HOST || host === `www.${SITE_HOST}`;
+    return internal ? (
+      <a key={i} href={part.href}>
+        {part.text}
+      </a>
+    ) : (
+      <a
+        key={i}
+        href={part.href}
+        target="_blank"
+        rel="ugc nofollow noopener noreferrer"
+      >
+        {part.text}
+      </a>
+    );
+  });
+}
 
 function timeAgo(iso: string, now: number): string {
   const s = Math.floor((now - Date.parse(iso)) / 1000);
@@ -469,7 +499,9 @@ export default function Discussion({ slug }: DiscussionProps) {
                   {timeAgo(c.at, now)}
                 </span>
               </div>
-              <p className={styles.body}>{c.body}</p>
+              <p className={styles.body}>
+                <CommentBody text={c.body} />
+              </p>
             </>
           )}
           {!c.removed && (c.depth < REPLY_DEPTH_MAX || isMine(c.id)) ? (

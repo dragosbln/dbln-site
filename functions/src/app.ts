@@ -6,7 +6,7 @@ import express, {
 import { bearer, type AdminVerifier } from "./admin";
 import type { Mailer } from "./notify";
 import { SlidingWindow } from "./ratelimit";
-import { SLUGS } from "./slugs";
+import { slugCatalog, type SlugExists } from "./slugCatalog";
 import { mintToken, verifyToken } from "./token";
 import type { CommentStatus, LikeAction, SocialStore } from "./store";
 
@@ -17,8 +17,6 @@ import type { CommentStatus, LikeAction, SocialStore } from "./store";
  * visitor's browser talks to dbln.me only. No CORS headers on purpose —
  * other origins get nothing readable.
  */
-
-const SLUG_SET = new Set(SLUGS);
 
 /** `d_` + uuid v4: the anonymous per-browser id minted by the client. */
 const SUBJECT_RE =
@@ -89,6 +87,12 @@ export type AppOptions = {
    * admin API allowlists.
    */
   adminUids?: string[];
+  /**
+   * Which article slugs exist. Prod passes a catalog that also reads the
+   * live sitemap (articles published after this deploy); the default is
+   * the deploy-time list only.
+   */
+  slugExists?: SlugExists;
   /** Rate-limit knobs, lowered by tests. */
   limits?: {
     perSubject?: number;
@@ -135,6 +139,8 @@ export function createApp(store: SocialStore, opts: AppOptions = {}) {
   const isAuthor = (subject: string) =>
     subject.startsWith("u_") && authorSet.has(subject.slice(2));
 
+  const slugExists = opts.slugExists ?? slugCatalog();
+
   const app = express();
   app.disable("x-powered-by");
   app.use(express.json({ limit: "8kb" }));
@@ -177,7 +183,7 @@ export function createApp(store: SocialStore, opts: AppOptions = {}) {
         res.status(400).json({ error: "bad_request" });
         return;
       }
-      if (!SLUG_SET.has(slug)) {
+      if (!(await slugExists(slug))) {
         res.status(400).json({ error: "unknown_slug" });
         return;
       }
@@ -204,7 +210,7 @@ export function createApp(store: SocialStore, opts: AppOptions = {}) {
   app.get("/api/comments", async (req, res, next) => {
     try {
       const slug = req.query.slug;
-      if (typeof slug !== "string" || !SLUG_SET.has(slug)) {
+      if (typeof slug !== "string" || !(await slugExists(slug))) {
         res.status(400).json({ error: "unknown_slug" });
         return;
       }
@@ -231,7 +237,7 @@ export function createApp(store: SocialStore, opts: AppOptions = {}) {
         res.status(400).json({ error: "bad_request" });
         return;
       }
-      if (!SLUG_SET.has(slug)) {
+      if (!(await slugExists(slug))) {
         res.status(400).json({ error: "unknown_slug" });
         return;
       }
