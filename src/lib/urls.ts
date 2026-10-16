@@ -24,3 +24,17 @@ export function postUrl(slug: string): string {
 export function coverOgImage(cover: string): string {
   return cover.replace(/\.svg$/, ".png");
 }
+
+/**
+ * The site-wide social image: the home page and every page without a cover
+ * of its own (/blog, /work, /privacy). PNG twin of covers/site.svg (edit the
+ * SVG, then `node scripts/render-cover-png.mts site`). Pages that export
+ * their own `openGraph` replace the layout's wholesale, so they must list
+ * this themselves or they ship no image at all — X then shows no card.
+ */
+export const siteOgImage = {
+  url: "/blog/covers/site.png",
+  width: 1200,
+  height: 630,
+  alt: `${site.name} — Independent AI Reliability Reviews`,
+};

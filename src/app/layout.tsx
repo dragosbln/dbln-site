@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import JsonLd from "@/components/JsonLd";
 import { site } from "@/content/site";
+import { siteOgImage } from "@/lib/urls";
 import { personSchema, webSiteSchema } from "@/lib/schema";
 import "./globals.css";
 import "@/styles/diagram.css";
@@ -44,24 +45,20 @@ export const metadata: Metadata = {
     description: site.description,
     locale: "en_US",
     // Site-wide og:image (link scrapers show a generic stock photo without
-    // one). Lives with the blog covers to reuse their SVG→PNG pipeline:
-    // edit site.svg, then `node scripts/render-cover-png.mts site`.
-    // NOTE: pages that export their own `openGraph` (e.g. /work) replace
-    // this whole object and must re-declare `images` if they want one.
-    images: [
-      {
-        url: "/blog/covers/site.png",
-        width: 1200,
-        height: 630,
-        alt: `${site.name} — Independent AI Reliability Reviews`,
-      },
-    ],
+    // one). NOTE: pages that export their own `openGraph` (/blog, /work,
+    // /privacy) replace this whole object and must list siteOgImage too.
+    images: [siteOgImage],
   },
-  // Card type only: title/description here would shadow every page's own
+  // No title/description here: they would shadow every page's own
   // (twitter.* merges shallowly and X falls back to og:* anyway). Article
-  // pages override with summary_large_image + their cover PNG.
+  // pages override with their cover PNG. The card type must be
+  // summary_large_image: X builds no card at all for `summary` pages
+  // (verified in its composer, 2026-10-16 — the home page and /blog showed
+  // no preview while the articles did), and the image is a plain string so
+  // the output matches the article pages exactly.
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
+    images: [siteOgImage.url],
   },
   robots: {
     index: true,

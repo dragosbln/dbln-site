@@ -12,6 +12,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - **Content.** All copy, links, and identity data live in `src/content/site.ts`. Components render content; they don't contain it.
 - **Server-first.** Components are React Server Components by default. Add `"use client"` only at interactive leaves (e.g. scroll reveal), never on whole sections.
 - **SEO surfaces.** When adding a route, update `src/app/sitemap.ts` and the Pages list in `src/app/llms.txt/route.ts`, and give the page its own `metadata` export with a canonical. Keep JSON-LD in `src/lib/schema.ts` in sync with content changes.
+- **Social cards.** A page that exports its own `openGraph` replaces the layout's wholesale, so it must list `images: [siteOgImage]` (`src/lib/urls.ts`) or it ships no image. The card type is `summary_large_image` everywhere (layout; articles set it too): X builds no card at all for `summary` pages — verified in its composer on 2026-10-16, where the home page and /blog showed no preview while the articles did. Don't "simplify" the type back, and keep twitter images as plain URL strings (matching the article pages, which are known to render).
 - **Copy voice.** Outward-facing copy is written by Dragos's rules: short declarative sentences, no em-dash asides, no "not X but Y" constructions, no overexplaining. Never invent or rewrite copy on your own — take it verbatim from `src/content/` or from the prototypes in `../claude_websie/`. Real testimonial quotes are verbatim, always.
 
 # Recipes
