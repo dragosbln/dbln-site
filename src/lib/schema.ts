@@ -115,7 +115,8 @@ export function techArticleSchema(post: Post) {
     author: { "@id": `${site.url}/#person` },
     publisher: { "@id": `${site.url}/#person` },
     isPartOf: { "@id": `${site.url}/#website` },
-    ...(post.devto ? { sameAs: [post.devto] } : {}),
+    // cross-posts that declare this page canonical: same work, other homes
+    ...(post.syndication.length > 0 ? { sameAs: post.syndication } : {}),
   };
 }
 

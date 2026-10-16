@@ -5,7 +5,8 @@ tags: ["architecture", "aws", "nextjs", "auth"]
 excerpt: "Evaluating the auth layer for a Partner Portal of 100+ microservices. Three textbook architectures each looked right on the whiteboard and fell apart on contact with the constraints — here's the one that survived."
 cover: "/blog/covers/securing-auth-large-scale-production-system.svg"
 coverAlt: "A mesh of service nodes with a highlighted auth boundary"
-devto: "https://dev.to/dragosbln/securing-auth-in-a-large-scale-production-system-three-industry-standard-architectures-and-why-279b"
+syndication:
+  - "https://dev.to/dragosbln/securing-auth-in-a-large-scale-production-system-three-industry-standard-architectures-and-why-279b"
 ---
 
 *A case study in why the verdict on an architecture decision can shift entirely once you dive into implementation details — using auth security on a large Next.js + AWS system as the vehicle. This article walks the three architectural paths we considered — plus a fourth option that, in this context, won.*

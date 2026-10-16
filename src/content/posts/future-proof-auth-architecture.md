@@ -5,7 +5,8 @@ tags: ["architecture", "security", "auth"]
 excerpt: "Vendor auth libraries quietly become load-bearing architecture nobody chose. Three practices that keep an auth system migratable — and why coding agents make the resilient version nearly free to build."
 cover: "/blog/covers/future-proof-auth-architecture.svg"
 coverAlt: "A radial control-wheel diagram with a locked teal ring"
-devto: "https://dev.to/dragosbln/keep-the-steering-wheel-3-ways-to-future-proof-your-auth-ee3"
+syndication:
+  - "https://dev.to/dragosbln/keep-the-steering-wheel-3-ways-to-future-proof-your-auth-ee3"
 ---
 
 *Your auth library's defaults quietly become your architecture. Here's how to stay in control while still renting the hard parts from people who specialize in them.*

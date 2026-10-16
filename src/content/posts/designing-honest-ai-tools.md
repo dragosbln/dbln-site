@@ -5,7 +5,7 @@ tags: ["ai", "agents", "auth"]
 excerpt: "The tool was built to detect what it can verify and refuse to guess at the rest. On its first real run it confidently got the basics wrong. The fix had little to do with the prompt and almost everything to do with the structure around it."
 cover: "/blog/covers/designing-honest-ai-tools.svg"
 coverAlt: "An audit report whose claims are tethered to lines of code; one teal tether pins a claim to its exact evidence, while one dashed claim ends in air with no anchor"
-# TODO(dragos): add the dev.to URL of this article's cross-post (devto: "…")
+# TODO(dragos): add the dev.to URL of this article's cross-post (syndication: ["…"])
 ---
 
 _How I rebuilt it so honesty and reliability were a structural constraint, not just a prompt request._

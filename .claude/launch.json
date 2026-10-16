@@ -18,6 +18,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "4174", "--directory", "/Users/dragosbilaniuc/Projects/dbln/dbln-site/out"],
       "port": 4174
+    },
+    {
+      "name": "social-harness",
+      "runtimeExecutable": "env",
+      "runtimeArgs": ["DBLN_ADMIN_UIDS=devgoogle,devgithub", "npm", "--prefix", "/Users/dragosbilaniuc/Projects/dbln/dbln-site/functions", "run", "serve"],
+      "port": 4610
     }
   ]
 }

@@ -90,8 +90,12 @@ export type Post = {
   coverAlt: string;
   /** ISO date of the last substantive revision, when one happened. */
   updated?: string;
-  /** URL of the dev.to cross-post, when one exists. */
-  devto?: string;
+  /**
+   * Public copies of this article on other platforms (dev.to, Medium
+   * publications…), each declaring this site as its canonical. Feeds the
+   * article's JSON-LD `sameAs` only; never rendered. Empty when none.
+   */
+  syndication: string[];
 };
 
 export type PostWithBody = Post & {

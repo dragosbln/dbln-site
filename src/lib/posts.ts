@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import { site } from "@/content/site";
 import type { Post, PostWithBody } from "@/content/types";
 
 /**
@@ -44,6 +45,42 @@ function requireString(
   return value;
 }
 
+/**
+ * Cross-posts become JSON-LD `sameAs`, a claim that each URL is this same
+ * work. Only absolute https copies elsewhere qualify; a URL on this site
+ * would point the article at itself. The old single `devto` field fails
+ * loudly instead of being silently ignored.
+ */
+function syndicationOf(data: Record<string, unknown>, filename: string): string[] {
+  if (data.devto !== undefined) {
+    throw new Error(
+      `posts: ${filename} frontmatter "devto" was renamed — list cross-post URLs under "syndication"`,
+    );
+  }
+  const list = data.syndication ?? [];
+  if (!Array.isArray(list) || list.some((u) => typeof u !== "string")) {
+    throw new Error(`posts: ${filename} frontmatter "syndication" must be a list of URLs`);
+  }
+  const siteHost = new URL(site.url).host;
+  for (const url of list as string[]) {
+    let parsed: URL;
+    try {
+      parsed = new URL(url);
+    } catch {
+      throw new Error(`posts: ${filename} "syndication" entry is not a URL: "${url}"`);
+    }
+    if (parsed.protocol !== "https:" || parsed.host === siteHost) {
+      throw new Error(
+        `posts: ${filename} "syndication" entries must be https copies on other sites, got "${url}"`,
+      );
+    }
+  }
+  if (new Set(list).size !== list.length) {
+    throw new Error(`posts: ${filename} "syndication" lists the same URL twice`);
+  }
+  return list as string[];
+}
+
 function parseFile(filename: string): { post: Post; body: string } {
   const raw = fs.readFileSync(path.join(POSTS_DIR, filename), "utf8");
   const { data, content } = matter(raw);
@@ -58,9 +95,7 @@ function parseFile(filename: string): { post: Post; body: string } {
   if (!Array.isArray(tags) || tags.some((t) => typeof t !== "string")) {
     throw new Error(`posts: ${filename} frontmatter "tags" must be a string array`);
   }
-  if (data.devto !== undefined && typeof data.devto !== "string") {
-    throw new Error(`posts: ${filename} frontmatter "devto" must be a string`);
-  }
+  const syndication = syndicationOf(data, filename);
   if (data.updated !== undefined) {
     if (typeof data.updated !== "string" || !DATE_RE.test(data.updated)) {
       throw new Error(
@@ -80,7 +115,7 @@ function parseFile(filename: string): { post: Post; body: string } {
       cover: requireString(data, "cover", filename),
       coverAlt: requireString(data, "coverAlt", filename),
       updated: data.updated,
-      devto: data.devto,
+      syndication,
     },
     body: content,
   };
