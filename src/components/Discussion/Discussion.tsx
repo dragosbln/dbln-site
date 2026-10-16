@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -39,7 +40,13 @@ type DiscussionProps = {
 
 /** Replies deeper than this hide the Reply action (mirrors the API cap). */
 const REPLY_DEPTH_MAX = 4;
-/** The post token can't be spent before this age (mirrors the API). */
+/** Thread fetch retries on load: retry n waits FETCH_BACKOFF_MS[n]. */
+const FETCH_BACKOFF_MS = [1_000, 3_000];
+/**
+ * The post token can't be spent before this age (mirrors the API). The
+ * button shows the wait as a progress fill (see armingClass) — Dragos kept
+ * the delay but wanted the wait visible, not a dead button.
+ */
 const TOKEN_MIN_AGE_MS = 5_000;
 
 /** Where a notice belongs: the main form, or one reply form by parent id. */
@@ -105,15 +112,24 @@ function timeAgo(iso: string, now: number): string {
 /**
  * The article Discussion section (design: blog-social article page).
  * Comments post instantly — no review queue — through the same-origin
- * /api. The thread is fetched only when the section nears the viewport;
- * the server hands a post token along with it, which ripens after a few
- * seconds (bot guard). Nested replies to the API's depth cap. Reply
- * drafts are kept per parent, so a slow submit can't eat text typed
- * into a different reply form meanwhile.
+ * /api. The thread, and the post token that comes with it, is fetched as
+ * soon as the page mounts (with retries), so both are there — and the API
+ * instance warm — by the time a reader scrolls down. The token ripens 5s
+ * after it arrives (bot guard); the Post button is disabled until then,
+ * but from the first typed character it shows the wait as a progress fill
+ * (determinate while a token ripens; a sliding bar while none has arrived
+ * yet, which also triggers a fetch), so the wait reads as loading, not as
+ * a dead button. A token the server refuses (a tab left open past its
+ * expiry, a key rotation) is refreshed, ripened and the post retried once.
+ * Nested replies to the API's depth cap. Reply drafts are kept per parent,
+ * so a slow submit can't eat text typed into a different reply form
+ * meanwhile.
  */
 export default function Discussion({ slug }: DiscussionProps) {
   const [thread, setThread] = useState<PublicComment[] | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  // When the token arrived, and whether it has ripened (TOKEN_MIN_AGE_MS).
+  const [tokenAt, setTokenAt] = useState(0);
   const [tokenReady, setTokenReady] = useState(false);
   const [body, setBody] = useState("");
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
@@ -130,11 +146,11 @@ export default function Discussion({ slug }: DiscussionProps) {
   const [remembered, setRemembered] = useState<Account | null>(null);
   const [signingIn, setSigningIn] = useState(false);
 
-  const rootRef = useRef<HTMLElement | null>(null);
   const nameRef = useRef<HTMLInputElement | null>(null);
   const replyNameRef = useRef<HTMLInputElement | null>(null);
-  const loadedRef = useRef(false);
   const getTokenRef = useRef<(() => Promise<string>) | null>(null);
+  // One thread fetch in flight at a time (mount, retries, on-demand).
+  const fetchingRef = useRef(false);
   // Synchronous double-submit guard: the button stays enabled while a
   // post is in flight (disabling the focused button would dump keyboard
   // focus onto <body>), so the guard must not wait for a state flush.
@@ -159,64 +175,87 @@ export default function Discussion({ slug }: DiscussionProps) {
     setRemembered(savedAccount());
   }, []);
 
-  // Lazy thread fetch on approach — IO plus the scroll fallback for
-  // throttled tabs (see AGENTS.md).
-  useEffect(() => {
-    const el = rootRef.current;
-    if (!el) return;
+  // A token just arrived: it ripens TOKEN_MIN_AGE_MS from now (the server
+  // counts from mint time, slightly earlier, so this is the safe side).
+  const armToken = useCallback((t: string) => {
+    setToken(t);
+    setTokenAt(Date.now());
+    setTokenReady(false);
+  }, []);
 
-    let io: IntersectionObserver | null = null;
-    const cleanup = () => {
-      io?.disconnect();
-      window.removeEventListener("scroll", onScroll);
-    };
-    const load = () => {
-      if (loadedRef.current) return;
-      loadedRef.current = true;
-      cleanup();
+  // Fetch the thread on mount, retrying a couple of times: the post token
+  // arrives with it, and the request warms the API instance (cold starts
+  // run 2–3s) before the reader reaches the form. A failure here is not
+  // fatal: typing into the form triggers another fetch (below).
+  useEffect(() => {
+    let cancelled = false;
+    let timer: number | undefined;
+    const attempt = (retry: number) => {
+      fetchingRef.current = true;
       fetchComments(slug)
         .then((payload) => {
+          if (cancelled) return;
           setThread(payload.comments);
-          setToken(payload.token);
-          setTokenReady(false);
+          armToken(payload.token);
           setNow(Date.now());
         })
         .catch((err) => {
           console.debug("[dbln social]", err);
-          // Leave thread null: the section renders nothing beyond the
-          // form, and posting without a token is disabled.
+          const wait = FETCH_BACKOFF_MS[retry];
+          if (!cancelled && wait !== undefined) {
+            timer = window.setTimeout(() => attempt(retry + 1), wait);
+          }
+        })
+        .finally(() => {
+          fetchingRef.current = false;
         });
     };
-    const near = () =>
-      el.getBoundingClientRect().top < window.innerHeight + 600;
-    const onScroll = () => {
-      if (near()) load();
+    attempt(0);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
     };
+  }, [slug, armToken]);
 
-    if (near()) {
-      load();
-      return;
-    }
-    io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) load();
-      },
-      { rootMargin: "600px 0px" },
-    );
-    io.observe(el);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return cleanup;
-  }, [slug]);
-
-  // The token ripens TOKEN_MIN_AGE_MS after it arrives; flip the flag
-  // exactly then so the post button enables without a reload. The flag
-  // is reset to false wherever a fresh token lands (async contexts), so
-  // this effect only ever schedules the flip.
+  // The token ripens TOKEN_MIN_AGE_MS after it arrives; flip the flag then,
+  // so the button enables without a reload. armToken resets the flag
+  // wherever a fresh token lands, so this effect only schedules the flip.
   useEffect(() => {
     if (!token || tokenReady) return;
-    const timer = window.setTimeout(() => setTokenReady(true), TOKEN_MIN_AGE_MS);
+    const remaining = Math.max(0, tokenAt + TOKEN_MIN_AGE_MS - Date.now());
+    const timer = window.setTimeout(() => setTokenReady(true), remaining);
     return () => window.clearTimeout(timer);
-  }, [token, tokenReady]);
+  }, [token, tokenAt, tokenReady]);
+
+  // Typing with no token yet (the mount fetch failed, or is still out):
+  // fetch again, so the wait the visitor sees is one with an end.
+  const typing =
+    body.trim() !== "" ||
+    Object.values(replyDrafts).some((draft) => draft.trim() !== "");
+  useEffect(() => {
+    if (!typing || token || fetchingRef.current) return;
+    fetchingRef.current = true;
+    fetchComments(slug)
+      .then((payload) => {
+        setThread(payload.comments);
+        armToken(payload.token);
+      })
+      .catch((err) => console.debug("[dbln social]", err))
+      .finally(() => {
+        fetchingRef.current = false;
+      });
+  }, [typing, token, slug, armToken]);
+
+  // Button state while the token ripens: `arming` (determinate fill, timed
+  // by CSS from the moment the class lands — i.e. token arrival — so it is
+  // truthful about the time left), `waiting` (no token yet, sliding bar);
+  // `typing` reveals the fill. Ready → none.
+  const armingClass = (text: string) =>
+    tokenReady
+      ? ""
+      : [token ? styles.arming : styles.waiting, text.trim() ? styles.typing : ""]
+          .filter(Boolean)
+          .join(" ");
 
   // Keep "x mins ago" labels honest while the tab stays open.
   useEffect(() => {
@@ -249,16 +288,13 @@ export default function Discussion({ slug }: DiscussionProps) {
 
   const total = (thread ?? []).filter((c) => !c.removed).length;
 
-  const refreshAfterTokenFailure = () => {
-    fetchComments(slug)
-      .then((payload) => {
-        setThread(payload.comments);
-        setToken(payload.token);
-        setTokenReady(false);
-      })
-      .catch(() => {
-        // Next submit shows the generic error again.
-      });
+  // A token straight from the server, refreshing the thread alongside:
+  // for a post whose token the server refused. It still has to ripen.
+  const freshToken = async (): Promise<string> => {
+    const payload = await fetchComments(slug);
+    setThread(payload.comments);
+    armToken(payload.token);
+    return payload.token;
   };
 
   const announcePosted = () => {
@@ -291,10 +327,10 @@ export default function Discussion({ slug }: DiscussionProps) {
         if (moved > 0) {
           // The loaded thread's `verified` flags predate the claim;
           // refresh so delete-own picks the right ownership proof.
+          // Thread only: the token in hand stays valid, and re-arming it
+          // would make the visitor sit through the ripening again.
           const payload = await fetchComments(slug);
           setThread(payload.comments);
-          setToken(payload.token);
-          setTokenReady(false);
         }
       } catch (err) {
         console.debug("[dbln social]", err);
@@ -359,7 +395,7 @@ export default function Discussion({ slug }: DiscussionProps) {
 
   const handleSubmit = (e: FormEvent, parentId: string | null) => {
     e.preventDefault();
-    if (!token || submittingRef.current) return;
+    if (!token || !tokenReady || submittingRef.current) return;
     const nameEl = parentId ? replyNameRef.current : nameRef.current;
     const name = (nameEl?.value ?? "").trim();
     const text = (parentId ? (replyDrafts[parentId] ?? "") : body).trim();
@@ -375,7 +411,7 @@ export default function Discussion({ slug }: DiscussionProps) {
   };
 
   const doSubmit = async (parentId: string | null) => {
-    if (!token || submittingRef.current) return;
+    if (!token || !tokenReady || submittingRef.current) return;
     const nameEl = parentId ? replyNameRef.current : nameRef.current;
     const name = (nameEl?.value ?? "").trim();
     const text = (parentId ? (replyDrafts[parentId] ?? "") : body).trim();
@@ -389,14 +425,20 @@ export default function Discussion({ slug }: DiscussionProps) {
       // the warning dialog the ref is set before React flushes the state.
       const getToken = getTokenRef.current;
       const idToken = getToken ? await getToken() : undefined;
-      const posted = await postComment({
-        slug,
-        parentId,
-        name,
-        body: text,
-        token,
-        idToken: idToken ?? undefined,
-      });
+      const send = (postToken: string) =>
+        postComment({ slug, parentId, name, body: text, token: postToken, idToken });
+      let posted: PublicComment;
+      try {
+        posted = await send(token);
+      } catch (err) {
+        // The server refused the token (a tab left open past its expiry,
+        // a key rotation): take a fresh one, let it ripen — the button
+        // shows the fill meanwhile — and retry once.
+        if (!(err instanceof CommentError && err.code === "token")) throw err;
+        const fresh = await freshToken();
+        await new Promise((r) => window.setTimeout(r, TOKEN_MIN_AGE_MS + 250));
+        posted = await send(fresh);
+      }
       setThread((cur) => [...(cur ?? []), posted]);
       saveName(name);
       notifyCommentAdded(slug, total + 1);
@@ -424,7 +466,6 @@ export default function Discussion({ slug }: DiscussionProps) {
         scope: parentId ?? "main",
         text: code === "rate_limited" ? copy.errorRate : copy.errorGeneric,
       });
-      if (code === "token") refreshAfterTokenFailure();
       console.debug("[dbln social]", err);
     } finally {
       submittingRef.current = false;
@@ -580,8 +621,9 @@ export default function Discussion({ slug }: DiscussionProps) {
                 />
                 <button
                   type="submit"
-                  className={styles.rfBtn}
+                  className={`${styles.rfBtn} ${armingClass(draft)}`}
                   disabled={!tokenReady || !draft.trim()}
+                  aria-busy={!tokenReady && draft.trim() !== ""}
                 >
                   {copy.replyLabel}
                 </button>
@@ -609,7 +651,6 @@ export default function Discussion({ slug }: DiscussionProps) {
   return (
     <section
       id="discussion"
-      ref={rootRef}
       className={styles.comments}
       aria-labelledby="discussion-title"
     >
@@ -651,8 +692,9 @@ export default function Discussion({ slug }: DiscussionProps) {
           <span className={styles.hint}>{copy.hint}</span>
           <button
             type="submit"
-            className={styles.postBtn}
+            className={`${styles.postBtn} ${armingClass(body)}`}
             disabled={!tokenReady || !body.trim()}
+            aria-busy={!tokenReady && body.trim() !== ""}
           >
             {copy.postLabel}
           </button>

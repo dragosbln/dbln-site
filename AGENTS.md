@@ -295,9 +295,14 @@ Invariants. These are privacy boundaries: breaking any of them makes
 Comments (instant post, no review queue — Dragos's call): POST
 /api/comments goes public immediately; the guardrails replace the queue.
 - Server: honeypot field `website` (must arrive empty), HMAC
-  proof-of-page-visit token from GET /api/comments (functions/src/token.ts,
-  ripens after 5s, dies after 2h — stateless, any instance verifies),
-  30s per-subject cooldown, per-subject/per-client/global comment windows,
+  proof-of-page-visit token from GET /api/comments (functions/src/token.ts:
+  ripens after 5s, dies after 24h — stateless, any instance verifies. The
+  5s delay stays by Dragos's call on 2026-10-16; what was broken was the
+  button going dead with no feedback, fixed on the client — see Discussion
+  below. The 2h life became 24h so a long-open tab doesn't fail its post),
+  2s per-subject cooldown (double-submit guard only; it was 30s and mostly
+  hit the author replying to several comments), per-subject/per-client/global
+  comment windows,
   name ≤ 60 / body ≤ 1200 / ≤ 3 links (counted as "http(s)://"), control
   chars stripped (newlines kept). Bodies are stored as typed; at render,
   `[words](https://…)` and bare http(s) URLs become links
@@ -371,10 +376,15 @@ of anonymous comments.
   This applies to /admin too: its session also ends when the page closes.
   What persists between visits is only `dbln:account` (uid + display
   name, NO token) so the form can offer one-click re-sign-in.
-- Route ordering is a cost boundary: `verifyVisitor` uses
-  `checkRevoked: true`, an external auth round-trip, so the cheap gates
-  (shape checks, the HMAC page token) and the client+global limiters run
-  BEFORE it in every route that takes an idToken. Don't reorder.
+- Route ordering is a cost boundary: `verifyVisitor` verifies the ID
+  token's signature and expiry (local once Google's certs are cached, but
+  the first call per instance fetches them), so the cheap gates (shape
+  checks, the HMAC page token) and the client+global limiters run BEFORE
+  it in every route that takes an idToken. Don't reorder. It no longer
+  passes `checkRevoked`: that was a network round-trip to Firebase Auth on
+  every signed-in post, delete and claim, and sessions here are in-memory
+  and die with the tab. The admin verifier keeps checkRevoked (purge is
+  irreversible).
 - Authed posts carry the Firebase ID token; the route derives the subject
   as `u_<uid>` from the VERIFIED token (never a client-supplied subject),
   so a caller can't attribute a comment to another account.
@@ -400,8 +410,8 @@ of anonymous comments.
   stay immutable), so prior anonymous comments become the account's and
   stay deletable. `dbln:mine` (local ids) drives which delete buttons
   show; the server enforces ownership regardless.
-- `verifyVisitor` in index.ts is plain `verifyIdToken(token, true)` (any
-  signed-in user, no allowlist, checkRevoked). Reuses the phase-2/3
+- `verifyVisitor` in index.ts is plain `verifyIdToken(token)` (any
+  signed-in user, no allowlist, no revocation check). Reuses the phase-2/3
   secrets — no new secret. Console: enable BOTH Google and GitHub
   providers (GitHub needs an OAuth app) with the same authorized-domain +
   redirect-URI setup as /admin.
@@ -420,8 +430,22 @@ that wipes queued presses' deltas and drifts the count when one fails.
 Plausible event: `Like` (needs a one-time goal in the dashboard; /privacy
 discloses that likes are counted by analytics — remove that line if the
 event ever goes).
-`Discussion` (client leaf in ArticleView) renders the thread: lazy fetch
-on approach, top-level newest-first / replies oldest-first, one reply
+`Discussion` (client leaf in ArticleView) renders the thread: fetched on
+mount with two retries (the token comes with it, and the request warms the
+API instance — cold starts run 2–3s — before the reader scrolls down; the
+old on-approach lazy fetch left the Post button dead for up to ~10s after
+a jump to #discussion). The button stays disabled until the token has
+ripened, but from the first typed character it shows a fill (`.arming`:
+determinate, CSS-timed from the class landing, so apply it when the token
+arrives, never when typing starts, or it lies about the time left;
+`.waiting`: a sliding bar while no token has arrived, which also triggers
+a fetch), so the wait reads as loading. After sign-in the thread refresh
+keeps the token in hand (re-arming would restart the wait). A `token`
+error on post refreshes the token, waits out the ripening and retries
+once before showing an error. Hosting's `**` header rule
+used to override the function's `no-store` on /api responses; firebase.json
+now ends with an `/api/**` → `no-store` rule (later rules win). Thread
+order: top-level newest-first / replies oldest-first, one reply
 form open at a time, saved name in localStorage `dbln:name` filled
 imperatively (never via state — hydration must match the empty input).
 Cross-component count sync: posting calls `notifyCommentAdded(slug)`;

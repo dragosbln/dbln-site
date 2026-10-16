@@ -32,14 +32,12 @@ const port = 4610;
 
 const store = new MemoryStore();
 const app = express();
-// Comment cooldown shortened so manual testing isn't 30s-gated; the
-// notification "email" prints to this console. The admin verifier accepts
+// The notification "email" prints to this console. The admin verifier accepts
 // the fixed dev token (AdminPanel's localhost affordance) — no Firebase
 // Auth needed to exercise the panel locally.
 app.use(
   createApp(store, {
     mailer: consoleMailer(),
-    limits: { commentCooldownMs: 2000 },
     // Author badge locally: set DBLN_ADMIN_UIDS to a comma-separated list
     // of uids (your real Firebase uid, or a "devuid:" test id) to see
     // those comments badged "Author".

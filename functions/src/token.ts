@@ -2,15 +2,21 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 
 /**
  * Proof-of-page-visit token for comment posts. GET /api/comments hands
- * one out; POST /api/comments requires it back. An API-only bot must
- * fetch the thread first and sit through the minimum age, which — with
- * the honeypot and the cooldowns — is the instant-post substitute for a
- * review queue. Tokens are stateless: `<ts>.<hmac(key, ts)>`, so any
- * instance can verify what another minted.
+ * one out; POST /api/comments requires it back, so an API-only bot has to
+ * fetch the thread first — which, with the honeypot and the rate windows,
+ * is the instant-post substitute for a review queue. Tokens are stateless:
+ * `<ts>.<hmac(key, ts)>`, so any instance can verify what another minted.
+ *
+ * A token ripens TOKEN_MIN_AGE_MS after it is minted: an API-only bot has
+ * to sit through that wait per thread. Dragos kept the delay (2026-10-16);
+ * what had made it feel broken was the client, whose Post button went dead
+ * with no feedback for those seconds — it now shows the ripening as a
+ * progress fill. The lifetime only has to outlast a tab left open for a
+ * long read; a refused token is refreshed and the post retried.
  */
 
 export const TOKEN_MIN_AGE_MS = 5_000;
-export const TOKEN_MAX_AGE_MS = 2 * 60 * 60 * 1000;
+export const TOKEN_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
 function sig(key: string, ts: string): string {
   return createHmac("sha256", key).update(ts).digest("hex");
