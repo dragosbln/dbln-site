@@ -1,0 +1,333 @@
+/* 04 · Who runs it. Design source: 04-who-runs-it.dc.html (r3-*). */
+
+.head {
+  --head-gap: 44px;
+}
+
+/* The two cards share the row's height (stretch), so the slider card is
+   at least as tall as the presentation card beside it. */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  padding: 28px 28px 26px;
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+}
+
+/* ---------- Presentation card ---------- */
+
+.row {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.photo {
+  width: 150px;
+  height: 150px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.name {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.location {
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  line-height: 1.6;
+}
+
+.links {
+  list-style: none;
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+
+.link {
+  display: inline-block;
+  color: var(--teal);
+  border-bottom: 1px solid color-mix(in srgb, var(--teal) 40%, transparent);
+  transition: border-color 0.2s;
+  white-space: nowrap;
+}
+
+.link:hover {
+  border-bottom-color: var(--teal);
+}
+
+.sep {
+  margin: 0 7px;
+  color: var(--ink-faint);
+}
+
+.bio {
+  color: var(--ink-body);
+  font-size: 16.5px;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.bio + .bio {
+  margin-top: 14px;
+}
+
+.depth {
+  margin-top: 22px;
+}
+
+.depthLabel {
+  margin-bottom: 12px;
+}
+
+.chips {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* ---------- Testimonial slider (ReviewSlider) ---------- */
+
+.sliderLabel {
+  margin-bottom: 22px;
+}
+
+/* Every quote sits in the same cell; the cell is as tall as the tallest
+   one, so switching never resizes the card (see ReviewSlider). */
+.quotes {
+  display: grid;
+}
+
+.figure {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.figure[aria-hidden="true"] {
+  visibility: hidden;
+}
+
+/* The home page's testimonial card (Testimonials.module.css), at the
+   slider's size. */
+.mark {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 44px;
+  line-height: 0.6;
+  color: var(--teal);
+  height: 26px;
+}
+
+.quote {
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 1.42;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  margin: 4px 0 22px;
+  text-wrap: pretty;
+}
+
+.who {
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.author {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.role {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  margin-top: 4px;
+}
+
+.nav {
+  margin-top: auto;
+  padding-top: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.dots {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.dot,
+.arrow {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--line);
+  transition: background 0.18s;
+}
+
+.dot[aria-pressed="true"] {
+  background: var(--teal);
+}
+
+.arrows {
+  display: flex;
+  gap: 8px;
+}
+
+.arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  transition:
+    border-color 0.18s,
+    background 0.18s;
+}
+
+.arrow:hover {
+  border-color: var(--teal);
+  background: var(--accent-wash);
+}
+
+.arrow svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 640px) {
+  .head {
+    --head-gap: 32px;
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .card {
+    padding: 22px 20px 20px;
+    border-radius: 12px;
+  }
+
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 10px;
+  }
+
+  .links {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    margin-top: 10px;
+  }
+
+  .bio {
+    font-size: 16px;
+  }
+
+  .depth {
+    margin-top: 20px;
+  }
+
+  .chip {
+    font-size: 13px;
+  }
+
+  .quote {
+    font-size: 17.5px;
+  }
+
+  .nav {
+    padding-top: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link,
+  .dot,
+  .arrow {
+    transition: none;
+  }
+}

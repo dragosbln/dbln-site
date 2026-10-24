@@ -2,7 +2,11 @@
   display: flex;
   align-items: baseline;
   gap: 18px;
-  margin-bottom: 52px;
+  /* A section sets --head-gap through `className` to tighten the gap. A
+     variable, not a competing margin-bottom: two rules of equal specificity
+     would be settled by stylesheet order, which module chunking doesn't
+     guarantee. */
+  margin-bottom: var(--head-gap, 52px);
 }
 
 .num {
@@ -29,15 +33,34 @@
 .asideLink {
   color: var(--teal);
   border-bottom: 1px solid color-mix(in srgb, var(--teal) 40%, transparent);
-  white-space: nowrap;
 }
 
 .asideLink:hover {
   border-bottom-color: var(--teal);
 }
 
+/* The arrow form keeps label and arrow on one line; the inline form
+   (asideTail) wraps with the sentence it sits in. */
+.nowrap {
+  white-space: nowrap;
+}
+
 @media (max-width: 760px) {
   .aside {
     display: none;
+  }
+
+  /* asideOnPhone: the aside takes the full row under the title. */
+  .asideOnPhone {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+  .asideOnPhone .aside {
+    display: block;
+    flex-basis: 100%;
+    margin-left: 0;
+    max-width: none;
+    font-size: 14.5px;
   }
 }

@@ -1,5 +1,5 @@
 import { site } from "@/content/site";
-import type { Post } from "@/content/types";
+import type { Post, Question, ReviewLanding } from "@/content/types";
 import { coverOgImage, postUrl } from "@/lib/urls";
 
 /**
@@ -79,6 +79,51 @@ export const privacyBreadcrumbSchema = {
     },
   ],
 };
+
+// The review's builders take its content as arguments (no import of
+// @/content/review here), so the page passes exactly what it renders and
+// the structured data can't describe a different offer than the page.
+export function reviewBreadcrumbSchema(landing: ReviewLanding) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: site.url },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: landing.title,
+        item: `${site.url}/review`,
+      },
+    ],
+  };
+}
+
+export function reviewServiceSchema(landing: ReviewLanding) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${site.url}/review#service`,
+    name: landing.title,
+    description: landing.metaDescription,
+    url: `${site.url}/review`,
+    provider: { "@id": `${site.url}/#person` },
+    serviceType: "AI reliability review",
+    inLanguage: "en",
+  };
+}
+
+export function faqPageSchema(items: Question[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: { "@type": "Answer", text: item.a },
+    })),
+  };
+}
 
 export function postBreadcrumbSchema(post: Post) {
   return {

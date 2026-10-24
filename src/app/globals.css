@@ -16,6 +16,15 @@
   --red: #a83a2e;
   --red-deep: #7e2b21;
   --red-wash: #f5e3de;
+  /* asks of the client (the review rail's "What I need" chips) */
+  --orange: #ad5f1e;
+  /* dark code surface — the same palette as the shiki theme "dbln-dark" in
+     src/lib/markdown.ts (which can't read CSS variables); keep both in sync */
+  --code-bg: #1b1d20;
+  --code-fg: #e8e6e0;
+  --code-comment: #8b8f93;
+  --code-string: #c3d98f;
+  --code-number: #e0a36b;
   --serif: var(--font-serif), Georgia, serif;
   --sans: var(--font-sans), system-ui, sans-serif;
   --mono: var(--font-mono), ui-monospace, monospace;

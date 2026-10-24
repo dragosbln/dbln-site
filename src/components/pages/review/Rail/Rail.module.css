@@ -1,0 +1,669 @@
+/* Section 02, "How it runs": the rail. Ported from 02-how-it-runs.dc.html
+   (.tl-* and .t1-*). Mobile-first: the rail is one 22px-labelled column;
+   at 900px it becomes a 120px label column plus a 320px branch column. */
+
+/* SectionHead's 52px gap is the site default; the rail's head sits closer
+   to its sticky switch. */
+.head {
+  --head-gap: 36px;
+}
+
+/* ---------- Sticky reading switch (full-width hairlines) ---------- */
+
+.bar {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 30;
+  background: color-mix(in srgb, var(--paper) 90%, transparent);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.barIn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 10px 0;
+}
+
+.barLabel {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+}
+
+/* The prototype declares 13px/600 for these, but its button reset
+   (`font: inherit`) outranks that rule, so the canvas Dragos reviewed shows
+   the body size and weight. The rendered look is the design. */
+.segButton {
+  font: inherit;
+  margin: 0;
+  border: 0;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.18s,
+    color 0.18s;
+}
+
+.segButton:not([aria-pressed="true"]):hover {
+  color: var(--teal);
+}
+
+.segButton[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* ---------- The rail ---------- */
+
+/* .section supplies the bottom padding. */
+.body {
+  padding-top: 40px;
+}
+
+.grid {
+  display: block;
+  list-style: none;
+}
+
+.pre,
+.post,
+.stop,
+.branch {
+  position: relative;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  column-gap: 0;
+}
+
+/* Phone: "Stop n" rotated, reading upward from the dot, left of the line. */
+.label {
+  position: absolute;
+  left: 2px;
+  bottom: calc(100% - 23px);
+  writing-mode: vertical-lr;
+  transform: rotate(180deg);
+  text-align: left;
+  font-family: var(--mono);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.label b {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--teal);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.when {
+  position: absolute;
+  left: 8px;
+  bottom: calc(100% - 23px);
+  writing-mode: vertical-lr;
+  transform: rotate(180deg);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+/* The cell's left border IS the rail line. */
+.cell {
+  grid-column: 2;
+  position: relative;
+  min-width: 0;
+  border-left: 2px solid var(--teal);
+  padding-left: 30px;
+  padding-right: 14px;
+}
+
+/* Lead-in and lead-out: the same line, dashed. */
+.dash {
+  border-left: 2px dashed var(--teal);
+  padding-bottom: 36px;
+}
+
+.dashEnd {
+  padding-top: 28px;
+  padding-bottom: 2px;
+}
+
+.kicker {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
+
+.triggers {
+  list-style: none;
+  margin-top: 8px;
+}
+
+.triggers li {
+  position: relative;
+  padding: 5px 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+/* The tick from the dashed line to each trigger. */
+.dash .triggers li::before {
+  content: "";
+  position: absolute;
+  left: -30px;
+  top: 14px;
+  width: 12px;
+  height: 2px;
+  background: var(--ink-faint);
+}
+
+.exNote,
+.close {
+  max-width: 56ch;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+.exNote {
+  margin-bottom: 14px;
+}
+
+.close {
+  margin-top: 16px;
+}
+
+/* The dot on the line; centred on the 2px border. */
+.node {
+  position: absolute;
+  left: -6px;
+  top: 31px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+  transition: box-shadow 0.2s;
+}
+
+.nodeOpen {
+  box-shadow:
+    0 0 0 3px var(--paper),
+    0 0 0 5px var(--teal);
+}
+
+/* ---------- Stop and branch headers ---------- */
+
+.hd,
+.bhd {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  gap: 12px;
+  align-items: start;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.hd {
+  padding: 24px 0 26px;
+  border-bottom: 1px solid var(--line);
+}
+
+.bhd {
+  padding: 2px 0 4px;
+}
+
+/* A column of blocks. The display lives here, not on the summary/note spans,
+   so their `hidden` attribute (the inactive reading) keeps working. */
+.hdText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.25;
+  letter-spacing: -0.005em;
+  transition: color 0.2s;
+}
+
+.bhd .title {
+  font-size: 18px;
+  margin-top: 4px;
+}
+
+.sum {
+  margin-top: 6px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* A flex box so the 16px svg sets its height and it rotates on its centre. */
+.chev {
+  display: flex;
+  margin-top: 5px;
+  color: var(--ink-faint);
+  transition:
+    transform 0.2s,
+    color 0.2s;
+}
+
+.bhd .chev {
+  margin-top: 10px;
+}
+
+.hd:hover .title,
+.hd:hover .chev,
+.bhd:hover .title,
+.bhd:hover .chev {
+  color: var(--teal);
+}
+
+.hd[aria-expanded="true"] .chev,
+.bhd[aria-expanded="true"] .chev {
+  transform: rotate(180deg);
+}
+
+/* ---------- Open panels ---------- */
+
+.panel {
+  padding: 18px 0 30px;
+  border-bottom: 1px solid var(--line);
+}
+
+.prose,
+.ex {
+  max-width: 62ch;
+  font-size: 15px;
+  line-height: 1.62;
+  color: var(--ink-body);
+}
+
+.ex {
+  text-wrap: pretty;
+}
+
+.ex + .ex {
+  margin-top: 12px;
+}
+
+/* ---------- Chip groups ---------- */
+
+.groups {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px 24px;
+  margin-top: 16px;
+}
+
+.groupLabel {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 6px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  color: var(--ink-faint);
+}
+
+.groupLabel svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: var(--ink-faint);
+}
+
+.chips {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+/* Widths are fitted to the longest text line by useFitChips. */
+.chip {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 7px;
+  max-width: 100%;
+  min-width: 0;
+  border: 1.5px solid var(--orange);
+  border-radius: 5px;
+  padding: 4px 8px 4px 7px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.chip svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  margin-top: 3px;
+  color: var(--orange);
+}
+
+.chip span {
+  min-width: 0;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+
+/* Group colours: asks orange, deliverables teal, rules red, the checkpoint
+   teal-deep on the wash. */
+.need .chip {
+  border-color: var(--orange);
+}
+
+.need .chip svg {
+  color: var(--orange);
+}
+
+.see .chip {
+  border-color: var(--teal);
+}
+
+.see .chip svg {
+  color: var(--teal);
+}
+
+.rules .chip {
+  border-color: var(--red);
+}
+
+.rules .chip svg {
+  color: var(--red);
+}
+
+.checkpoint .chip {
+  border-color: var(--teal-deep);
+  background: var(--accent-wash);
+}
+
+.checkpoint .chip svg {
+  color: var(--teal-deep);
+}
+
+/* ---------- The branch ("Meanwhile") ---------- */
+
+.branch .cell {
+  padding-top: 26px;
+  padding-bottom: 26px;
+}
+
+.bcard {
+  position: relative;
+  border-left: 2px solid var(--teal-deep);
+  padding: 0 0 0 16px;
+}
+
+/* Phone: the dashed connector from the rail line to the inline card. */
+.bcard::before {
+  content: "";
+  position: absolute;
+  left: -32px;
+  top: 12px;
+  width: 30px;
+  height: 0;
+  border-top: 2px dashed var(--teal-deep);
+}
+
+.meta {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.5;
+  color: var(--teal-deep);
+}
+
+.metaTail {
+  color: var(--ink-faint);
+}
+
+.bnote {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.bpanel {
+  padding: 10px 0 4px;
+}
+
+.fork,
+.rejoin {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .head {
+    --head-gap: 24px;
+  }
+
+  .body {
+    padding-top: 28px;
+  }
+}
+
+@media (min-width: 900px) {
+  .groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bcard .groups {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Stops in column 1; the branch card in a 320px column 2 beside stops 2
+     and 3. Rows are explicit so the branch can span them. */
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    column-gap: 56px;
+  }
+
+  .pre,
+  .post,
+  .stop {
+    grid-template-columns: 120px minmax(0, 1fr);
+  }
+
+  .label {
+    grid-column: 1;
+    position: static;
+    writing-mode: horizontal-tb;
+    transform: none;
+    text-align: right;
+    padding: 20px 22px 0 0;
+    line-height: 1.2;
+    white-space: normal;
+  }
+
+  .label b {
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .when {
+    left: auto;
+    right: calc(100% + 24px);
+    bottom: auto;
+    top: 40px;
+    writing-mode: horizontal-tb;
+    transform: none;
+    text-align: right;
+    letter-spacing: 0.02em;
+    line-height: 1.3;
+  }
+
+  .cell {
+    padding-left: 34px;
+    padding-right: 0;
+  }
+
+  .dash .triggers li::before {
+    left: -34px;
+  }
+
+  .pre {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .s0 {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .s1 {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .s2 {
+    grid-column: 1;
+    grid-row: 4;
+  }
+
+  .s3 {
+    grid-column: 1;
+    grid-row: 5;
+  }
+
+  .s4 {
+    grid-column: 1;
+    grid-row: 6;
+  }
+
+  .s5 {
+    grid-column: 1;
+    grid-row: 7;
+  }
+
+  .post {
+    grid-column: 1;
+    grid-row: 8;
+  }
+
+  /* The branch's own teal-deep line runs from the fork (row 4) to the
+     rejoin (row 6); the card hangs off it, free to run past row 5 when
+     open (column 2 is empty below). */
+  .branch {
+    display: block;
+    grid-column: 2;
+    grid-row: 4 / 6;
+    align-self: stretch;
+    min-height: 0;
+    padding: 0;
+  }
+
+  .branch::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: -8px;
+    border-left: 2px solid var(--teal-deep);
+  }
+
+  .branch .cell {
+    position: absolute;
+    top: 40px;
+    left: 18px;
+    right: 0;
+    border-left: 0;
+    padding: 0;
+  }
+
+  .bcard {
+    border-left: 0;
+    padding: 0;
+  }
+
+  .bcard::before {
+    display: none;
+  }
+
+  /* Dashed connectors across both columns: from the centre of the rail
+     (120px label column + 1px into the 2px line) to the branch line (the
+     320px column's left edge). */
+  .fork,
+  .rejoin {
+    display: block;
+    grid-column: 1 / 3;
+    align-self: start;
+    height: 0;
+    margin: 8px 320px 0 121px;
+    border-top: 2px dashed var(--teal-deep);
+    pointer-events: none;
+  }
+
+  .fork {
+    grid-row: 4;
+  }
+
+  .rejoin {
+    grid-row: 6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .segButton,
+  .node,
+  .title,
+  .chev {
+    transition: none;
+  }
+}

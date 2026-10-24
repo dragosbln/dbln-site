@@ -1,0 +1,138 @@
+/* 06 · Questions (06-questions.dc.html: .q1-*). */
+
+.head {
+  --head-gap: 36px;
+}
+
+.list {
+  max-width: 880px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* Each row draws only its top hairline and the list draws the last one.
+   The late rows' wrapper has no border of its own, so the seam between
+   the visible rows and the revealed ones never doubles up: hidden or
+   shown, the rows read as one list. Keep it free of borders and of
+   :first-child / + selectors, which would break across the wrapper. */
+.row {
+  border-top: 1px solid var(--line);
+}
+
+/* An h3 for the outline only; the type comes from the spans inside. */
+.q {
+  font: inherit;
+}
+
+.toggle {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 20px;
+  column-gap: 12px;
+  align-items: baseline;
+  width: 100%;
+  padding: 20px 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.num {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--teal);
+}
+
+.text {
+  font-family: var(--serif);
+  font-size: 21px;
+  line-height: 1.35;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+.chev {
+  display: flex;
+  align-self: center;
+  justify-self: end;
+  color: var(--ink-faint);
+}
+
+.toggle:hover .text,
+.toggle:hover .chev {
+  color: var(--teal);
+}
+
+.toggle[aria-expanded="true"] .chev {
+  transform: rotate(180deg);
+}
+
+/* The "more" row: a control, not a question. */
+.more .num {
+  font-size: 14px;
+}
+
+.more .text {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.answer {
+  padding: 0 0 26px 56px;
+  max-width: calc(62ch + 56px);
+}
+
+.answer p {
+  font-size: 16.5px;
+  line-height: 1.6;
+  color: var(--ink-body);
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .text {
+    transition: color 0.2s;
+  }
+
+  .chev {
+    transition:
+      transform 0.2s,
+      color 0.2s;
+  }
+}
+
+@media (max-width: 640px) {
+  .head {
+    --head-gap: 24px;
+  }
+
+  .list {
+    max-width: none;
+  }
+
+  .toggle {
+    grid-template-columns: 30px minmax(0, 1fr) 18px;
+    column-gap: 10px;
+    padding: 16px 0;
+  }
+
+  .text {
+    font-size: 18px;
+    line-height: 1.3;
+  }
+
+  .answer {
+    padding: 0 0 22px 40px;
+    max-width: none;
+  }
+
+  .answer p {
+    font-size: 16px;
+  }
+}

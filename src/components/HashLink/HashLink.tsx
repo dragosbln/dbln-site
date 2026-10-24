@@ -4,10 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { MouseEvent, ReactNode } from "react";
 import { resolveHashHref } from "@/lib/hashHref";
+import { isModifiedClick } from "@/lib/isModifiedClick";
 
 type HashLinkProps = {
   href: string;
   className?: string;
+  /** Runs before HashLink's own handling (see the composition note below). */
+  onClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
   children: ReactNode;
 };
 
@@ -31,34 +34,29 @@ type HashLinkProps = {
  * A click while the URL already carries the hash is a same-URL navigation
  * for the router, which doesn't scroll either, so that case scrolls the
  * target itself and skips the router.
+ *
+ * A caller's `onClick` runs first; if it calls `preventDefault()`, the click
+ * is the caller's and HashLink does nothing more (no scroll here, and `Link`
+ * skips the router on a prevented click too).
  */
-export default function HashLink({ href, className, children }: HashLinkProps) {
+export default function HashLink({
+  href,
+  className,
+  onClick,
+  children,
+}: HashLinkProps) {
   const pathname = usePathname();
   const { href: resolved, id } = resolveHashHref(href, pathname);
-  const onClick =
-    id === null
-      ? undefined
-      : (event: MouseEvent<HTMLAnchorElement>) => {
-          if (isModifiedClick(event) || window.location.hash !== `#${id}`) {
-            return;
-          }
-          event.preventDefault();
-          document.getElementById(id)?.scrollIntoView();
-        };
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    onClick?.(event);
+    if (event.defaultPrevented || id === null) return;
+    if (isModifiedClick(event) || window.location.hash !== `#${id}`) return;
+    event.preventDefault();
+    document.getElementById(id)?.scrollIntoView();
+  };
   return (
-    <Link className={className} href={resolved} onClick={onClick}>
+    <Link className={className} href={resolved} onClick={handleClick}>
       {children}
     </Link>
-  );
-}
-
-/** Same rule as Next's Link: new-tab/window clicks stay with the browser. */
-function isModifiedClick(event: MouseEvent<HTMLAnchorElement>) {
-  return (
-    event.button !== 0 ||
-    event.metaKey ||
-    event.ctrlKey ||
-    event.shiftKey ||
-    event.altKey
   );
 }

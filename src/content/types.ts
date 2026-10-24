@@ -18,6 +18,11 @@ export type SectionIntro = {
   aside?: string;
   /** Optional link appended after the aside text. */
   asideLink?: NavItem;
+  /**
+   * Text after the link. When present the link renders inline (no arrow)
+   * so the aside reads as one sentence: "…skip this and [book the call]."
+   */
+  asideTail?: string;
 };
 
 export type PageHero = {
@@ -62,6 +67,11 @@ export type ReviewStep = {
 export type Testimonial = {
   /** Verbatim — never rewrite real quotes. */
   quote: string;
+  /**
+   * A shorter cut of the same quote for compact placements (the review
+   * page's slider). A verbatim subset of `quote`, never a paraphrase.
+   */
+  shortQuote?: string;
   name: string;
   role: string;
   /** Optional link to the author's public profile (LinkedIn). */
@@ -160,18 +170,25 @@ export type Contact = {
   body: string;
 };
 
+/**
+ * Option values of the hidden `format` booking field on the Cal.com event
+ * type. Must match Cal's stored options exactly or the prefill silently
+ * no-ops. Typed as a union so every site surface that prefills the booking
+ * (the picker, `BookingLink`) is checked against the same four values.
+ */
+export type BookingFormatValue =
+  | "live-misbehaving"
+  | "live-unmeasured"
+  | "pre-launch"
+  | "other";
+
 /** One row in the contact section's format picker (step 01). */
 export type BookingFormat = {
   /** Two-digit index shown in the row ("01"). */
   num: string;
   title: string;
   desc: string;
-  /**
-   * Option value of the hidden `format` booking field on the Cal.com event
-   * type. Must match Cal's stored option exactly or the prefill silently
-   * no-ops.
-   */
-  value: string;
+  value: BookingFormatValue;
   /** Short label for the card-header chip ("Advisory"). */
   chip: string;
 };
@@ -337,4 +354,259 @@ export type PrivacyNotice = {
   sections: PrivacySection[];
   /** Closing block; its email link renders from `site.email`. */
   contact: PrivacySection & { emailHint: string };
+};
+
+/* ---------- The review offer page (/review) ---------- */
+/*
+ * Design source: ../claude_websie/review-page-handover (one component file
+ * per section). Section ids and in-page hrefs come from `anchors` in
+ * src/content/review.ts so links and targets can't drift.
+ */
+
+/** A row of the landing panel's "Comes out" list; expands to one sentence and one excerpt. */
+export type GlanceDeliverable = {
+  /** "01" … "05" */
+  num: string;
+  title: string;
+  /** One sentence: what it is and who it is for. */
+  detail: string;
+  /** One line from the worked example, set in mono on a paper-2 chip. */
+  excerpt: string;
+};
+
+export type ReviewLanding = {
+  /** "·"-separated; each segment wraps as a unit (as the home Hero). */
+  eyebrow: string;
+  title: string;
+  lede: string;
+  /** Plain-text page summary for <meta name="description"> and og. */
+  metaDescription: string;
+  /** The three doors: primary pill, ghost text link, plain underline link. */
+  doors: { primary: NavItem; secondary: NavItem; tertiary: NavItem };
+  panel: {
+    title: string;
+    goesIn: { label: string; items: { title: string; body: string }[] };
+    lenses: {
+      label: string;
+      /** `bodyShort` replaces `body` under 480px, where two lenses share one row. */
+      items: { title: string; body: string; bodyShort?: string }[];
+      /** The line under the two lenses ("Each failure tied to a design decision"). */
+      bridge: string;
+    };
+    comesOut: { label: string; items: GlanceDeliverable[] };
+    /** The teal mono line at the foot of the rail ("Two to three weeks"). */
+    timeline: string;
+    /** Shown under the panel only while a deliverable row is open. */
+    excerptNote: string;
+  };
+};
+
+/** One of the three situation cards; each links to the booking step with its situation preselected. */
+export type Situation = {
+  /** Mono kicker ("A complaint"). */
+  kicker: string;
+  title: string;
+  body: string;
+  /** The card's own call to action, rendered with an arrow. */
+  cta: string;
+  /** What the card prefills in the booking picker (see `BookingLink`). */
+  situation: BookingFormatValue;
+};
+
+export type SituationsSection = SectionIntro & {
+  items: Situation[];
+  /** The booking section, as a "/review#contact" href rendered with `BookingLink`. */
+  bookingHref: string;
+  covers: {
+    label: string;
+    items: string[];
+    /** The starred line under the list. */
+    note: string;
+  };
+  notFit: { label: string; items: string[] };
+};
+
+/** The rail's two readings; the sticky switch flips every text at once. */
+export type RailReading = "happens" | "example";
+
+/** Glyphs drawn by the rail's icon set (RailIcon); one per chip. */
+export type RailChipIcon =
+  | "clock"
+  | "person"
+  | "key"
+  | "doc"
+  | "file"
+  | "note"
+  | "rule"
+  | "check"
+  | "enter"
+  | "play";
+
+export type RailChip = { icon: RailChipIcon; text: string };
+
+/** The four chip groups under an open stop, in render order. */
+export type RailGroups = {
+  need: RailChip[];
+  see: RailChip[];
+  rules: RailChip[];
+  checkpoint: RailChip[];
+};
+
+export type RailStop = {
+  /** "Stop 0" … "Stop 5" */
+  label: string;
+  /** The time, under the label ("Before", "Days 1 and 2", …). */
+  when: string;
+  title: string;
+  happens: { summary: string; prose: string; groups: RailGroups };
+  example: { summary: string; paragraphs: string[] };
+};
+
+/** The card that forks off the rail beside stops 2 and 3 ("Meanwhile"). */
+export type RailBranch = {
+  kicker: string;
+  /** Appended to the kicker in the example reading ("· Day four"). */
+  exampleKicker: string;
+  title: string;
+  happens: { note: string; groups: RailGroups };
+  example: { note: string; paragraphs: string[] };
+};
+
+export type RailSection = SectionIntro & {
+  /** Mono label before the reading switch ("Reading"). */
+  readingLabel: string;
+  readings: Record<RailReading, string>;
+  /** Above stop 0, on the dashed lead-in. */
+  pre: {
+    happens: { kicker: string; items: string[] };
+    example: { note: string; kicker: string; items: string[] };
+  };
+  stops: RailStop[];
+  branch: RailBranch;
+  groupLabels: Record<keyof RailGroups, string>;
+  /** After stop 5, on the dashed lead-out. */
+  post: {
+    happens: { kicker: string; items: string[]; close: string };
+    example: { kicker: string; items: string[] };
+  };
+};
+
+/** The five sample documents; also the silhouette drawn on each spine. */
+export type DocumentKey = "summary" | "findings" | "arch" | "roadmap" | "set";
+
+export type DocTableColumn = {
+  label: string;
+  /** Mono cells (ids, counts, days). */
+  mono?: boolean;
+  /** The column that must not collapse (the roadmap's "Change"). */
+  wide?: boolean;
+};
+
+/** A cell is plain text, or a mono id prefix + text ("R-1 Route side-effect…"). */
+export type DocTableCell = string | { id: string; text: string };
+
+export type DocCodeToken =
+  | string
+  | { text: string; tone: "comment" | "key" | "string" | "number" };
+
+/**
+ * The block vocabulary of a sample document page. Rendered by
+ * `DocumentPage`; a `kicker` labels the block(s) that follow it.
+ */
+export type DocBlock =
+  | { kind: "kicker"; text: string }
+  /** Mono meta line under the title, separated by a hairline. */
+  | { kind: "meta"; text: string }
+  | { kind: "p"; text: string }
+  /** Serif italic pull line (the question the client asked). */
+  | { kind: "quote"; text: string }
+  /** Bold answer line. */
+  | { kind: "answer"; text: string }
+  | { kind: "table"; columns: DocTableColumn[]; rows: DocTableCell[][] }
+  | { kind: "ol"; items: string[] }
+  /** Hairline-separated list. */
+  | { kind: "ul"; items: string[] }
+  /** Label/value rows; `boxed` draws the paper-2 box (the method block). */
+  | {
+      kind: "kv";
+      boxed?: boolean;
+      rows: { label: string; value: string; mono?: boolean }[];
+    }
+  /** A bordered finding card: mono id, optional serif title, inner blocks. */
+  | { kind: "finding"; id: string; title?: string; blocks: DocBlock[] }
+  /** Dark code block; each line is a list of tokens. */
+  | { kind: "code"; lines: DocCodeToken[][] };
+
+export type SampleDocument = {
+  key: DocumentKey;
+  title: string;
+  /** Who it is for ("For whoever decides"): on the spine and above the page. */
+  audience: string;
+  blocks: DocBlock[];
+  /** Page footer ("Executive summary" · "Page 1 of 3"). */
+  foot?: { left: string; right: string };
+};
+
+/** A tier label over one or more spines ("What you read"). */
+export type DocumentTier = { label: string; docs: DocumentKey[] };
+
+export type DeliverablesSection = SectionIntro & {
+  /** Under the head ("Pages from a worked example…"). */
+  note: string;
+  /** aria-label of the document picker. */
+  pickerLabel: string;
+  tiers: DocumentTier[];
+  documents: SampleDocument[];
+  /** Closing paragraph under the page. */
+  close: string;
+};
+
+export type ReviewerSection = SectionIntro & {
+  portrait: { src: string; alt: string };
+  /** Mono lines under the name ("Cluj-Napoca, RO", "Remote · EU/US"). */
+  location: string[];
+  /** Rows of links separated by a middle dot ([work, writing], [LinkedIn, CV]). */
+  links: NavItem[][];
+  /** Two paragraphs. */
+  bio: string[];
+  depthLabel: string;
+  depth: string[];
+  /** The testimonial slider; quotes come from `testimonials` in site.ts. */
+  slider: {
+    label: string;
+    /** aria-labels: the dots group, prev/next buttons. */
+    chooseLabel: string;
+    prevLabel: string;
+    nextLabel: string;
+    /** `{n}`, `{total}`, `{name}` interpolate ("Review 1 of 3, Shilpi Reddy"). */
+    reviewLabel: string;
+  };
+};
+
+export type FirstReadSection = SectionIntro & {
+  lede: string;
+  waysLabel: string;
+  /** Rich text: the time it costs is **bold** inside the sentence. */
+  ways: { letter: string; body: string }[];
+  /** Primary button opening a prefilled mailto (site.email). */
+  cta: { label: string; subject: string; body: string };
+  /** The sub-page link; absent until /review/first-read exists. */
+  guide?: NavItem;
+  notLabel: string;
+  not: string;
+};
+
+export type Question = {
+  /** "01" … "14" */
+  num: string;
+  q: string;
+  a: string;
+};
+
+export type QuestionsSection = SectionIntro & {
+  items: Question[];
+  /** How many rows show before the "more" row. */
+  visibleCount: number;
+  /** The "more" row's label ("Nine more questions"). */
+  moreLabel: string;
 };

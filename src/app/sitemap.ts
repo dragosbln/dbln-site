@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { privacy } from "@/content/privacy";
+import { reviewPath } from "@/content/review";
 import { site } from "@/content/site";
 import { getPosts } from "@/lib/posts";
 import { postUrl } from "@/lib/urls";
@@ -23,6 +24,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${site.url}/work`,
       changeFrequency: "monthly",
       priority: 0.8,
+    },
+    {
+      url: `${site.url}${reviewPath}`,
+      changeFrequency: "monthly",
+      priority: 0.9,
     },
     {
       url: `${site.url}/blog`,

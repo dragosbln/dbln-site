@@ -7,7 +7,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 # Project conventions
 
 - **Static export.** `next.config.ts` sets `output: "export"`. Nothing may rely on a server at runtime: no dynamic route handlers, no `cookies()`/`headers()`, no middleware. Route handlers must be `force-static` GET.
-- **Components.** One folder per component: `src/components/<Name>/` containing `<Name>.tsx`, `<Name>.module.css` (if styled), and an `index.ts` barrel (`export { default } from "./<Name>";`). Import other components via `@/components/<Name>`; import a component's own CSS relatively (`./<Name>.module.css`).
+- **Components.** One folder per component: `src/components/<Name>/` containing `<Name>.tsx`, `<Name>.module.css` (if styled), and an `index.ts` barrel (`export { default } from "./<Name>";`). Import other components via `@/components/<Name>`; import a component's own CSS relatively (`./<Name>.module.css`). Top level is for shared pieces (primitives, chrome, anything two pages use); a section that belongs to one page lives in `src/components/pages/<page>/<Name>/` with the same folder shape (first used by `/review`). The `pages/` level is load-bearing: `src/components/review/` would be the same directory as the `Review` component on the case-insensitive macOS disk (git records whichever casing existed first), and the import then fails on the Linux CI runner. A section's client leaf is a second file in the section's folder, imported relatively. Top-level components never import from a page folder.
 - **Styling.** CSS Modules only — no inline `style={{}}`, no styled-jsx, no Tailwind. `src/app/globals.css` holds only design tokens, the reset, and the `.wrap` / `.section` / `.reveal` utilities. Everything else lives in the owning component's module. Two exceptions, both global because the markup is generated from markdown at build and can't carry hashed module classes: `src/styles/prose.css` (`.prose`, plus the `.prose--peek` compact variant) and `src/styles/diagram.css` (`dg-*`).
 - **Content.** All copy, links, and identity data live in `src/content/site.ts`. Components render content; they don't contain it.
 - **Server-first.** Components are React Server Components by default. Add `"use client"` only at interactive leaves (e.g. scroll reveal), never on whole sections.
@@ -232,6 +232,49 @@ Embed facts learned from the package source (do not "simplify" these away):
   the card never collapses or shifts. (The old IntersectionObserver lazy
   mount was removed when click-to-load landed: a pick already implies the
   section is on screen, so the observer was dead weight.)
+
+## The review offer page (/review)
+
+Design: `../claude_websie/review-page-handover` (one `.dc.html` per section,
+authoritative for markup, CSS values and copy; `README.md` there explains
+the format). Content: `src/content/review.ts`, typed by the "review offer
+page" section of `types.ts`; sections in `src/components/pages/review/<Name>/`;
+the route composes them with the existing `Contact` and three JSON-LD
+objects (breadcrumb, `Service`, `FAQPage`) built from the same content.
+
+- **Anchors.** Section ids and every in-page href come from `anchors` and
+  `reviewPath` in `review.ts` (`` `${reviewPath}#${anchors.contact}` ``),
+  rendered with `HashLink`/`PillLink`, so a link and its target can't drift.
+- **Everything is in the HTML.** Collapsed rows, the rail's inactive
+  reading, the four unselected sample documents, the late questions: all
+  rendered and toggled with the `hidden` attribute (`aria-expanded` /
+  `aria-controls` on the control). The page is a crawler surface; never
+  "optimise" that into conditional rendering.
+- **Situation cards prefill the booking** through `BookingLink` →
+  `src/lib/bookingPrefill.ts` → `BookingFlow`, never through the URL. The
+  value is a visitor's click on this site, which is what lets `BookingFlow`
+  treat it as the pick that loads Cal.com (the click-to-load boundary
+  above). A request outlives a client-side navigation for 10 s so a card on
+  another page can reach a freshly mounted booking section; a page that
+  renders its own booking section takes every request, so its cards must
+  target that section. Don't add a `?situation=` reader: a shared URL would
+  load Cal without a click.
+- **Sample documents** render through `DocumentPage` from the `DocBlock`
+  vocabulary in `types.ts` (kicker, meta, p, quote, answer, table, ol, ul,
+  kv, finding, code). Extend the vocabulary rather than adding markup to a
+  section; the renderer is meant to outlive this page.
+- **Shared primitives** that came with the page: `ChevronIcon`, `PillLink`
+  (the ink pill for any href kind: mailto, external, internal), `BookingLink`,
+  `DocumentPage`; `SectionHead` gained `asideTail` (an inline link inside
+  the aside sentence), `asideOnPhone` and `className`; `HashLink` composes a
+  caller's `onClick`. Reuse them before writing a new one.
+- **Testimonials** reuse `testimonials.items` from `site.ts`; a
+  `shortQuote` is a verbatim cut of `quote` for compact placements, never a
+  paraphrase.
+- **Open items marked in content:** `TODO(cv)` (the design links `/cv.pdf`,
+  which doesn't exist) and `TODO(first-read)` (the guide sub-page
+  `/review/first-read` is designed separately). Both links are off until
+  the files exist; flip the content, nothing else.
 
 ## Analytics (Plausible)
 
