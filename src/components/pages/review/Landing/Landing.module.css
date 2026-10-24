@@ -1,0 +1,545 @@
+/* Design: 00-hero-desktop / 00-hero-phone in the review-page handover.
+   Desktop first, as Hero.module.css: 980 (one column), 640 (gutters and
+   paddings), 480 (eyebrow and lens tweaks). */
+
+.hero {
+  padding: 96px 0 64px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* Text left, panel right; one column below 980px, panel after the text. */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 520px;
+  gap: 24px 72px;
+  align-items: start;
+}
+
+/* ---------- Text column ---------- */
+
+.eyebrow {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 40px;
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  margin-top: 6px; /* centers on the label's first line when it wraps */
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 0 4px var(--accent-wash);
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+}
+
+/* Each "·"-separated segment wraps as a unit. */
+.segment {
+  white-space: nowrap;
+}
+
+.title {
+  font-family: var(--serif);
+  font-weight: 400;
+  /* 52px in the desktop design at 1280, 36px in the phone one at 375. */
+  font-size: clamp(36px, 4.1vw, 52px);
+  line-height: 1.06;
+  letter-spacing: -0.018em;
+}
+
+.lede {
+  margin-top: 30px;
+  font-size: 19px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 52ch;
+}
+
+.doors {
+  margin-top: 40px;
+}
+
+.doorRow {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink-soft);
+  transition: color 0.2s;
+}
+
+.ghost:hover {
+  color: var(--teal);
+}
+
+.plainRow {
+  margin-top: 18px;
+}
+
+.plain {
+  display: inline-block;
+  padding: 6px 0 2px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--teal-deep);
+  border-bottom: 1px solid color-mix(in srgb, var(--teal) 40%, transparent);
+  transition:
+    border-color 0.2s,
+    color 0.2s;
+}
+
+.plain:hover {
+  color: var(--teal);
+  border-bottom-color: var(--teal);
+}
+
+/* ---------- Panel ---------- */
+
+.panel {
+  margin-top: 8px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  overflow: hidden;
+}
+
+.panelHead {
+  padding: 13px 22px;
+  background: var(--paper-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.panelTitle {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* The box the rail is positioned against: the three blocks and the
+   timeline line, not the excerpt note under it (see GlanceList). */
+.body {
+  position: relative;
+}
+
+/* The rail runs from the first dot's centre down into the chevron. */
+.rail {
+  position: absolute;
+  left: 27px;
+  top: 29px;
+  bottom: 34px;
+  width: 2px;
+  background: var(--teal);
+}
+
+.railEnd {
+  position: absolute;
+  left: 21px;
+  bottom: 24px;
+  color: var(--teal);
+}
+
+.block {
+  position: relative;
+  padding: 18px 22px 18px 54px;
+  border-top: 1px solid var(--line);
+}
+
+.blockIn {
+  padding-top: 20px;
+  border-top: 0;
+}
+
+.blockOut {
+  padding-bottom: 14px;
+}
+
+/* Sits on the rail, level with the block label (padding-top + 4px). */
+.blockDot {
+  position: absolute;
+  left: 23px;
+  top: 22px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.blockIn .blockDot {
+  top: 24px;
+}
+
+.blockLabel {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.blockLabelOut {
+  margin-bottom: 6px;
+}
+
+/* Goes in */
+
+.inList {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.inTitle {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.inBody {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+/* Two lenses */
+
+.lensList {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.lens {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.lensTitle {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+}
+
+.lensBody {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+
+/* `bodyShort` replaces `body` where the two lenses get narrow. */
+.lensShort {
+  display: none;
+}
+
+/* The bracket joining the two lenses, and its stem down to the bridge line. */
+.bracket {
+  height: 12px;
+  margin: 0 25%;
+  border: 1px solid var(--line);
+  border-top: 0;
+  border-radius: 0 0 6px 6px;
+}
+
+.stem {
+  width: 1px;
+  height: 10px;
+  background: var(--line);
+  margin: 0 auto;
+}
+
+.bridge {
+  margin-top: 6px;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* Comes out (GlanceList) */
+
+.rows {
+  list-style: none;
+}
+
+.rowItem + .rowItem {
+  border-top: 1px solid var(--line);
+}
+
+.row {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  width: 100%;
+  padding: 7px 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.row:hover {
+  color: var(--teal);
+}
+
+.rowNum {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-faint);
+  font-weight: 500;
+}
+
+.rowTitle {
+  flex: 1 1 auto;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.row[aria-expanded="true"] .rowTitle {
+  font-weight: 600;
+}
+
+/* ChevronIcon takes no className, so this wrapper carries the rotation. */
+.chev {
+  display: flex;
+  flex-shrink: 0;
+  align-self: center;
+  color: var(--ink-faint);
+  transition:
+    transform 0.2s,
+    color 0.2s;
+}
+
+.row:hover .chev {
+  color: var(--teal);
+}
+
+.row[aria-expanded="true"] .chev {
+  transform: rotate(180deg);
+}
+
+/* Indented to the title (num width + gap). */
+.rowPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 2px 0 12px 28px;
+}
+
+/* `display: flex` would otherwise override the hidden attribute. */
+.rowPanel[hidden] {
+  display: none;
+}
+
+.detail {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.excerpt {
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--paper-2);
+  border-radius: 5px;
+  padding: 8px 10px;
+  overflow-wrap: break-word;
+}
+
+.timeline {
+  padding: 8px 22px 22px 54px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal);
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.note {
+  padding: 12px 22px 14px 54px;
+  border-top: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+  color: var(--ink-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chev {
+    transition: none;
+  }
+}
+
+/* ---------- Breakpoints ---------- */
+
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* The 24px row gap + 12px: the phone design's 36px under the doors. */
+  .panel {
+    margin-top: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 64px 0 48px;
+  }
+
+  .eyebrow {
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .lede {
+    margin-top: 20px;
+    font-size: 18px;
+  }
+
+  /* The doors stack; the pill takes the full width. */
+  .doors {
+    margin-top: 28px;
+  }
+
+  .doorRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .primary {
+    align-self: stretch;
+    justify-content: center;
+  }
+
+  .plainRow {
+    margin-top: 12px;
+  }
+
+  .plain {
+    padding-top: 8px;
+  }
+
+  /* The panel's inset narrows with the page gutter; rail, dots and chevron
+     shift 2px with it to stay on one line. */
+  .panelHead {
+    padding: 13px 20px;
+  }
+
+  .rail {
+    left: 25px;
+  }
+
+  .railEnd {
+    left: 19px;
+  }
+
+  .block {
+    padding-right: 20px;
+    padding-left: 50px;
+  }
+
+  .blockDot {
+    left: 21px;
+  }
+
+  .row {
+    gap: 12px;
+  }
+
+  .rowPanel {
+    padding-left: 26px;
+  }
+
+  .timeline {
+    padding: 8px 20px 22px 50px;
+  }
+
+  .note {
+    padding: 12px 20px 14px 50px;
+  }
+}
+
+/* The longest unbreakable eyebrow segment must fit a 375px viewport; the
+   two lenses share one narrow row. */
+@media (max-width: 480px) {
+  .label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+  }
+
+  .dot {
+    margin-top: 5px;
+  }
+
+  .inList {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .lensList {
+    gap: 10px;
+  }
+
+  .lens {
+    padding: 12px;
+  }
+
+  .lensTitle {
+    font-size: 19px;
+  }
+
+  .lensBody {
+    font-size: 13.5px;
+  }
+
+  .lensLong {
+    display: none;
+  }
+
+  .lensShort {
+    display: inline;
+  }
+
+  .bridge {
+    font-size: 12px;
+  }
+}

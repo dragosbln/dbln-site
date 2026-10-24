@@ -1,0 +1,217 @@
+/* Design: 01-when-you-need-this in the review-page handover. Desktop first;
+   one column at 640px, as the design. */
+
+/* SectionHead keeps its 52px on desktop; the phone design tightens it. This
+   overrides SectionHead's own .head at equal specificity, which holds
+   because SectionHead is imported before this module (Next orders CSS by
+   import order). */
+@media (max-width: 640px) {
+  .head {
+    --head-gap: 20px;
+  }
+}
+
+/* ---------- Cards ---------- */
+
+.cards {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+/* Lets each card fill its row, so the three share a height. */
+.cardItem {
+  display: flex;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 26px 24px 24px;
+  background: var(--paper);
+  transition:
+    border-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.card:hover {
+  border-color: var(--teal);
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px -28px
+    color-mix(in srgb, var(--teal) 60%, transparent);
+}
+
+.kicker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--teal);
+  line-height: 1.5;
+}
+
+.cardTitle {
+  display: block;
+  margin-top: 10px;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.25;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+.cardBody {
+  display: block;
+  margin-top: 10px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+/* The card's own call to action, pinned to the card's foot. */
+.go {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: color 0.2s;
+}
+
+.card:hover .go {
+  color: var(--teal);
+}
+
+/* ---------- What it covers / Not the right fit ---------- */
+
+.row {
+  margin-top: 56px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 48px;
+  align-items: start;
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.covers {
+  list-style: disc;
+  margin-top: 10px;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-body);
+}
+
+.covers li::marker {
+  color: var(--ink-faint);
+}
+
+/* The starred line: the mark hangs in its own 16px column. */
+.star {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  column-gap: 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.starMark {
+  font-family: var(--mono);
+  font-weight: 500;
+  color: var(--teal);
+}
+
+.notFit {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper-2);
+  padding: 20px 22px 18px;
+}
+
+/* --ink-faint fails AA on paper-2; the -2 shade is the one for it. */
+.notFit .label {
+  color: var(--ink-faint-2);
+}
+
+.notFitList {
+  list-style: none;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-body);
+}
+
+/* Keep the border colour change; drop the lift and its shadow. */
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: border-color 0.2s;
+  }
+
+  .card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .cards {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .card {
+    padding: 16px 16px 14px;
+  }
+
+  .cardTitle {
+    margin-top: 6px;
+  }
+
+  .cardBody {
+    margin-top: 6px;
+    line-height: 1.45;
+  }
+
+  .go {
+    margin-top: 10px;
+    padding-top: 0;
+  }
+
+  .row {
+    margin-top: 40px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .notFit {
+    padding: 16px 16px 14px;
+  }
+}
