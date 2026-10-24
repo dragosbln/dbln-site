@@ -1,3 +1,4 @@
+import { landing, questions, reviewPath } from "@/content/review";
 import { review, site } from "@/content/site";
 import { caseStudies } from "@/content/work";
 import { getPosts } from "@/lib/posts";
@@ -33,6 +34,7 @@ export function GET() {
 ## Pages
 
 - [Home](${site.url}/): positioning, the review offer, the method, selected work, testimonials, writing
+- [${landing.title}](${site.url}${reviewPath}): the offer page in full: when you need it, how it runs stop by stop with a worked example, the five deliverables as sample pages, who runs it, the free first read, ${questions.items.length} questions answered
 - [Work](${site.url}/work): ${caseStudies.length} case studies in depth (situation, the expensive-to-reverse decision, approach, outcomes) — ${caseNames}
 - [Writing](${site.url}/blog): all articles; RSS at ${site.url}/feed.xml
 - [Privacy Notice](${site.url}/privacy): what the site collects (no cookies, cookieless analytics, Cal.com only on request)

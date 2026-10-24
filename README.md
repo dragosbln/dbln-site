@@ -59,6 +59,7 @@ Generated from `src/content/site.ts` so they never drift from page content:
 src/
   app/          # routes, layout, global styles, metadata routes
   components/   # one folder per component: <Name>.tsx + <Name>.module.css + index.ts
+                # shared pieces at the top level; a page's own sections under components/pages/<page>/
   content/      # site.ts — single source of truth for copy and identity
   lib/          # schema.ts and other helpers
 ```
