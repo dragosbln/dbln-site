@@ -182,6 +182,8 @@ export const testimonials: TestimonialsSection = {
     {
       quote:
         "He helped me transform my initial concepts into clear, structured documentation and provided insights that added real value to the project. What impressed me most was his ability to communicate technical concepts in a way that was accessible to everyone, ensuring alignment across the board. A consummate professional.",
+      shortQuote:
+        "What impressed me most was his ability to communicate technical concepts in a way that was accessible to everyone, ensuring alignment across the board. A consummate professional.",
       name: "Emin Eskiocak",
       role: "PropTech Entrepreneur",
       href: "https://www.linkedin.com/in/emineskiocak/",

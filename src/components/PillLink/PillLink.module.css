@@ -1,0 +1,32 @@
+/* The hero's primary button (Hero.module.css .primary), shared. */
+.pill {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 14px 26px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+
+.pill:hover {
+  background: var(--teal-deep);
+  transform: translateY(-1px);
+}
+
+.block {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill:hover {
+    transform: none;
+  }
+}

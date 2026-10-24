@@ -3,8 +3,9 @@
 import Cal, { getCalApi } from "@calcom/embed-react";
 import { Fragment, type ReactNode, useEffect, useRef, useState } from "react";
 import Reveal from "@/components/Reveal";
-import type { ContactBooking } from "@/content/types";
+import type { BookingFormatValue, ContactBooking } from "@/content/types";
 import { track } from "@/lib/analytics";
+import { subscribeBookingFormat } from "@/lib/bookingPrefill";
 import styles from "./BookingFlow.module.css";
 
 const CAL_NAMESPACE = "booking";
@@ -335,11 +336,41 @@ export default function BookingFlow({
     setPending(null);
   };
 
+  // Two ways to pick a format. The picker toggles: clicking the picked row
+  // again deselects it. A situation link (`BookingLink`, through
+  // bookingPrefill) only selects: the visitor asked for that situation, so
+  // asking again keeps it. Past that, both take the same path, so an
+  // interacted booker still gets the restart dialog, and the pick boots Cal
+  // and is tracked like any other.
   const requestFormat = (value: string) => {
     const next = format === value ? null : value;
     if (interacted) setPending({ next });
     else applyFormat(next);
   };
+
+  const selectRequestedFormat = (value: BookingFormatValue) => {
+    // No picker to act on once a booking has landed (design 5a).
+    if (confirmed || format === value) return;
+    if (!booking.formats.some((f) => f.value === value)) return;
+    if (interacted) setPending({ next: value });
+    else applyFormat(value);
+  };
+
+  /** Latest `selectRequestedFormat` for the subscription, registered once. */
+  const selectRequestedRef = useRef(selectRequestedFormat);
+  useEffect(() => {
+    selectRequestedRef.current = selectRequestedFormat;
+  });
+
+  // A requested situation is a visitor's click on this site: delivered live
+  // while mounted, or held across the client-side navigation that mounted
+  // this instance (see bookingPrefill). Being a click, it counts as the pick
+  // that loads Cal.
+  useEffect(
+    () =>
+      subscribeBookingFormat((value) => selectRequestedRef.current(value)),
+    [],
+  );
 
   /**
    * Reschedule and cancel hand the booking back to Cal in its own tab, and

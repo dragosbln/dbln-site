@@ -1,0 +1,370 @@
+/* A sample document's paper page; design `.wy-pg` in the review handover
+   (03-what-you-get.dc.html). Prototype class → here: wy-k kicker, wy-p para,
+   wy-q quote, wy-ans answer, wy-tb table, wy-chg wide, wy-fd finding,
+   wy-id findingId. */
+.page {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 40px 44px 32px;
+  max-width: 760px;
+  margin: 0 auto;
+  /* Tables and label/value grids stack by the page's own width (container
+     query below), not the viewport's: beside a sticky spine column the page
+     is far narrower than the viewport, and the roadmap table needs ~460px. */
+  container-type: inline-size;
+}
+
+.page h3 {
+  margin: 0 0 8px;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 26px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.meta {
+  margin: 0 0 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.65;
+  letter-spacing: 0.02em;
+  color: var(--ink-faint);
+}
+
+.kicker {
+  margin: 22px 0 7px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+}
+
+/* A kicker straight under the title (no meta line between). */
+.page h3 + .kicker {
+  margin-top: 14px;
+}
+
+.para {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-body);
+}
+
+.quote {
+  margin: 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 19px;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.answer {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-body);
+  margin-top: 4px;
+}
+
+.table th {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+  text-align: left;
+  padding: 0 12px 8px 0;
+  border-bottom: 1px solid var(--line);
+  vertical-align: bottom;
+}
+
+.table td {
+  padding: 9px 12px 9px 0;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.table td:first-child {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.table td.sans {
+  font-family: var(--sans);
+  font-size: 13.5px;
+  white-space: normal;
+}
+
+.table td.wide {
+  font-family: var(--sans);
+  font-size: 13.5px;
+  white-space: normal;
+  min-width: 180px;
+}
+
+/* The mono id of an `{ id, text }` cell ("R-1"). */
+.table td b {
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 12px;
+  margin-right: 6px;
+  color: var(--teal);
+}
+
+.table td.mono,
+.mono {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.ol {
+  margin: 0;
+  padding-left: 22px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-body);
+}
+
+.ol li {
+  padding: 3px 0;
+}
+
+.ol li::marker {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--teal);
+}
+
+.ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-body);
+}
+
+.ul li {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.box {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.box dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 7px 14px;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.box dt {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint-2);
+  padding-top: 3px;
+}
+
+.box dd {
+  margin: 0;
+  color: var(--ink-body);
+}
+
+.finding {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px 18px 14px;
+}
+
+.finding + .finding {
+  margin-top: 12px;
+}
+
+.findingId {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--teal);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.finding h4 {
+  margin: 4px 0 10px;
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+}
+
+.kv {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 6px 14px;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+/* Spacing the prototype sets inline: a finding's label/value rows sit 8px
+   under its id when untitled, 14px under its table. */
+.findingId + .kv {
+  margin-top: 8px;
+}
+
+.table + .kv {
+  margin-top: 14px;
+}
+
+.kv dt {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding-top: 3px;
+}
+
+.kv dd {
+  margin: 0;
+  color: var(--ink-body);
+}
+
+.code {
+  margin: 0;
+  background: var(--code-bg);
+  color: var(--code-fg);
+  border: 1px solid var(--ink-body);
+  border-radius: 12px;
+  padding: 16px 18px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Named after the DocCodeToken tones; the component looks them up by tone. */
+.code .comment {
+  color: var(--code-comment);
+  font-style: italic;
+}
+
+.code .key {
+  color: var(--teal-bright);
+}
+
+.code .string {
+  color: var(--code-string);
+}
+
+.code .number {
+  color: var(--code-number);
+}
+
+.foot {
+  margin-top: 26px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 22px 16px 20px;
+  }
+
+  .page h3 {
+    font-size: 22px;
+  }
+
+  .code {
+    font-size: 11.5px;
+    padding: 14px 12px;
+  }
+}
+
+/* Narrow page box (a phone, or the spine layout just above 900px). */
+@container (max-width: 560px) {
+  /* Rows stack into blocks; each cell prints its column label instead. */
+  .table thead {
+    display: none;
+  }
+
+  .table tr {
+    display: block;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .table td {
+    display: block;
+    border: 0;
+    padding: 2px 0;
+  }
+
+  .table td:first-child {
+    white-space: normal;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    display: block;
+    font-family: var(--mono);
+    /* 10px in the prototype; the site's mono floor is 10.5px. */
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 1px;
+  }
+
+  .table td.wide {
+    min-width: 0;
+  }
+
+  .box dl,
+  .kv {
+    grid-template-columns: 1fr;
+    gap: 2px 0;
+  }
+
+  .box dd,
+  .kv dd {
+    margin-bottom: 6px;
+  }
+}
