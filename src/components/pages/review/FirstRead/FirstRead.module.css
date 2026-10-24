@@ -1,0 +1,164 @@
+/* 05 · Start with a first read. Design source:
+   05-start-with-a-first-read.dc.html (fr-*, f1-*). */
+
+.head {
+  --head-gap: 28px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  column-gap: 56px;
+  align-items: start;
+}
+
+.lede {
+  max-width: 62ch;
+  color: var(--ink-body);
+  font-size: 18px;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+}
+
+.waysLabel {
+  margin: 36px 0 12px;
+}
+
+.ways {
+  list-style: none;
+  border-bottom: 1px solid var(--line);
+}
+
+.way {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  border-top: 1px solid var(--line);
+  padding: 18px 0 20px;
+}
+
+.letter {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--teal);
+  font-weight: 500;
+  line-height: 1.8;
+}
+
+.body {
+  color: var(--ink-body);
+  font-size: 17px;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.body strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* The panel is the grid item itself (the prototype wraps it in a div,
+   which leaves the sticky no room to travel): with align-items: start it
+   rides down its row, under the header, while the rows scroll past. */
+.panel {
+  position: sticky;
+  top: calc(var(--header-h) + 4px);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper-2);
+  padding: 24px 24px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* .fr-btn: the shared pill at the prototype's tighter size, without the
+   hero's hover lift. Two classes, so it outranks PillLink's own rules
+   whatever order the stylesheets load in. */
+.panel .cta {
+  padding: 13px 24px;
+  letter-spacing: -0.005em;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.panel .cta:hover {
+  transform: none;
+}
+
+.guide {
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.link {
+  color: var(--teal);
+  border-bottom: 1px solid color-mix(in srgb, var(--teal) 40%, transparent);
+  transition: border-color 0.2s;
+}
+
+.link:hover {
+  border-bottom-color: var(--teal);
+}
+
+/* --ink-faint-2: the faint tone that stays AA on --paper-2. */
+.notLabel {
+  margin-top: 10px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-faint-2);
+}
+
+.not {
+  margin-top: -4px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  text-wrap: pretty;
+}
+
+/* SectionHead moves the aside under the title at 760px (asideOnPhone). */
+@media (max-width: 640px) {
+  .head {
+    --head-gap: 22px;
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lede {
+    font-size: 17px;
+  }
+
+  .waysLabel {
+    margin: 28px 0 10px;
+  }
+
+  .way {
+    grid-template-columns: 34px minmax(0, 1fr);
+    padding: 14px 0 16px;
+  }
+
+  .panel {
+    position: static;
+    margin-top: 24px;
+    padding: 20px 20px 18px;
+    border-radius: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link {
+    transition: none;
+  }
+}
