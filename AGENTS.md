@@ -8,7 +8,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 - **Static export.** `next.config.ts` sets `output: "export"`. Nothing may rely on a server at runtime: no dynamic route handlers, no `cookies()`/`headers()`, no middleware. Route handlers must be `force-static` GET.
 - **Components.** One folder per component: `src/components/<Name>/` containing `<Name>.tsx`, `<Name>.module.css` (if styled), and an `index.ts` barrel (`export { default } from "./<Name>";`). Import other components via `@/components/<Name>`; import a component's own CSS relatively (`./<Name>.module.css`). Top level is for shared pieces (primitives, chrome, anything two pages use); a section that belongs to one page lives in `src/components/pages/<page>/<Name>/` with the same folder shape (first used by `/review`). The `pages/` level is load-bearing: `src/components/review/` would be the same directory as the `Review` component on the case-insensitive macOS disk (git records whichever casing existed first), and the import then fails on the Linux CI runner. A section's client leaf is a second file in the section's folder, imported relatively. Top-level components never import from a page folder.
-- **Styling.** CSS Modules only — no inline `style={{}}`, no styled-jsx, no Tailwind. `src/app/globals.css` holds only design tokens, the reset, and the `.wrap` / `.section` / `.reveal` utilities. Everything else lives in the owning component's module. Two exceptions, both global because the markup is generated from markdown at build and can't carry hashed module classes: `src/styles/prose.css` (`.prose`, plus the `.prose--peek` compact variant) and `src/styles/diagram.css` (`dg-*`).
+- **Styling.** CSS Modules only — no inline `style={{}}`, no styled-jsx, no Tailwind. `src/app/globals.css` holds only design tokens, the reset, and the `.wrap` / `.section` / `.reveal` utilities. Everything else lives in the owning component's module. A section tightens `.section`'s padding by setting `--section-pad` / `--section-pad-phone` in its own module class (the home page runs at 78/54px), the same way `SectionHead` takes `--head-gap`: never a competing `padding` rule, which stylesheet order would settle. Two exceptions, both global because the markup is generated from markdown at build and can't carry hashed module classes: `src/styles/prose.css` (`.prose`, plus the `.prose--peek` compact variant) and `src/styles/diagram.css` (`dg-*`).
 - **Content.** All copy, links, and identity data live in `src/content/site.ts`. Components render content; they don't contain it.
 - **Server-first.** Components are React Server Components by default. Add `"use client"` only at interactive leaves (e.g. scroll reveal), never on whole sections.
 - **SEO surfaces.** When adding a route, update `src/app/sitemap.ts` and the Pages list in `src/app/llms.txt/route.ts`, and give the page its own `metadata` export with a canonical. Keep JSON-LD in `src/lib/schema.ts` in sync with content changes.
@@ -138,12 +138,37 @@ To publish:
    Medium publications move the story to their own domain on acceptance, so
    list the publication URL. The old single `devto` field fails the build.
 
+## The home page
+
+Design: the approved homepage of 2026-11-02 (a standalone HTML handed over
+as the spec; its copy is now `src/content/site.ts`). Sections, in order:
+`Hero` (one CTA, the profile aside with `site.portrait`), `Review` (the
+engagement panel on one rail + "Review in context"), `Work`, `Testimonials`,
+`Writing`, then `pages/home/Booking`. The context entries link to their own
+page once it exists; until then they lead to the booking section
+(`TODO(customer-relations)` in `site.ts`: flip the href, nothing else).
+The page's JSON-LD adds a `Service` node (`/#service`) built from the same
+content; `/llms.txt` derives its offer lines from `hero` and `review`.
+
 ## Contact booking (Cal.com)
 
 The contact section (design: 3a in `../claude_websie/directions/brief.html`)
 is a server shell (`Contact`) slotting the heading into one client leaf
 (`BookingFlow`): format picker + optional note on the left, a paper card with
-the Cal.com inline embed (`@calcom/embed-react`) on the right.
+the Cal.com inline embed (`@calcom/embed-react`) on the right. It renders on
+/review and /work.
+
+The home page has its own booking surface, `src/components/pages/home/Booking`
+(server shell + `CalendarGate` client leaf), with no situation picker: the
+"Show available times" button is the visitor's request that loads Cal — the
+same click-to-load boundary as below, and /privacy describes both. It uses
+its own Cal namespace (`home`; `BookingFlow` keeps `booking`, so neither
+hears the other's events) and the shared theme in `src/lib/calTheme.ts`.
+Once the booker is up, Cal's own event details show (with the timezone
+selector) and the site-authored card header leaves the card; a landed
+booking shows Cal's own confirmation screen, not the 5a scheduled card.
+Plausible events: `Booking Calendar Opened` (no props; needs a goal in the
+dashboard) and `Booking Confirmed` with `format: "none"`.
 
 The Cal side is configuration the code depends on — breaking it fails
 silently:

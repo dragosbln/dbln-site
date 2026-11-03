@@ -11,7 +11,11 @@ import styles from "./Writing.module.css";
 export default function Writing() {
   const posts = getPosts().slice(0, writing.featuredCount);
   return (
-    <section id="writing" className="section" aria-labelledby="writing-title">
+    <section
+      id="writing"
+      className={`section ${styles.section}`}
+      aria-labelledby="writing-title"
+    >
       <div className="wrap">
         <SectionHead
           num={writing.num}
@@ -19,7 +23,12 @@ export default function Writing() {
           id="writing-title"
           aside={writing.aside}
           asideLink={writing.asideLink}
+          asideOnPhone
+          className={styles.head}
         />
+        <Reveal as="p" className={styles.intro}>
+          {writing.intro}
+        </Reveal>
         <ul className={styles.grid}>
           {posts.map((post) => (
             <Reveal as="li" className={styles.cell} key={post.slug}>

@@ -9,6 +9,8 @@ import { isModifiedClick } from "@/lib/isModifiedClick";
 type HashLinkProps = {
   href: string;
   className?: string;
+  /** Replaces the link's text as its accessible name (a context entry that leads to booking). */
+  "aria-label"?: string;
   /** Runs before HashLink's own handling (see the composition note below). */
   onClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
   children: ReactNode;
@@ -42,6 +44,7 @@ type HashLinkProps = {
 export default function HashLink({
   href,
   className,
+  "aria-label": ariaLabel,
   onClick,
   children,
 }: HashLinkProps) {
@@ -55,7 +58,12 @@ export default function HashLink({
     document.getElementById(id)?.scrollIntoView();
   };
   return (
-    <Link className={className} href={resolved} onClick={handleClick}>
+    <Link
+      className={className}
+      href={resolved}
+      aria-label={ariaLabel}
+      onClick={handleClick}
+    >
       {children}
     </Link>
   );

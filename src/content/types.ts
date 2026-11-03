@@ -34,13 +34,29 @@ export type PageHero = {
   metaDescription: string;
 };
 
+/** The home hero's profile aside; the portrait is `site.portrait`, the name `site.name`. */
+export type HeroProfile = {
+  /** aria-label of the aside ("About Dragos"). */
+  label: string;
+  /** Under the name ("Software engineer & architect"). */
+  role: string;
+  bio: string;
+  /** The personal line ("I run every review myself…"). */
+  commitment: string;
+  /** Foot line ("Cluj-Napoca, Romania · Remote"). */
+  location: string;
+  /** Foot links: a section of this site, or a profile (opens in a new tab). */
+  links: NavItem[];
+};
+
 export type Hero = {
   eyebrow: string;
   /** Rich text. */
   title: string;
   lede: string;
-  actions: { primary: NavItem; secondary: NavItem };
-  meta: { key: string; value: string; detail: string }[];
+  /** The one call to action; leads to the booking section. */
+  cta: NavItem;
+  profile: HeroProfile;
 };
 
 export type WorkItem = {
@@ -53,15 +69,32 @@ export type WorkItem = {
   tags: string[];
 };
 
-export type ReviewStep = {
-  /** Mono eyebrow, e.g. "01 · You provide". */
-  eyebrow: string;
-  /** Serif lead line, e.g. "Three inputs:". */
-  lead: string;
-  /** Rich text items. */
-  items: string[];
-  /** Numbered markers (ol) when true; em-dash markers (ul) otherwise. */
-  ordered?: boolean;
+/** The home review section's engagement panel: three steps on one rail. */
+export type EngagementPanel = {
+  title: string;
+  bring: { label: string; text: string };
+  /** The two lenses, set side by side in serif. */
+  lenses: { label: string; items: string[] };
+  receive: {
+    label: string;
+    /** aria-label of the deliverables list. */
+    listLabel: string;
+    items: string[];
+  };
+  /** The teal mono line at the rail's end: "Fixed scope · Two to three weeks". */
+  scope: string;
+  duration: string;
+};
+
+/**
+ * A context the review is read in. Links to that context's page; until the
+ * page exists, to the booking section, with `ariaLabel` naming the action.
+ */
+export type ReviewContextItem = {
+  name: string;
+  desc: string;
+  href: string;
+  ariaLabel?: string;
 };
 
 export type Testimonial = {
@@ -76,13 +109,6 @@ export type Testimonial = {
   role: string;
   /** Optional link to the author's public profile (LinkedIn). */
   href?: string;
-};
-
-export type AgenticItem = {
-  /** Mono kicker, e.g. "Quality". */
-  kicker: string;
-  title: string;
-  body: string;
 };
 
 export type Post = {
@@ -148,17 +174,13 @@ export type CaseStudy = {
 
 export type WorkSection = SectionIntro & { items: WorkItem[]; cta?: NavItem };
 export type ReviewSection = SectionIntro & {
-  /** The scope strip on top of the card. */
-  scope: { lead: string; note: string };
-  steps: ReviewStep[];
+  panel: EngagementPanel;
+  context: { label: string; items: ReviewContextItem[] };
 };
 export type TestimonialsSection = SectionIntro & { items: Testimonial[] };
-export type AgenticSection = SectionIntro & {
-  /** Rich text pull quote. */
-  pull: string;
-  items: AgenticItem[];
-};
 export type WritingSection = SectionIntro & {
+  /** One line under the head ("Research and practical work on…"). */
+  intro: string;
   /** How many of the newest posts the landing section shows. */
   featuredCount: number;
 };
@@ -168,6 +190,43 @@ export type Contact = {
   /** Rich text. */
   title: string;
   body: string;
+};
+
+/**
+ * The home page's booking section: no situation picker; one button loads
+ * Cal.com (click-to-load, AGENTS.md "Contact booking"). The event itself is
+ * `booking.event`.
+ */
+export type HomeBooking = {
+  label: string;
+  /** Rich text. */
+  title: string;
+  body: string;
+  /** The small line under the body ("No preparation or system access needed."). */
+  prep: string;
+  /** Above the email link. */
+  mailPrompt: string;
+  card: {
+    /** Site-authored header, shown until Cal's own event details load. */
+    title: string;
+    meta: string;
+    /** The click-to-load button. */
+    button: string;
+    /** Under the button: names the third party the click will contact. */
+    note: string;
+    privacyLabel: string;
+    /** Status line while the booker loads. */
+    loading: string;
+    /** Status after the slow-load timeout, before the email fallback link. */
+    slow: string;
+    /** Status when the embed cannot load, before the email fallback link. */
+    failed: string;
+    emailFallback: string;
+    /** aria-label of the calendar region. */
+    slotLabel: string;
+    /** title of the booker iframe once it has loaded. */
+    iframeTitle: string;
+  };
 };
 
 /**

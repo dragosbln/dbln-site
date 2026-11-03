@@ -1,10 +1,10 @@
 import type {
-  AgenticSection,
   CodePeekContent,
   Contact,
   ContactBooking,
   DiscussionContent,
   Hero,
+  HomeBooking,
   NavItem,
   NotFound,
   ReviewSection,
@@ -26,14 +26,16 @@ export const site = {
   /** Short brand form, e.g. the header's "/ Luckylabs". */
   companyShort: "Luckylabs",
   role: "Independent AI Reliability Reviews · Software Architect",
-  title: "Dragos Bilaniuc — Independent AI Reliability Reviews",
+  title: "Dragos Bilaniuc · AI reliability & system design",
   description:
-    "I find where AI products break, and the design decisions that let it break. Independent reviews of LLM products: verified findings, architecture review, system-level fix plan.",
+    "Independent reviews of AI workflows, grounded in agent behaviour and system design. Evidence, priorities and runnable checks for your next rollout.",
   email: "dragos@dbln.me",
   location: "Cluj-Napoca, Romania",
   /** Structured halves of `location`, for the Person schema's PostalAddress. */
   locality: "Cluj-Napoca",
   countryCode: "RO",
+  /** The portrait in public/: the home hero and the review page's reviewer card. */
+  portrait: "/images/dragos-640.jpg",
   socials: {
     devto: "https://dev.to/dragosbln",
     github: "https://github.com/dragosbln",
@@ -63,114 +65,108 @@ export const nav: { links: NavItem[]; cta: NavItem } = {
   cta: { label: "Book a call", href: "/#contact" },
 };
 
+/** The home hero (design: the approved homepage of 2026-11-02): one CTA, the profile aside. */
 export const hero: Hero = {
-  eyebrow: "AI Reliability · Independent reviews of LLM products · Software Architecture & Development",
-  title:
-    "I find where your AI product breaks, and *the design decisions* that let it break.",
-  lede: "Independent reviews for teams whose LLM feature is live but unmeasured. I reproduce failures from your real outputs, review the architecture around the model, and trace each one to the design decision behind it. You leave with a full report, a system-level fix plan, and a starter regression set. Anything I can't verify stays out of the report.",
-  actions: {
-    primary: { label: "Book a call", href: "/#contact" },
-    secondary: { label: "See selected work", href: "/#work" },
+  eyebrow: "AI reliability & system design",
+  title: "I help teams establish what their AI is ready to *handle next.*",
+  lede: "Independent reviews for teams preparing to release or expand AI workflows. I examine agent behaviour and system design to establish what needs to change and how to verify it.",
+  cta: { label: "Let's discuss your next rollout", href: "/#contact" },
+  profile: {
+    label: "About Dragos",
+    role: "Software engineer & architect",
+    bio: "Over nine years in software delivery, across engineering, architecture and technical leadership.",
+    commitment: "I run every review myself, from the first conversation to the handoff.",
+    location: "Cluj-Napoca, Romania · Remote",
+    links: [
+      { label: "Selected work", href: "/#work" },
+      { label: "LinkedIn", href: site.socials.linkedin },
+    ],
   },
-  meta: [
-    { key: "Based", value: "Cluj-Napoca, RO", detail: "Remote · EU / US" },
-    {
-      key: "Technologies",
-      value: "LLMs · TypeScript · Node.js",
-      detail: "Next.js · AWS · GCP",
-    },
-    {
-      key: "Depth",
-      value: "AI Systems Design · Architecture · Security",
-      detail: "Microservices · DDD · Event-Driven · CI/CD",
-    },
-  ],
 };
 
 export const work: WorkSection = {
-  num: "03",
+  num: "02",
   title: "Selected work",
-  aside: "The work behind the reviews: where the architectural and engineering depth comes from.",
-  asideLink: { label: "Read more case studies", href: "/work" },
-  cta: { label: "Read more case studies", href: "/work" },
+  aside: "Experience in architecture and delivery.",
+  asideLink: { label: "Explore the case studies", href: "/work" },
+  cta: { label: "Explore the case studies", href: "/work" },
   items: [
     {
-      period: "2026",
-      title: "Verification-first AI audit tool",
-      role: "Architect & Author · Open source",
-      body: "An open-source audit skill that reviews a codebase's auth layer for vendor lock-in risk. AI does the reading; every finding is quoted from the code and **verified against live runs**, and the harness that tests the auditor is **mutation-tested**. The method behind my reviews, working in public.",
-      tags: ["AI-assisted audit", "Verified evidence", "Mutation testing", "Open source"],
+      period: "2025–26",
+      title: "Authentication re-architecture",
+      role: "Senior Software Engineer · Pie Insurance",
+      body: "Owned the authentication track of a unified frontend re-architecture for a Partner Portal backed by **100+ microservices**. Wrote the architecture decisions and migrated the legacy Amplify/SRP flow to OAuth on Cognito Managed Login.",
+      tags: ["Cognito", "OAuth", "Managed Login", "ADRs", "Multi-pool"],
     },
     {
-      period: "2024—25",
-      title: "Backend for an AI-agents platform",
-      role: "Lead Backend Architect · Bullseye Web3 Studio",
-      body: "Architected the event-driven microservices backend behind two greenfield products, including A1X, a platform where users create and run their own AI agents. Zero to **150,000+ registered users**; GCP stayed **under $500/month** across 10+ services, mostly by deciding what not to build before product-market fit.",
+      period: "2024–25",
+      title: "Backend architecture for two new products",
+      role: "Lead Backend Architect & Developer · Bullseye Web3 Studio",
+      body: "Architected and led the backend for two products, including A1X, a platform for creating and running AI agents. The work supported **150,000+ registered users**, with GCP costs under **$500/month** across 10+ services.",
       tags: ["AI agents", "Microservices", "GCP", "Cost efficiency"],
     },
     {
-      period: "2020—25",
-      title: "LLM chatbot in a health product",
+      period: "2020–25",
+      title: "Technical leadership from idea to production",
       role: "Fractional CTO · Parentool",
-      body: "Shipped a production LLM chatbot (OpenAI, structured outputs) inside a health-tech product I ran end to end: **10,000+ users**, **7% paid conversion**, peak at **#3 in App Store Health & Fitness**. A domain where wrong answers carry real cost.",
+      body: "Owned architecture and delivery for a health-tech product, including a production LLM chatbot. The product reached **10,000+ users** and peaked at **#3 in App Store Health & Fitness**.",
       tags: ["LLM chatbot", "OpenAI", "Fractional CTO", "0→1"],
-    },
-    {
-      period: "2025—26",
-      title: "Auth system re-architecture",
-      role: "Lead Architect & Engineer · Pie Insurance",
-      body: "Owned the authentication track of a unified frontend re-architecture across a Partner Portal of **100+ backend microservices**. Wrote the ADRs (framework, token storage, OAuth, multi-pool Cognito) and migrated the legacy Amplify/SRP auth to a modern OAuth flow on Cognito Managed Login.",
-      tags: ["Cognito", "OAuth", "Managed Login", "ADRs", "Multi-pool"],
     },
   ],
 };
 
-/** Landing section 01 (design: engagements-3a): the single lead offer. */
+/**
+ * Landing section 01: the engagement at a glance, beside the contexts the
+ * review is read in. Each context links to its own page once that page
+ * exists; until then it leads to the booking section, as Finance does.
+ */
 export const review: ReviewSection = {
   num: "01",
   title: "The AI Reliability Review",
-  scope: {
-    lead: "Fixed scope, two weeks.",
-    note: "+1–3 days if you don't have tracing yet.",
+  panel: {
+    title: "The engagement, at a glance",
+    bring: {
+      label: "You bring",
+      text: "One workflow and the next rollout decision.",
+    },
+    lenses: {
+      label: "I review",
+      items: ["Agent behaviour", "System design"],
+    },
+    receive: {
+      label: "You receive",
+      listLabel: "Review deliverables",
+      items: ["Findings", "Roadmap", "Runnable checks"],
+    },
+    scope: "Fixed scope",
+    duration: "Two to three weeks",
   },
-  steps: [
-    {
-      eyebrow: "01 · You provide",
-      lead: "Three inputs:",
-      items: [
-        "Repo access",
-        "A slice of real outputs *— or a way to generate them*",
-        "2–3 hours of team time",
-      ],
-    },
-    {
-      eyebrow: "02 · I review",
-      lead: "Both sides of the system:",
-      items: [
-        "**Behavior** *— failures in your real outputs, reproduced and counted*",
-        "**Design** *— the architecture around the model: data flow, retrieval, prompts, fallbacks*",
-        "**The trace** *— each failure tied to the design decision behind it*",
-      ],
-    },
-    {
-      eyebrow: "03 · You leave with",
-      lead: "Five deliverables:",
-      ordered: true,
-      items: [
-        "Failure inventory",
-        "Architecture findings",
-        "Ranked fix roadmap",
-        "Starter regression set",
-        "Executive readout",
-      ],
-    },
-  ],
+  context: {
+    label: "Review in context",
+    items: [
+      // TODO(customer-relations): the design links a dedicated customer
+      // relations review page, not built yet. Flip `href` to it (and drop
+      // `ariaLabel`) once it exists; nothing else changes.
+      {
+        name: "Customer relations",
+        desc: "Customer-service agents, actions and handoffs.",
+        href: "/#contact",
+        ariaLabel: "Discuss a customer relations workflow",
+      },
+      {
+        name: "Finance",
+        desc: "Invoices, payments and financial records.",
+        href: "/#contact",
+        ariaLabel: "Discuss a finance workflow",
+      },
+    ],
+  },
 };
 
 export const testimonials: TestimonialsSection = {
-  num: "04",
+  num: "03",
   title: "What teams say",
-  aside: "From the people who hired me: enterprise leads, founders, clients.",
+  aside: "From the people I’ve worked with.",
   items: [
     {
       quote:
@@ -198,49 +194,46 @@ export const testimonials: TestimonialsSection = {
   ],
 };
 
-export const agentic: AgenticSection = {
-  num: "02",
-  title: "The method",
-  aside: "How AI fits in the work, and why the findings hold.",
-  pull: "I use AI heavily in every review: it reads more outputs, tries more angles, and covers more of the system than I could alone. But *the judgment doesn't get outsourced, and neither does the verification.* Every finding is reproduced by hand before it reaches the report.",
-  items: [
-    {
-      kicker: "Search",
-      title: "AI-accelerated analysis",
-      body: "AI reads more of your outputs and your codebase than a human reviewer could. It surfaces candidates: possible failures, suspect paths, patterns worth a look.",
-    },
-    {
-      kicker: "Verify",
-      title: "Candidates become findings",
-      body: "AI-assisted analysis produces findings that are plausible and wrong. So a candidate becomes a finding only when I reproduce it and trace it to a cause. What I can't verify doesn't ship.",
-    },
-    {
-      kicker: "Evidence",
-      title: "Findings you can re-run",
-      body: "Each finding carries its trace and its reproduction steps. Your team can check my work without me in the room.",
-    },
-    {
-      kicker: "Design",
-      title: "Down to the decision",
-      body: "Failures get traced to the design decision that allowed them: retrieval, data flow, fallbacks, orchestration. The fix plan changes the system, and the regression set keeps it honest.",
-    },
-  ],
-};
-
 // Articles themselves live in src/content/posts/*.md; the landing section
 // shows the newest `featuredCount` of them (src/lib/posts.ts).
 export const writing: WritingSection = {
-  num: "05",
+  num: "04",
   title: "Writing",
-  aside: "Notes from production work, written up in full.",
   asideLink: { label: "Read the blog", href: "/blog" },
+  intro: "Research and practical work on AI reliability and system design.",
   featuredCount: 3,
 };
 
+/** The booking band on /review and /work (`Contact` + `BookingFlow`). */
 export const contact: Contact = {
   label: "Book a call",
   title: "Ready to find out where your AI product *breaks?*",
   body: "Pick your situation, pick a time. The intro call is 30 minutes.",
+};
+
+/**
+ * The home page's booking band (`pages/home/Booking`): one button loads the
+ * Cal.com calendar; the event is `booking.event` below.
+ */
+export const homeBooking: HomeBooking = {
+  label: "Let’s talk",
+  title: "What do you want your agent to *handle next?*",
+  body: "Let’s discuss your AI workflow, what your team is preparing to change, and where confidence is missing. We’ll work out whether a review would help and what it should focus on.",
+  prep: "No preparation or system access needed.",
+  mailPrompt: "Prefer email? Send me a sentence about the workflow.",
+  card: {
+    title: "Discuss your AI workflow",
+    meta: "30 min · Google Meet",
+    button: "Show available times",
+    note: "The calendar loads from Cal.com when you click.",
+    privacyLabel: "Privacy notice",
+    loading: "Loading available times…",
+    slow: "The calendar is taking longer than expected.",
+    failed: "The calendar couldn’t load.",
+    emailFallback: "Arrange a time by email.",
+    slotLabel: "Choose a time with Dragos",
+    iframeTitle: "Book a 30-minute conversation with Dragos",
+  },
 };
 
 /**

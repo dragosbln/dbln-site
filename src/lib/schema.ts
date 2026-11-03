@@ -1,4 +1,4 @@
-import { site } from "@/content/site";
+import { hero, review, site } from "@/content/site";
 import type { Post, Question, ReviewLanding } from "@/content/types";
 import { coverOgImage, postUrl } from "@/lib/urls";
 
@@ -30,6 +30,10 @@ export const personSchema = {
   sameAs: Object.values(site.socials),
   knowsAbout: [
     "AI reliability",
+    "AI reliability reviews",
+    "AI agents",
+    "Agent behaviour",
+    "System design",
     "LLM applications",
     "Software architecture",
     "Authentication and security",
@@ -164,6 +168,23 @@ export function techArticleSchema(post: Post) {
     ...(post.syndication.length > 0 ? { sameAs: post.syndication } : {}),
   };
 }
+
+/**
+ * The offer as the home page presents it (section 01). Its own node: the
+ * /review page describes the full engagement under `/review#service`, and
+ * the two must not claim one @id with two descriptions.
+ */
+export const homeServiceSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "@id": `${site.url}/#service`,
+  name: review.title,
+  description: hero.lede,
+  url: `${site.url}/#review`,
+  provider: { "@id": `${site.url}/#person` },
+  serviceType: "AI reliability review",
+  inLanguage: "en",
+};
 
 export const webSiteSchema = {
   "@context": "https://schema.org",

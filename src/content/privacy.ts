@@ -5,8 +5,10 @@ import type { PrivacyNotice } from "./types";
  * /privacy page copy. This is a description of the code's actual behaviour,
  * so it is only true as long as that behaviour holds. The claims that carry
  * weight: no cookies, Plausible is cookieless and EU-hosted, and Cal.com is
- * contacted only after a format pick (see AGENTS.md, "Contact booking" and
- * "Analytics"). Identity values interpolate from site.ts so they can't drift.
+ * contacted only after the visitor asks for the calendar: a format pick, or
+ * the home page's "Show available times" button (see AGENTS.md, "Contact
+ * booking" and "Analytics"). Identity values interpolate from site.ts so
+ * they can't drift.
  */
 export const privacy: PrivacyNotice = {
   hero: {
@@ -16,7 +18,7 @@ export const privacy: PrivacyNotice = {
     metaDescription:
       "What dbln.me collects and what it doesn't. Cookieless analytics, no cross-site tracking, and a booking flow that contacts Cal.com only when you choose to.",
   },
-  updated: "2026-07-26",
+  updated: "2026-11-03",
   updatedLabel: "Last updated",
   sections: [
     {
@@ -68,8 +70,8 @@ export const privacy: PrivacyNotice = {
       num: "06",
       title: "Booking a call",
       body: [
-        "The contact section embeds Cal.com. Nothing is requested from Cal.com until you pick a call format. Scroll past the section and no third party is contacted at all.",
-        "Once you pick a format, Cal.com loads and the booking form is theirs. Your name, your email, the format you picked and your answer about what you are weighing go to Cal.com so the call can be scheduled, and they reach my calendar. Cal.com's own privacy policy covers their side of it.",
+        "The booking section embeds Cal.com. Nothing is requested from Cal.com until you ask for the calendar: on the home page by choosing to show available times, on the other pages by picking a call format. Scroll past the section and no third party is contacted at all.",
+        "Once the calendar loads, the booking form is theirs. Your name, your email, the format you picked where the section asks for one, and your answer about what you are weighing go to Cal.com so the call can be scheduled, and they reach my calendar. Cal.com's own privacy policy covers their side of it.",
         "The legal basis is taking steps at your request before a contract.",
       ],
     },

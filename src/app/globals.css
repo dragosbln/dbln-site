@@ -113,14 +113,18 @@ a {
   padding: 0 var(--gutter);
 }
 
+/* A section tightens its padding through the two variables from its own
+   module class (the home page runs at 78/54), never by a competing
+   `padding` rule: equal specificity would be settled by stylesheet order,
+   which module chunking doesn't guarantee. */
 .section {
-  padding: 88px 0;
+  padding: var(--section-pad, 88px) 0;
   border-bottom: 1px solid var(--line);
 }
 
 @media (max-width: 640px) {
   .section {
-    padding: 64px 0;
+    padding: var(--section-pad-phone, 64px) 0;
   }
 }
 

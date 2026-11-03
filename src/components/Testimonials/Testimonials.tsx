@@ -7,7 +7,7 @@ export default function Testimonials() {
   return (
     <section
       id="testimonials"
-      className="section"
+      className={`section ${styles.section}`}
       aria-labelledby="testimonials-title"
     >
       <div className="wrap">
@@ -16,6 +16,8 @@ export default function Testimonials() {
           title={testimonials.title}
           id="testimonials-title"
           aside={testimonials.aside}
+          asideOnPhone
+          className={styles.head}
         />
         <ul className={styles.grid}>
           {testimonials.items.map((item) => (

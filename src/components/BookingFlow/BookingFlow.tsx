@@ -6,31 +6,10 @@ import Reveal from "@/components/Reveal";
 import type { BookingFormatValue, ContactBooking } from "@/content/types";
 import { track } from "@/lib/analytics";
 import { subscribeBookingFormat } from "@/lib/bookingPrefill";
+import { CAL_CSS_VARS } from "@/lib/calTheme";
 import styles from "./BookingFlow.module.css";
 
 const CAL_NAMESPACE = "booking";
-
-/**
- * Paper-token theme for the embedded booker. Colors only — the booker's
- * fonts are Cal's own and cannot be themed from outside the iframe.
- */
-const CAL_CSS_VARS: Record<string, string> = {
-  "cal-brand": "#0c7b72",
-  "cal-brand-emphasis": "#0a5b55",
-  "cal-brand-text": "#ffffff",
-  "cal-bg": "#f6f4ef",
-  "cal-bg-emphasis": "#e4efec",
-  "cal-bg-subtle": "#efece4",
-  "cal-bg-muted": "#efece4",
-  "cal-border": "#d9d5cb",
-  "cal-border-subtle": "#d9d5cb",
-  "cal-border-muted": "#e5e2d9",
-  "cal-border-booker": "#f6f4ef",
-  "cal-text": "#4a4d52",
-  "cal-text-emphasis": "#17191c",
-  "cal-text-subtle": "#6b6e73",
-  "cal-text-muted": "#8a8c8f",
-};
 
 type BookingFlowProps = {
   /** Server-rendered kicker + title + lede (slotted in above the steps). */

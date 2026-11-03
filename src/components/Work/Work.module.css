@@ -1,10 +1,15 @@
+.section {
+  --section-pad: 78px;
+  --section-pad-phone: 54px;
+}
+
 .list {
   list-style: none;
 }
 
 .row {
   display: grid;
-  grid-template-columns: 56px 1fr 1fr;
+  grid-template-columns: 56px minmax(0, 1fr) minmax(0, 1fr);
   gap: 32px;
   padding: 34px 0;
   border-top: 1px solid var(--line);
