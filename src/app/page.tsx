@@ -6,14 +6,31 @@ import Review from "@/components/Review";
 import Testimonials from "@/components/Testimonials";
 import Work from "@/components/Work";
 import Writing from "@/components/Writing";
-import { homeBooking } from "@/content/site";
+import { homeBooking, site } from "@/content/site";
 import { homeServiceSchema } from "@/lib/schema";
+import { homeOgImage } from "@/lib/urls";
 
-// Title, description, og and robots (index, follow) come from the root
-// layout: the home page is the site's default page.
+// Title, description and robots (index, follow) come from the root layout:
+// the home page is the site's default page. The social card is this page's
+// own (homeOgImage), so og and twitter are set here in full: each block
+// replaces the layout's wholesale, and the layout keeps the site-wide card
+// for pages without one.
 export const metadata: Metadata = {
   alternates: {
     canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    url: site.url,
+    siteName: site.name,
+    title: site.title,
+    description: site.description,
+    locale: "en_US",
+    images: [homeOgImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: [homeOgImage.url],
   },
 };
 
