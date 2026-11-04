@@ -5,13 +5,10 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import ArrowIcon from "@/components/ArrowIcon";
 import CalendarIcon from "@/components/CalendarIcon";
-import type { HomeBooking } from "@/content/types";
+import type { BookingBandContent } from "@/content/types";
 import { track } from "@/lib/analytics";
 import { CAL_CSS_VARS } from "@/lib/calTheme";
-import styles from "./Booking.module.css";
-
-/** Own namespace: `BookingFlow`'s ("booking") registers its own handlers. */
-const CAL_NAMESPACE = "home";
+import styles from "./BookingBand.module.css";
 
 /** How long the booker may take before the status offers the email fallback. */
 const SLOW_LOAD_MS = 15_000;
@@ -19,10 +16,12 @@ const SLOW_LOAD_MS = 15_000;
 type Phase = "idle" | "loading" | "ready" | "slow" | "failed";
 
 type CalendarGateProps = {
-  copy: HomeBooking["card"];
+  copy: BookingBandContent["card"];
   /** Cal.com link path ("dragosbln/30min"). */
   calLink: string;
   email: string;
+  /** The page's own Cal namespace (see `BookingBand`). */
+  namespace: string;
 };
 
 /**
@@ -40,7 +39,13 @@ type CalendarGateProps = {
  * selector), so the site-authored header leaves the card; the `ui`
  * instruction is one-shot and re-applied on every `linkReady`.
  */
-export default function CalendarGate({ copy, calLink, email }: CalendarGateProps) {
+export default function CalendarGate({
+  copy,
+  calLink,
+  email,
+  namespace,
+}: CalendarGateProps) {
+  const slotId = `${namespace}-cal-slot`;
   const [phase, setPhase] = useState<Phase>("idle");
   /** The embed mounts only once Cal's API is up and the handlers are registered. */
   const [calReady, setCalReady] = useState(false);
@@ -66,7 +71,7 @@ export default function CalendarGate({ copy, calLink, email }: CalendarGateProps
     }, SLOW_LOAD_MS);
     (async () => {
       try {
-        const cal = await getCalApi({ namespace: CAL_NAMESPACE });
+        const cal = await getCalApi({ namespace });
         cal("ui", ui);
         cal("on", {
           action: "linkReady",
@@ -96,7 +101,7 @@ export default function CalendarGate({ copy, calLink, email }: CalendarGateProps
         setPhase("failed");
       }
     })();
-  }, [started, copy.iframeTitle]);
+  }, [started, copy.iframeTitle, namespace]);
 
   // The status line announces the load and takes focus so a keyboard
   // visitor isn't left on the button that just disappeared.
@@ -129,7 +134,7 @@ export default function CalendarGate({ copy, calLink, email }: CalendarGateProps
             type="button"
             className={styles.load}
             onClick={open}
-            aria-controls="home-cal-slot"
+            aria-controls={slotId}
             aria-describedby="booking-privacy-note"
           >
             {copy.button} <ArrowIcon />
@@ -159,7 +164,7 @@ export default function CalendarGate({ copy, calLink, email }: CalendarGateProps
       </p>
       <div
         ref={slotRef}
-        id="home-cal-slot"
+        id={slotId}
         className={styles.calendar}
         role="region"
         aria-label={copy.slotLabel}
@@ -168,7 +173,7 @@ export default function CalendarGate({ copy, calLink, email }: CalendarGateProps
       >
         {calReady && (
           <Cal
-            namespace={CAL_NAMESPACE}
+            namespace={namespace}
             calLink={calLink}
             config={{ layout: "month_view", theme: "light" }}
           />

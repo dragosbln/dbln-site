@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { customerOperationsPath } from "@/content/customerOperations";
 import { privacy } from "@/content/privacy";
 import { reviewPath } from "@/content/review";
 import { site } from "@/content/site";
@@ -27,6 +28,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${site.url}${reviewPath}`,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${site.url}${customerOperationsPath}`,
       changeFrequency: "monthly",
       priority: 0.9,
     },

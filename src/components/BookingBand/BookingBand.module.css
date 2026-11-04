@@ -1,6 +1,7 @@
-/* Design: the approved homepage (2026-11-02), .bk-* rules. The greys are the
-   design's own values for text on the ink surface (each clears AA there);
-   the rest maps to the site tokens. */
+/* Design: the approved homepage (2026-11-02) and the customer-operations
+   review page, .bk-* rules. The greys are the design's own values for text
+   on the ink surface (each clears AA there); the rest maps to the site
+   tokens. */
 
 .band {
   background: var(--ink);

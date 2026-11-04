@@ -47,16 +47,23 @@ className props didn't change — still have it.
 
 Section hrefs in content stay `/#contact` (they must work from every page).
 Render them with `HashLink` (Header, Hero), never a bare `Link` or `<a>`.
-It relativizes the href to `#contact` on the page it targets and falls back
-to `Link` elsewhere. Why: Next's router only performs a hash jump when the
-target's query string equals the current one, so a `Link` to `/#contact`
-on `/?fbclid=…` (Facebook, LinkedIn, any utm link) updates the URL and
-never scrolls: the button looks dead. A native `<a href="#…">` is not the
-fix either: its history entry carries no router state, so Back from a later
-client-side navigation shows the wrong page under the right URL (CaseNav's
-chips have this today). `HashLink` also handles the click while the URL
-already has the hash, which the router treats as a same-URL navigation and
-doesn't scroll.
+On the page it targets it renders the href as `#contact` and handles the
+click itself: `history.pushState` with the hash (Next patches pushState to
+carry its router state and resync its URL), then `scrollIntoView` on the
+target; while the URL already has the hash it only scrolls. Elsewhere it
+falls back to `Link`. Why not the router: it scrolls only on what it sees
+as a hash-only change against its own URL, and that drifts from the address
+bar. A `Link` to `/#contact` on `/?fbclid=…` (Facebook, LinkedIn, any utm
+link) differs in query, so it soft-navigates and never scrolls; after a
+native fragment jump (the skip link, a hand-edited URL) it still holds the
+previous hash, so a click back to that hash is a same-URL navigation and
+nothing moves. Either way the button looks dead. A native `<a href="#…">`
+is not the fix either: its history entry carries no router state, so Back
+from a later client-side navigation shows the wrong page under the right
+URL (CaseNav's chips have this today). Preview through Firebase's hosting
+emulator (`dbln-site-hosting` launch entry, clean URLs): a plain static
+server serves `/page.html`, the pathname never matches and every section
+link looks dead there.
 
 ## Adding a section to a page
 
@@ -144,11 +151,53 @@ Design: the approved homepage of 2026-11-02 (a standalone HTML handed over
 as the spec; its copy is now `src/content/site.ts`). Sections, in order:
 `Hero` (one CTA, the profile aside with `site.portrait`), `Review` (the
 engagement panel on one rail + "Review in context"), `Work`, `Testimonials`,
-`Writing`, then `pages/home/Booking`. The context entries link to their own
-page once it exists; until then they lead to the booking section
-(`TODO(customer-relations)` in `site.ts`: flip the href, nothing else).
+`Writing`, then the shared `BookingBand`. The context entries link to their
+own page once it exists: Customer relations leads to
+`/customer-operations-review`; Finance leads to the booking section until
+its page exists (`TODO(finance)` in `site.ts`: flip the href, nothing else).
 The page's JSON-LD adds a `Service` node (`/#service`) built from the same
 content; `/llms.txt` derives its offer lines from `hero` and `review`.
+
+## The customer-operations review page (/customer-operations-review)
+
+Design: the approved reference page `dbln-review-customer-operations.html`
+(handed over 2026-11-03; a standalone HTML with its own template runtime,
+authoritative for copy, CSS values and interactions). Content:
+`src/content/customerOperations.ts`, typed by the last section of
+`types.ts`; sections in `src/components/pages/customer-operations/<Name>/`;
+the route composes them with the shared `BookingBand` and three JSON-LD
+objects (breadcrumb, `Service`, `FAQPage`) built from the same content.
+The page's `<title>` is a draft composed for production (the reference
+carried a design-reference title); the lede is the meta description.
+
+- **Anchors** come from `anchors` and `customerOperationsPath` in the
+  content file, rendered with `HashLink`/`PillLink`, as on /review.
+- **Everything is in the HTML**: the collapsed steps (native `<details>`
+  sharing one `name`, so one opens at a time), all five deliverable panels,
+  the three gate files of the checks editor and the closed answers. Toggled
+  with `hidden` / the `open` state, never conditionally rendered.
+- **The story rail** (`Story` + `StoryRail` client leaf) is native
+  horizontal scrolling with snap points; Back/Next step by measured card
+  offsets because the trigger card is narrower than the steps. The edge
+  fades are a mask whose stops (`--fade-left/right`) the leaf sets from the
+  scroll position; they fall in the rail's outer gutters (negative margin +
+  matching padding and scroll padding), so a snapped card's box, border
+  included, is never faded. The three illustrations are one sprite,
+  `public/images/customer-operations-story.png` (the reference's PNG,
+  quantised to 256 colours; the lossless original is 345 KB), shown with
+  `background-position`.
+- **The deliverable browser** (`DeliverableBrowser`) is one DOM for both
+  layouts: each row is a picker button plus its panel; the desktop grid
+  (`display: contents` rows, the panel spanning the right column) becomes a
+  +/− accordion under 600px, where the selection may also be empty. A
+  cross-reference opens its deliverable (and gate file) and hands focus to
+  that deliverable's button, since the button it was pressed in just hid.
+- **Shared pieces** that came with the page: `QuestionList` (promoted from
+  /review; `visibleCount`/`moreLabel` optional) and `BookingBand`
+  (promoted from the home page; see "Contact booking").
+- The quoted testimonial is a verbatim cut of the first one in `site.ts`;
+  `test/customer-operations.test.mjs` checks that and the page's links.
+
 
 ## Contact booking (Cal.com)
 
@@ -158,12 +207,15 @@ is a server shell (`Contact`) slotting the heading into one client leaf
 the Cal.com inline embed (`@calcom/embed-react`) on the right. It renders on
 /review and /work.
 
-The home page has its own booking surface, `src/components/pages/home/Booking`
-(server shell + `CalendarGate` client leaf), with no situation picker: the
-"Show available times" button is the visitor's request that loads Cal — the
-same click-to-load boundary as below, and /privacy describes both. It uses
-its own Cal namespace (`home`; `BookingFlow` keeps `booking`, so neither
-hears the other's events) and the shared theme in `src/lib/calTheme.ts`.
+The home page and /customer-operations-review use `BookingBand`
+(`src/components/BookingBand`: server shell + `CalendarGate` client leaf),
+with no situation picker: the "Show available times" button is the
+visitor's request that loads Cal — the same click-to-load boundary as
+below, and /privacy describes both. Each page passes its own Cal namespace
+(`home`, `customer-operations-review`; `BookingFlow` keeps `booking`, so
+none hears another's events; the `cal("on", …)` listeners are never
+removed, so a shared namespace would double-fire across a client-side
+navigation) and the band uses the shared theme in `src/lib/calTheme.ts`.
 Once the booker is up, Cal's own event details show (with the timezone
 selector) and the site-authored card header leaves the card; a landed
 booking shows Cal's own confirmation screen, not the 5a scheduled card.
@@ -578,7 +630,8 @@ small under the copyright in the footer. The copy is **a description of what
 the code does**, not boilerplate: it states that the site sets no cookies,
 that the only device storage is the booking picker's `sessionStorage` key,
 that Plausible is cookieless and EU-hosted, and that Cal.com is contacted
-only after a format pick. Change any of those behaviours and this copy is
+only after a format pick or the "Show available times" button (home page,
+/customer-operations-review). Change any of those behaviours and this copy is
 wrong — which is a compliance problem, not a stale-doc problem. Identity
 values interpolate from `site.ts`; bump `privacy.updated` (drives both the
 rendered date and the sitemap's `lastModified`) when the substance changes.

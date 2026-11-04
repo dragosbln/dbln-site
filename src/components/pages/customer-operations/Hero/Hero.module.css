@@ -1,0 +1,436 @@
+/* Design: H-Desktop / H-Phone in the customer-operations reference. Desktop
+   first, as the /review Landing: 980 (one column), 640 (phone paddings and
+   the stacked doors), 480 (eyebrow, the narrow "goes in" and lens rows). */
+
+.hero {
+  padding: 96px 0 64px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* Text left, panel right; one column below 980px, panel after the text. */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 520px;
+  gap: 24px 72px;
+  align-items: start;
+}
+
+/* ---------- Text column ---------- */
+
+.eyebrow {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 40px;
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  margin-top: 6px; /* centers on the label's first line when it wraps */
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 0 4px var(--accent-wash);
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.title {
+  font-family: var(--serif);
+  font-weight: 400;
+  /* 52px in the desktop design at 1280, 36px in the phone one at 375. */
+  font-size: clamp(36px, 4.1vw, 52px);
+  line-height: 1.06;
+  letter-spacing: -0.018em;
+}
+
+.title em {
+  font-style: italic;
+  color: var(--teal);
+}
+
+.lede {
+  margin-top: 30px;
+  font-size: 19px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 52ch;
+}
+
+.doors {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 40px;
+}
+
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink-soft);
+  transition: color 0.2s;
+}
+
+.ghost:hover {
+  color: var(--teal);
+}
+
+/* ---------- Panel ---------- */
+
+.panel {
+  margin-top: 8px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  overflow: hidden;
+}
+
+.panelHead {
+  padding: 13px 22px;
+  background: var(--paper-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.panelTitle {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* The box the rail is positioned against. */
+.body {
+  position: relative;
+}
+
+/* The rail runs from the first dot's centre down into the chevron. */
+.rail {
+  position: absolute;
+  left: 27px;
+  top: 29px;
+  bottom: 34px;
+  width: 2px;
+  background: var(--teal);
+}
+
+.railEnd {
+  position: absolute;
+  left: 21px;
+  bottom: 24px;
+  color: var(--teal);
+}
+
+.block {
+  position: relative;
+  padding: 18px 22px 18px 54px;
+  border-top: 1px solid var(--line);
+}
+
+.blockIn {
+  padding-top: 20px;
+  border-top: 0;
+}
+
+.blockOut {
+  padding-bottom: 14px;
+}
+
+/* Sits on the rail, level with the block label (padding-top + 4px). */
+.blockDot {
+  position: absolute;
+  left: 23px;
+  top: 22px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.blockIn .blockDot {
+  top: 24px;
+}
+
+.blockLabel {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.blockLabelOut {
+  margin-bottom: 6px;
+}
+
+/* Goes in */
+
+.inList {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.inTitle {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.inBody {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+/* Two lenses */
+
+.lensList {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.lens {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.lensTitle {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+}
+
+.lensBody {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+
+/* The bracket joining the two lenses, and its stem down to the bridge line. */
+.bracket {
+  height: 12px;
+  margin: 0 25%;
+  border: 1px solid var(--line);
+  border-top: 0;
+  border-radius: 0 0 6px 6px;
+}
+
+.stem {
+  width: 1px;
+  height: 10px;
+  background: var(--line);
+  margin: 0 auto;
+}
+
+.bridge {
+  margin-top: 6px;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* Comes out: number, title, format on one hairline-separated row each. */
+
+.rows {
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  gap: 5px 12px;
+  align-items: baseline;
+  padding: 11px 0;
+}
+
+.row + .row {
+  border-top: 1px solid var(--line);
+}
+
+.rowNum {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-faint);
+}
+
+.rowTitle {
+  font-size: 15px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.rowFormat {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-faint-2);
+  white-space: nowrap;
+}
+
+.timeline {
+  padding: 8px 22px 22px 54px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal);
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ghost {
+    transition: none;
+  }
+}
+
+/* ---------- Breakpoints ---------- */
+
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* The 24px row gap + 12px: the phone design's 36px under the doors. */
+  .panel {
+    margin-top: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 56px 0 48px;
+  }
+
+  .eyebrow {
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .lede {
+    margin-top: 20px;
+    font-size: 18px;
+  }
+
+  /* The doors stack; the pill takes the full width. */
+  .doors {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  .primary {
+    align-self: stretch;
+    justify-content: center;
+  }
+
+  /* The panel's inset narrows with the page gutter; rail, dots and chevron
+     shift 2px with it to stay on one line. */
+  .panelHead {
+    padding: 13px 20px;
+  }
+
+  .rail {
+    left: 25px;
+  }
+
+  .railEnd {
+    left: 19px;
+  }
+
+  .block {
+    padding-right: 20px;
+    padding-left: 50px;
+  }
+
+  .blockDot {
+    left: 21px;
+  }
+
+  /* The format drops under the title; the number spans both lines. */
+  .row {
+    grid-template-columns: 18px minmax(0, 1fr);
+    column-gap: 10px;
+    padding: 10px 0;
+  }
+
+  .rowNum {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  .rowTitle,
+  .rowFormat {
+    grid-column: 2;
+  }
+
+  .timeline {
+    padding: 8px 20px 22px 50px;
+  }
+}
+
+/* The eyebrow must fit a 375px viewport; "goes in" stacks and the two
+   lenses share one narrow row. */
+@media (max-width: 480px) {
+  .label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+  }
+
+  .dot {
+    margin-top: 5px;
+  }
+
+  .inList {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .lensList {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 128px), 1fr));
+    gap: 10px;
+  }
+
+  .lens {
+    padding: 12px;
+  }
+
+  .lensTitle {
+    font-size: 19px;
+  }
+
+  .lensBody {
+    font-size: 13.5px;
+  }
+
+  .bridge {
+    font-size: 12px;
+  }
+}

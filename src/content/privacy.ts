@@ -6,9 +6,10 @@ import type { PrivacyNotice } from "./types";
  * so it is only true as long as that behaviour holds. The claims that carry
  * weight: no cookies, Plausible is cookieless and EU-hosted, and Cal.com is
  * contacted only after the visitor asks for the calendar: a format pick, or
- * the home page's "Show available times" button (see AGENTS.md, "Contact
- * booking" and "Analytics"). Identity values interpolate from site.ts so
- * they can't drift.
+ * the "Show available times" button of the home page and the
+ * customer-operations review page (see AGENTS.md, "Contact booking" and
+ * "Analytics"). Identity values interpolate from site.ts so they can't
+ * drift.
  */
 export const privacy: PrivacyNotice = {
   hero: {
@@ -70,7 +71,7 @@ export const privacy: PrivacyNotice = {
       num: "06",
       title: "Booking a call",
       body: [
-        "The booking section embeds Cal.com. Nothing is requested from Cal.com until you ask for the calendar: on the home page by choosing to show available times, on the other pages by picking a call format. Scroll past the section and no third party is contacted at all.",
+        "The booking section embeds Cal.com. Nothing is requested from Cal.com until you ask for the calendar: on the home page and the customer-operations review page by choosing to show available times, on the other pages by picking a call format. Scroll past the section and no third party is contacted at all.",
         "Once the calendar loads, the booking form is theirs. Your name, your email, the format you picked where the section asks for one, and your answer about what you are weighing go to Cal.com so the call can be scheduled, and they reach my calendar. Cal.com's own privacy policy covers their side of it.",
         "The legal basis is taking steps at your request before a contract.",
       ],

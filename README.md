@@ -22,10 +22,11 @@ npm run lint
 npm run build    # static export into out/
 ```
 
-Preview the production build locally:
+Preview the production build locally with Firebase's own hosting rules
+(clean URLs, redirects, headers), which the in-page section links rely on:
 
 ```bash
-npx serve out
+firebase serve --only hosting -p 4176
 ```
 
 ## Deployment

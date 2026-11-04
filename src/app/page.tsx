@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import BookingBand from "@/components/BookingBand";
 import Hero from "@/components/Hero";
 import JsonLd from "@/components/JsonLd";
 import Review from "@/components/Review";
 import Testimonials from "@/components/Testimonials";
 import Work from "@/components/Work";
 import Writing from "@/components/Writing";
-import Booking from "@/components/pages/home/Booking";
+import { homeBooking } from "@/content/site";
 import { homeServiceSchema } from "@/lib/schema";
 
 // Title, description, og and robots (index, follow) come from the root
@@ -29,7 +30,7 @@ export default function Home() {
       <Work />
       <Testimonials />
       <Writing />
-      <Booking />
+      <BookingBand content={homeBooking} namespace="home" />
       <JsonLd data={homeServiceSchema} />
     </main>
   );

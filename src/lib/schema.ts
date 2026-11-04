@@ -117,6 +117,37 @@ export function reviewServiceSchema(landing: ReviewLanding) {
   };
 }
 
+/**
+ * An offer page's breadcrumb and Service node, built from what the page
+ * renders (its path, the offer's name, its summary) so the structured data
+ * can't describe a different offer than the page. First used by
+ * /customer-operations-review; /review keeps its own builders above.
+ */
+export function offerBreadcrumbSchema(path: string, name: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: site.url },
+      { "@type": "ListItem", position: 2, name, item: `${site.url}${path}` },
+    ],
+  };
+}
+
+export function offerServiceSchema(path: string, name: string, description: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${site.url}${path}#service`,
+    name,
+    description,
+    url: `${site.url}${path}`,
+    provider: { "@id": `${site.url}/#person` },
+    serviceType: "AI reliability review",
+    inLanguage: "en",
+  };
+}
+
 export function faqPageSchema(items: Question[]) {
   return {
     "@context": "https://schema.org",

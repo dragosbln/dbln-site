@@ -4,7 +4,7 @@ import type {
   ContactBooking,
   DiscussionContent,
   Hero,
-  HomeBooking,
+  BookingBandContent,
   NavItem,
   NotFound,
   ReviewSection,
@@ -115,6 +115,9 @@ export const work: WorkSection = {
   ],
 };
 
+/** The customer-operations review page (src/content/customerOperations.ts). */
+export const customerOperationsPath = "/customer-operations-review";
+
 /**
  * Landing section 01: the engagement at a glance, beside the contexts the
  * review is read in. Each context links to its own page once that page
@@ -144,15 +147,13 @@ export const review: ReviewSection = {
   context: {
     label: "Review in context",
     items: [
-      // TODO(customer-relations): the design links a dedicated customer
-      // relations review page, not built yet. Flip `href` to it (and drop
-      // `ariaLabel`) once it exists; nothing else changes.
       {
         name: "Customer relations",
         desc: "Customer-service agents, actions and handoffs.",
-        href: "/#contact",
-        ariaLabel: "Discuss a customer relations workflow",
+        href: customerOperationsPath,
       },
+      // TODO(finance): links its own page once that exists; flip `href` to
+      // it (and drop `ariaLabel`), nothing else changes.
       {
         name: "Finance",
         desc: "Invoices, payments and financial records.",
@@ -212,10 +213,11 @@ export const contact: Contact = {
 };
 
 /**
- * The home page's booking band (`pages/home/Booking`): one button loads the
- * Cal.com calendar; the event is `booking.event` below.
+ * The home page's booking band (`BookingBand`): one button loads the Cal.com
+ * calendar; the event is `booking.event` below. The customer-operations
+ * review page's band differs in its body only (customerOperations.ts).
  */
-export const homeBooking: HomeBooking = {
+export const homeBooking: BookingBandContent = {
   label: "Let’s talk",
   title: "What do you want your agent to *handle next?*",
   body: "Let’s discuss your AI workflow, what your team is preparing to change, and where confidence is missing. We’ll work out whether a review would help and what it should focus on.",

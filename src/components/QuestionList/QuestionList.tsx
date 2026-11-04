@@ -4,16 +4,20 @@ import { type Ref, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import ChevronIcon from "@/components/ChevronIcon";
 import type { Question } from "@/content/types";
-import styles from "./Questions.module.css";
+import styles from "./QuestionList.module.css";
 
 /** The late rows' wrapper, the panel the "more" row controls. */
 const MORE_ID = "questions-more";
 
 type QuestionListProps = {
   items: Question[];
-  /** Rows shown before the "more" row; the rest wait, hidden, behind it. */
-  visibleCount: number;
-  moreLabel: string;
+  /**
+   * Rows shown before the "more" row; the rest wait, hidden, behind it.
+   * Absent (or not less than the count), every row shows and there is no
+   * "more" row.
+   */
+  visibleCount?: number;
+  moreLabel?: string;
 };
 
 type QuestionRowProps = {
@@ -59,6 +63,7 @@ function QuestionRow({ item, open, onToggle, buttonRef }: QuestionRowProps) {
 /**
  * The questions accordion: one answer open at a time; rows past
  * `visibleCount` sit behind a "more" row that reveals them and disappears.
+ * Closed answers stay in the HTML: the pages are crawler surfaces.
  */
 export default function QuestionList({
   items,
@@ -69,8 +74,8 @@ export default function QuestionList({
   const [more, setMore] = useState(false);
   const firstLateRef = useRef<HTMLButtonElement>(null);
 
-  const early = items.slice(0, visibleCount);
-  const late = items.slice(visibleCount);
+  const early = items.slice(0, visibleCount ?? items.length);
+  const late = items.slice(visibleCount ?? items.length);
 
   function toggle(num: string, isLate: boolean) {
     setOpen((current) => (current === num ? null : num));

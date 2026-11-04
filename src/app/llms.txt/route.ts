@@ -1,3 +1,8 @@
+import {
+  customerOperationsPath,
+  hero as customerOperationsHero,
+  questions as customerOperationsQuestions,
+} from "@/content/customerOperations";
 import { landing, questions, reviewPath } from "@/content/review";
 import { hero, review, site } from "@/content/site";
 import { caseStudies } from "@/content/work";
@@ -21,8 +26,14 @@ export function GET() {
   const positioning = hero.title.replace(/\*/g, "");
   const lenses = panel.lenses.items.join(" and ");
   const deliverables = panel.receive.items.join(", ");
+  // a context with a page of its own links it; one without still leads to
+  // the booking section
   const contexts = context.items
-    .map((item) => `${item.name} (${item.desc.replace(/\.$/, "")})`)
+    .map((item) => {
+      const desc = item.desc.replace(/\.$/, "");
+      const page = item.href.startsWith("/#") ? "" : `, see ${site.url}${item.href}`;
+      return `${item.name} (${desc}${page})`;
+    })
     .join("; ");
   // short case names ("Equinet — by Mustad" → "Equinet"), matching CaseNav
   const caseNames = caseStudies.map((c) => c.name.split(/ — | · /)[0]).join(", ");
@@ -41,6 +52,7 @@ export function GET() {
 ## Pages
 
 - [Home](${site.url}/): positioning, the engagement at a glance, selected work, testimonials, writing, booking
+- [${customerOperationsHero.pageTitle}](${site.url}${customerOperationsPath}): the review for customer-service AI: a review in practice (a fictional refund scenario, real failure patterns), how it runs in three phases, the five deliverables with illustrative excerpts, who runs it, ${customerOperationsQuestions.items.length} questions answered, booking
 - [${landing.title}](${site.url}${reviewPath}): the offer page in full: when you need it, how it runs stop by stop with a worked example, the five deliverables as sample pages, who runs it, the free first read, ${questions.items.length} questions answered
 - [Work](${site.url}/work): ${caseStudies.length} case studies in depth (situation, the expensive-to-reverse decision, approach, outcomes) — ${caseNames}
 - [Writing](${site.url}/blog): all articles; RSS at ${site.url}/feed.xml
