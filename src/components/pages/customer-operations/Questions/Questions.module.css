@@ -1,0 +1,11 @@
+/* 05 · Questions: the gap under the head. The list is `QuestionList`. */
+
+.head {
+  --head-gap: 36px;
+}
+
+@media (max-width: 640px) {
+  .head {
+    --head-gap: 24px;
+  }
+}

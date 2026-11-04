@@ -904,7 +904,7 @@ export const deliverables: DeliverablesSection = {
 export const reviewer: ReviewerSection = {
   num: "04",
   title: "Who runs it",
-  portrait: { src: "/images/dragos-640.jpg", alt: site.name },
+  portrait: { src: site.portrait, alt: site.name },
   location: ["Cluj-Napoca, RO", "Remote · EU/US"],
   links: [
     [

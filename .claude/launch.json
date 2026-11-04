@@ -20,6 +20,12 @@
       "port": 4174
     },
     {
+      "name": "dbln-site-hosting",
+      "runtimeExecutable": "firebase",
+      "runtimeArgs": ["serve", "--only", "hosting", "-p", "4176"],
+      "port": 4176
+    },
+    {
       "name": "social-harness",
       "runtimeExecutable": "env",
       "runtimeArgs": ["DBLN_ADMIN_UIDS=devgoogle,devgithub", "npm", "--prefix", "/Users/dragosbilaniuc/Projects/dbln/dbln-site/functions", "run", "serve"],

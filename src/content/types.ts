@@ -34,13 +34,29 @@ export type PageHero = {
   metaDescription: string;
 };
 
+/** The home hero's profile aside; the portrait is `site.portrait`, the name `site.name`. */
+export type HeroProfile = {
+  /** aria-label of the aside ("About Dragos"). */
+  label: string;
+  /** Under the name ("Software engineer & architect"). */
+  role: string;
+  bio: string;
+  /** The personal line ("I run every review myself…"). */
+  commitment: string;
+  /** Foot line ("Cluj-Napoca, Romania · Remote"). */
+  location: string;
+  /** Foot links: a section of this site, or a profile (opens in a new tab). */
+  links: NavItem[];
+};
+
 export type Hero = {
   eyebrow: string;
   /** Rich text. */
   title: string;
   lede: string;
-  actions: { primary: NavItem; secondary: NavItem };
-  meta: { key: string; value: string; detail: string }[];
+  /** The one call to action; leads to the booking section. */
+  cta: NavItem;
+  profile: HeroProfile;
 };
 
 export type WorkItem = {
@@ -53,15 +69,32 @@ export type WorkItem = {
   tags: string[];
 };
 
-export type ReviewStep = {
-  /** Mono eyebrow, e.g. "01 · You provide". */
-  eyebrow: string;
-  /** Serif lead line, e.g. "Three inputs:". */
-  lead: string;
-  /** Rich text items. */
-  items: string[];
-  /** Numbered markers (ol) when true; em-dash markers (ul) otherwise. */
-  ordered?: boolean;
+/** The home review section's engagement panel: three steps on one rail. */
+export type EngagementPanel = {
+  title: string;
+  bring: { label: string; text: string };
+  /** The two lenses, set side by side in serif. */
+  lenses: { label: string; items: string[] };
+  receive: {
+    label: string;
+    /** aria-label of the deliverables list. */
+    listLabel: string;
+    items: string[];
+  };
+  /** The teal mono line at the rail's end: "Fixed scope · Two to three weeks". */
+  scope: string;
+  duration: string;
+};
+
+/**
+ * A context the review is read in. Links to that context's page; until the
+ * page exists, to the booking section, with `ariaLabel` naming the action.
+ */
+export type ReviewContextItem = {
+  name: string;
+  desc: string;
+  href: string;
+  ariaLabel?: string;
 };
 
 export type Testimonial = {
@@ -76,13 +109,6 @@ export type Testimonial = {
   role: string;
   /** Optional link to the author's public profile (LinkedIn). */
   href?: string;
-};
-
-export type AgenticItem = {
-  /** Mono kicker, e.g. "Quality". */
-  kicker: string;
-  title: string;
-  body: string;
 };
 
 export type Post = {
@@ -148,17 +174,13 @@ export type CaseStudy = {
 
 export type WorkSection = SectionIntro & { items: WorkItem[]; cta?: NavItem };
 export type ReviewSection = SectionIntro & {
-  /** The scope strip on top of the card. */
-  scope: { lead: string; note: string };
-  steps: ReviewStep[];
+  panel: EngagementPanel;
+  context: { label: string; items: ReviewContextItem[] };
 };
 export type TestimonialsSection = SectionIntro & { items: Testimonial[] };
-export type AgenticSection = SectionIntro & {
-  /** Rich text pull quote. */
-  pull: string;
-  items: AgenticItem[];
-};
 export type WritingSection = SectionIntro & {
+  /** One line under the head ("Research and practical work on…"). */
+  intro: string;
   /** How many of the newest posts the landing section shows. */
   featuredCount: number;
 };
@@ -168,6 +190,44 @@ export type Contact = {
   /** Rich text. */
   title: string;
   body: string;
+};
+
+/**
+ * A booking band without the situation picker (`BookingBand`): one button
+ * loads Cal.com (click-to-load, AGENTS.md "Contact booking"). The home page
+ * and the customer-operations review page each have one; the event itself
+ * is `booking.event`.
+ */
+export type BookingBandContent = {
+  label: string;
+  /** Rich text. */
+  title: string;
+  body: string;
+  /** The small line under the body ("No preparation or system access needed."). */
+  prep: string;
+  /** Above the email link. */
+  mailPrompt: string;
+  card: {
+    /** Site-authored header, shown until Cal's own event details load. */
+    title: string;
+    meta: string;
+    /** The click-to-load button. */
+    button: string;
+    /** Under the button: names the third party the click will contact. */
+    note: string;
+    privacyLabel: string;
+    /** Status line while the booker loads. */
+    loading: string;
+    /** Status after the slow-load timeout, before the email fallback link. */
+    slow: string;
+    /** Status when the embed cannot load, before the email fallback link. */
+    failed: string;
+    emailFallback: string;
+    /** aria-label of the calendar region. */
+    slotLabel: string;
+    /** title of the booker iframe once it has loaded. */
+    iframeTitle: string;
+  };
 };
 
 /**
@@ -605,8 +665,211 @@ export type Question = {
 
 export type QuestionsSection = SectionIntro & {
   items: Question[];
-  /** How many rows show before the "more" row. */
-  visibleCount: number;
+  /** How many rows show before the "more" row; absent, every row shows. */
+  visibleCount?: number;
   /** The "more" row's label ("Nine more questions"). */
-  moreLabel: string;
+  moreLabel?: string;
+};
+
+/* ---------- The customer-operations review page (/customer-operations-review) ---------- */
+/*
+ * Design source: the approved customer-operations reference page
+ * (dbln-review-customer-operations.html, 2026-11-03). Section ids and
+ * in-page hrefs come from `anchors` in src/content/customerOperations.ts.
+ */
+
+/** A row of the hero panel's "Comes out" list: number, title, format. */
+export type GlanceRow = { num: string; title: string; format: string };
+
+export type CustomerOperationsHero = {
+  eyebrow: string;
+  /** Rich text: the emphasised close ("*handle next*"). */
+  title: string;
+  lede: string;
+  /** Plain-text name of the offer for <title>, the breadcrumb and the Service schema. */
+  pageTitle: string;
+  /** Plain-text page summary for <meta name="description"> and og. */
+  metaDescription: string;
+  /** The two doors: primary pill, ghost text link. */
+  doors: { primary: NavItem; secondary: NavItem };
+  panel: {
+    title: string;
+    goesIn: { label: string; items: { title: string; body: string }[] };
+    lenses: {
+      label: string;
+      items: { title: string; body: string }[];
+      /** The line under the two lenses ("Trace the behavior back to the system."). */
+      bridge: string;
+    };
+    comesOut: { label: string; items: GlanceRow[] };
+    /** The teal mono line at the foot of the rail ("Two to three weeks"). */
+    timeline: string;
+  };
+};
+
+/** The three panels of the story illustration sprite, left to right. */
+export type StoryArt = "team" | "pattern" | "conditions";
+
+type StoryCardBase = {
+  /** For the live status line ("Showing the doubt."). */
+  name: string;
+  /** aria-label of the card ("Step 1 of 3: the doubt"). */
+  ariaLabel: string;
+  /** Teal uppercase label ("THE TRIGGER", "01 · THE DOUBT"). */
+  label: string;
+  title: string;
+};
+
+/** A card of the horizontal review story: the narrow trigger, or an illustrated step. */
+export type StoryCard =
+  | (StoryCardBase & { kind: "trigger" })
+  | (StoryCardBase & {
+      kind: "step";
+      art: StoryArt;
+      /** aria-label of the illustration. */
+      artAlt: string;
+      /** The paragraph that flows around the illustration with the title. */
+      lead: string;
+      body?: string;
+      /** The serif pull line in the wash box (step 2). */
+      finding?: string;
+      /** Rich text: the small line after the finding ("**Also found:** …"). */
+      more?: string;
+    });
+
+export type StorySection = SectionIntro & {
+  /** The Back/Next controls: the nav's aria-label and the two button labels. */
+  nav: { label: string; back: string; next: string };
+  /** aria-label of the scrolling region. */
+  railLabel: string;
+  /** Live status line; `{name}` interpolates the settled card's `name`. */
+  status: string;
+  cards: StoryCard[];
+};
+
+export type ProcessStep = {
+  /** "0" … "6"; also the list's start number. */
+  num: string;
+  name: string;
+  /** Right-aligned time indicator ("Days 1–2"). */
+  timing: string;
+  summary: string;
+  prose: string;
+  team: string;
+  checkpoint: string;
+};
+
+export type ProcessPhase = {
+  title: string;
+  note: string;
+  steps: ProcessStep[];
+  /** Rich text: the wash line under the phase ("**If something critical turns up:** …"). */
+  critical?: string;
+};
+
+export type ProcessSection = SectionIntro & {
+  /** The two dt labels of every step's detail. */
+  meta: { team: string; checkpoint: string };
+  phases: ProcessPhase[];
+};
+
+export type DeliverableKey = "summary" | "findings" | "design" | "roadmap" | "checks";
+
+/** The three rollout-gate files of the checks editor. */
+export type CheckCaseKey = "retry" | "cap" | "status";
+
+/** An inline cross-reference ("(G01)") that opens another deliverable, and a gate file in it. */
+export type XRef = { label: string; go: DeliverableKey; caseKey?: CheckCaseKey };
+
+/** Text with inline cross-references. */
+export type RefText = (string | XRef)[];
+
+export type LabelledValue = { label: string; value: RefText };
+
+export type Deliverable = {
+  key: DeliverableKey;
+  title: string;
+  /** Shorter title for the picker, when the full one is long. */
+  navTitle?: string;
+  format: string;
+  purpose: string;
+};
+
+export type CheckLine = { tone?: "comment" | "key" | "string"; text: string };
+
+export type CheckCase = {
+  key: CheckCaseKey;
+  filename: string;
+  lines: CheckLine[];
+  /** The failing run's title ("G01 · Duplicate payment") and its detail. */
+  failure: string;
+  expected: string;
+};
+
+/** The texts of the design finding's architecture diagram; the geometry is the component's. */
+export type ArchitectureLabels = {
+  alt: string;
+  runtime: string;
+  service: string;
+  tool: string;
+  faultFrom: string;
+  faultTo: string;
+  store: [string, string];
+  api: string;
+  apiMeta: string;
+};
+
+export type DeliverablesBrowser = SectionIntro & {
+  /** aria-label of the deliverable picker. */
+  pickerLabel: string;
+  items: Deliverable[];
+  summary: { label: string; heading: string; bullets: RefText[]; bottom: string };
+  findings: { label: string; heading: string; body: string; evidence: LabelledValue[] };
+  design: {
+    label: string;
+    heading: string;
+    body: string;
+    columns: LabelledValue[];
+    diagram: ArchitectureLabels;
+  };
+  roadmap: {
+    step: { label: string; heading: string; body: string; meta: LabelledValue[] };
+    /** The collapsed later items. */
+    next: string[];
+  };
+  checks: {
+    /** aria-label of the file list. */
+    filesLabel: string;
+    folders: { gates: string; regression: string; fixtures: string };
+    /** Before the open file's name ("gates / "). */
+    openPrefix: string;
+    cases: CheckCase[];
+    regression: string[];
+    fixtures: string[];
+    terminal: { command: string; runs: { status: "pass" | "fail"; text: string }[] };
+    note: string;
+  };
+};
+
+export type ReviewerCard = SectionIntro & {
+  /** Under the name; the name and portrait are `site.name` / `site.portrait`. */
+  role: string;
+  location: string;
+  bio: string[];
+  commitment: string;
+  /** A profile (new tab) or a page of this site. */
+  links: NavItem[];
+  testimonial: {
+    label: string;
+    /** A verbatim cut of a quote in `testimonials` (site.ts). */
+    quote: string;
+    name: string;
+    role: string;
+    href?: string;
+  };
+  writing: {
+    label: string;
+    all: NavItem;
+    articles: { title: string; desc: string; href: string }[];
+  };
 };

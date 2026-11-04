@@ -58,9 +58,9 @@ export default function SectionHead({
       <h2 id={id} className={styles.title}>
         {title}
       </h2>
-      {aside ? (
+      {aside || asideLink ? (
         <p className={styles.aside}>
-          {aside}{" "}
+          {aside ? `${aside} ` : null}
           {asideLink && asideTail ? (
             <>
               <HashLink className={styles.asideLink} href={asideLink.href}>

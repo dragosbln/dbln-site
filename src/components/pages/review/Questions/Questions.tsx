@@ -1,7 +1,7 @@
+import QuestionList from "@/components/QuestionList";
 import Reveal from "@/components/Reveal";
 import SectionHead from "@/components/SectionHead";
 import { anchors, questions } from "@/content/review";
-import QuestionList from "./QuestionList";
 import styles from "./Questions.module.css";
 
 /** 06 · Questions (design: 06-questions.dc.html). */

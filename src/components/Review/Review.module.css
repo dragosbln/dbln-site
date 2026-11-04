@@ -1,101 +1,318 @@
-.card {
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  overflow: hidden;
+/* Design: the approved homepage (2026-11-02), .he-* rules. Desktop first:
+   980 (tighter gap), 800 (one column), 640 (phone insets and sizes). */
+
+.section {
+  --section-pad: 78px;
+  --section-pad-phone: 54px;
 }
 
-.scope {
-  padding: 18px 32px;
+.head {
+  --head-gap: 35px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+  gap: 56px;
+  align-items: start;
+}
+
+/* The Reveal wrappers are the grid's children; neither may force a width. */
+.cell {
+  min-width: 0;
+}
+
+/* ---------- The engagement panel ---------- */
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.panelTitle {
+  padding: 13px 22px;
   background: var(--paper-2);
   border-bottom: 1px solid var(--line);
-}
-
-.scopeLead {
   font-size: 15px;
-  font-weight: 600;
-}
-
-.scopeNote {
-  font-size: 14px;
-  color: var(--ink-faint-2);
-  margin-top: 2px;
+  line-height: 1.4;
+  font-weight: 500;
 }
 
 .steps {
-  display: grid;
-  grid-template-columns: 1fr 1.15fr 1fr;
+  list-style: none;
 }
 
 .step {
-  padding: 30px 32px 34px;
-  border-right: 1px solid var(--line);
-  transition: background 0.25s;
+  position: relative;
+  padding: 18px 22px 18px 53px;
 }
 
-.step:last-child {
-  border-right: 0;
+.step + .step {
+  border-top: 1px solid var(--line);
 }
 
-.step:hover {
-  background: var(--accent-wash);
+/* The rail: one segment per step, run 1px past the bottom so the segments
+   join through the hairlines; the first starts at its dot. */
+.step::before {
+  content: "";
+  position: absolute;
+  left: 26px;
+  top: 0;
+  bottom: -1px;
+  width: 1px;
+  background: var(--teal);
 }
 
-.eyebrow {
+.step:first-child::before {
+  top: 27px;
+}
+
+/* The dot, level with the label; the paper ring lifts it off the rail. */
+.step::after {
+  content: "";
+  position: absolute;
+  left: 22px;
+  top: 22px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 0 3px var(--paper);
+}
+
+.label {
   font-family: var(--mono);
-  font-size: 11.5px;
-  letter-spacing: 0.1em;
+  font-size: 11px;
+  line-height: 1.6;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.content {
+  margin-top: 9px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.lenses {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  margin-top: 10px;
+}
+
+.lenses p {
+  font-family: var(--serif);
+  font-size: 23px;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.lenses p + p {
+  border-left: 1px solid var(--line);
+  padding-left: 24px;
+}
+
+.handover {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 8px;
+  margin-top: 9px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.handover li:not(:last-child)::after {
+  content: " ·";
+  margin-left: 8px;
+  color: var(--ink-faint);
+}
+
+/* The rail's end: a short stub into a chevron, then the scope line. */
+.duration {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 7px;
+  padding: 4px 22px 22px 53px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--teal);
 }
 
-.lead {
-  font-family: var(--serif);
-  font-size: 22px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  margin: 14px 0 18px;
+.duration::before {
+  content: "";
+  position: absolute;
+  left: 26px;
+  top: 0;
+  height: 14px;
+  width: 1px;
+  background: var(--teal);
 }
 
-.list {
+.duration::after {
+  content: "";
+  position: absolute;
+  left: 23px;
+  top: 9px;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid var(--teal);
+  border-bottom: 1.5px solid var(--teal);
+  transform: rotate(45deg);
+}
+
+/* ---------- Review in context ---------- */
+
+.context {
+  border-left: 1px solid var(--line);
+  padding-left: 26px;
+}
+
+.contextList {
   list-style: none;
+  margin-top: 13px;
+}
+
+.contextList > li {
+  border-top: 1px solid var(--line);
+}
+
+.contextList > li:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+.contextLink {
   display: grid;
-  gap: 12px;
-  padding-left: 14px;
+  grid-template-columns: minmax(0, 1fr) 15px;
+  gap: 5px 12px;
+  padding: 15px 0;
 }
 
-.list li {
+.contextName {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.35;
+  transition: color 0.2s;
+}
+
+.arrow {
   display: flex;
-  gap: 8px;
-  font-size: 15px;
+  align-self: center;
+  color: var(--teal-deep);
 }
 
-.marker {
-  font-family: var(--mono);
+.contextDesc {
+  grid-column: 1 / -1;
   font-size: 13px;
-  color: var(--teal);
-  padding-top: 2px;
-}
-
-.list strong {
-  font-weight: 600;
-}
-
-.list em {
-  font-style: normal;
+  line-height: 1.5;
   color: var(--ink-soft);
 }
 
-@media (max-width: 900px) {
-  .steps {
+.contextLink:hover .contextName {
+  color: var(--teal-deep);
+}
+
+@media (max-width: 980px) {
+  .grid {
+    gap: 40px;
+  }
+}
+
+@media (max-width: 800px) {
+  .grid {
     grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .context {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .contextList {
+    margin-top: 12px;
+  }
+}
+
+/* The panel's inset narrows; rail, dots and chevron shift with it. */
+@media (max-width: 640px) {
+  .panelTitle {
+    padding: 12px 18px;
+    font-size: 14px;
   }
 
   .step {
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
+    padding: 17px 17px 17px 44px;
   }
 
-  .step:last-child {
-    border-bottom: 0;
+  .step::before {
+    left: 21px;
+  }
+
+  .step:first-child::before {
+    top: 26px;
+  }
+
+  .step::after {
+    left: 17px;
+    top: 21px;
+  }
+
+  .duration {
+    padding: 4px 17px 20px 44px;
+    font-size: 10.5px;
+  }
+
+  .duration::before {
+    left: 21px;
+  }
+
+  .duration::after {
+    left: 18px;
+  }
+
+  .label {
+    font-size: 10.5px;
+  }
+
+  .content,
+  .handover {
+    font-size: 15px;
+  }
+
+  .lenses {
+    gap: 14px;
+  }
+
+  .lenses p {
+    font-size: 21px;
+  }
+
+  .lenses p + p {
+    padding-left: 14px;
+  }
+
+  .contextName {
+    font-size: 17px;
+  }
+
+  .contextLink {
+    padding: 13px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contextName {
+    transition: none;
   }
 }

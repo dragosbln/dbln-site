@@ -1,0 +1,299 @@
+/* 01 · A review in practice (design: K1 in the customer-operations reference,
+   .rs-* / .tr-* rules). Two design-only values stay literal: the card wash
+   #e7eeea and the muted grey #62676a. Breakpoints: 560 (phone sizes and
+   the 16px gutter), 440 (the illustration above the title). */
+
+.section {
+  --section-pad: 64px;
+  --section-pad-phone: 48px;
+}
+
+.head {
+  --head-gap: 24px;
+}
+
+/* ---------- Back / Next ---------- */
+
+.nav {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 17px;
+}
+
+.arrows {
+  display: flex;
+  gap: 7px;
+  padding-bottom: 2px;
+}
+
+.arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 34px;
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.arrow:not(:disabled):hover {
+  background: var(--paper-2);
+}
+
+.arrow svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* ---------- The rail ---------- */
+
+/* The rail bleeds into the page gutter by --rail-gutter on both sides and
+   pads by the same amount, so the mask's fades (--fade-left/right, set by
+   StoryRail as the visitor scrolls) fall in that bleed: a card snapped to
+   the scroll padding sits whole, border included, outside the faded area.
+   The first column is the narrower trigger card; every later one a step. */
+.rail {
+  --rail-gutter: 24px;
+  --fade-left: 0px;
+  --fade-right: 22px;
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: min(340px, 94%);
+  grid-auto-columns: min(600px, 94%);
+  gap: 20px;
+  margin-inline: calc(-1 * var(--rail-gutter));
+  padding-inline: var(--rail-gutter);
+  scroll-padding-inline: var(--rail-gutter);
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x mandatory;
+  scroll-snap-stop: always;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--fade-left),
+    #000 calc(100% - var(--fade-right)),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--fade-left),
+    #000 calc(100% - var(--fade-right)),
+    transparent
+  );
+}
+
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+.card {
+  min-width: 0;
+  padding: 24px 26px 26px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  scroll-snap-align: start;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Every teal card label: the trigger's and the steps'. */
+.label {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--teal-deep);
+}
+
+/* The trigger: a wash card, no number, no illustration. */
+.trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: #e7eeea;
+  border-color: transparent;
+}
+
+.trigger .label {
+  margin-bottom: 22px;
+}
+
+.triggerTitle {
+  font-size: 23px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+/* The steps: the illustration floats right inside the flow root, so the
+   title group and the lead wrap around it. */
+.flow {
+  display: flow-root;
+}
+
+.art {
+  --art-width: 176px;
+  display: block;
+  float: right;
+  width: var(--art-width);
+  aspect-ratio: 1.5;
+  margin: 0 0 8px 22px;
+  background-image: url("/images/customer-operations-story.png");
+  background-repeat: no-repeat;
+  /* The sprite holds the three panels side by side. */
+  background-size: 300% auto;
+}
+
+.artTeam {
+  background-position: 0% 50%;
+}
+
+.artPattern {
+  background-position: 50% 50%;
+}
+
+.artConditions {
+  background-position: 100% 50%;
+}
+
+.titleGroup {
+  min-width: 0;
+}
+
+.stepLabel {
+  margin-bottom: 6px;
+}
+
+.cardTitle {
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+}
+
+.lead {
+  margin-top: 13px;
+  color: var(--ink-soft);
+}
+
+.body {
+  margin-top: 11px;
+}
+
+.body > p {
+  margin-top: 11px;
+  color: var(--ink-soft);
+}
+
+.body > p:first-child {
+  margin-top: 0;
+}
+
+.finding {
+  margin: 15px 0 13px;
+  padding: 13px 15px;
+  border-left: 2px solid var(--teal-deep);
+  background: #e7eeea;
+}
+
+.finding p {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.more {
+  font-size: 12px;
+}
+
+.more strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* The live status line, for screen readers only. */
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Breakpoints ---------- */
+
+@media (max-width: 560px) {
+  .head {
+    --head-gap: 23px;
+  }
+
+  .rail {
+    --rail-gutter: 16px;
+    --fade-right: 14px;
+    gap: 12px;
+  }
+
+  .card {
+    padding: 18px;
+  }
+
+  .cardTitle {
+    font-size: 18px;
+  }
+
+  .lead,
+  .body > p {
+    font-size: 13px;
+  }
+
+  .art {
+    --art-width: 114px;
+    margin-left: 16px;
+  }
+
+  .finding {
+    padding: 12px 13px;
+  }
+
+  .finding p {
+    font-size: 17px;
+  }
+}
+
+/* Too narrow to flow text beside the illustration: it sits above, right. */
+@media (max-width: 440px) {
+  .art {
+    float: none;
+    margin: 0 0 14px auto;
+  }
+}
+
+@media (pointer: coarse) {
+  .arrow {
+    min-height: 44px;
+  }
+}

@@ -8,7 +8,11 @@ import styles from "./Work.module.css";
 
 export default function Work() {
   return (
-    <section id="work" className="section" aria-labelledby="work-title">
+    <section
+      id="work"
+      className={`section ${styles.section}`}
+      aria-labelledby="work-title"
+    >
       <div className="wrap">
         <SectionHead
           num={work.num}

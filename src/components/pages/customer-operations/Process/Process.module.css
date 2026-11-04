@@ -1,0 +1,255 @@
+/* 02 · How it runs (design: T1 in the customer-operations reference,
+   .process-* rules). The muted grey #62676a and the wash #e8eee8 are the
+   design's own values. Breakpoints: 760 (narrower label column), 640 (one
+   column), 380 (tighter summary grid). */
+
+.section {
+  --section-pad-phone: 60px;
+}
+
+.head {
+  --head-gap: 36px;
+}
+
+/* A phase: its label column beside its steps. */
+.phase {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 32px;
+  margin-top: 28px;
+}
+
+.head + .phase {
+  margin-top: 0;
+}
+
+.phaseLabel {
+  padding-top: 18px;
+}
+
+.phaseTitle {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--teal-deep);
+}
+
+.phaseNote {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #62676a;
+  max-width: 22ch;
+}
+
+.phaseBody {
+  min-width: 0;
+}
+
+.sequence {
+  list-style: none;
+}
+
+.step {
+  min-width: 0;
+}
+
+.details {
+  border-bottom: 1px solid var(--line);
+}
+
+/* The summary row: number, name + time + one line, caret. */
+.summary {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 14px;
+  gap: 12px;
+  align-items: start;
+  padding: 16px 0;
+  list-style: none;
+  cursor: pointer;
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.num {
+  padding-top: 4px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--teal-deep);
+}
+
+.main {
+  min-width: 0;
+}
+
+/* Name left, time right, on one baseline. */
+.top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.name {
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.timing {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: #62676a;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.brief {
+  display: block;
+  margin-top: 6px;
+  max-width: 76ch;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+/* The caret points down at rest and up while the step is open. */
+.disclosure {
+  display: flex;
+  width: 14px;
+  height: 14px;
+  margin-top: 4px;
+  color: #62676a;
+  transition: transform 0.2s;
+}
+
+.details[open] > .summary .disclosure {
+  transform: rotate(180deg);
+}
+
+.details[open] > .summary .name {
+  color: var(--teal-deep);
+}
+
+.detail {
+  padding: 0 26px 18px 36px;
+}
+
+.prose {
+  max-width: 76ch;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+/* "Your team" and "Checkpoint" share a row while 220px each fits. */
+.meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 10px 24px;
+  margin-top: 15px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.meta dt {
+  margin-bottom: 4px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #62676a;
+}
+
+.meta dd {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.critical {
+  margin-top: 16px;
+  padding: 12px 15px;
+  background: #e8eee8;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.critical strong {
+  font-weight: 500;
+  color: var(--teal-deep);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .disclosure {
+    transition: none;
+  }
+}
+
+/* ---------- Breakpoints ---------- */
+
+@media (max-width: 760px) {
+  .phase {
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 22px;
+  }
+}
+
+@media (max-width: 640px) {
+  .head {
+    --head-gap: 28px;
+  }
+
+  /* The label runs above its steps: title and note on one baseline. */
+  .phase {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+    margin-top: 26px;
+  }
+
+  .phaseLabel {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 0;
+  }
+
+  .phaseTitle {
+    font-size: 21px;
+  }
+
+  .phaseNote {
+    margin: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .summary {
+    grid-template-columns: 18px minmax(0, 1fr) 12px;
+    gap: 8px;
+  }
+
+  .name {
+    font-size: 16px;
+  }
+
+  .detail {
+    padding-left: 26px;
+    padding-right: 8px;
+  }
+
+  .phaseLabel {
+    display: block;
+  }
+
+  .phaseNote {
+    margin-top: 4px;
+  }
+}

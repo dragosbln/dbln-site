@@ -8,11 +8,11 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 - **Static export.** `next.config.ts` sets `output: "export"`. Nothing may rely on a server at runtime: no dynamic route handlers, no `cookies()`/`headers()`, no middleware. Route handlers must be `force-static` GET.
 - **Components.** One folder per component: `src/components/<Name>/` containing `<Name>.tsx`, `<Name>.module.css` (if styled), and an `index.ts` barrel (`export { default } from "./<Name>";`). Import other components via `@/components/<Name>`; import a component's own CSS relatively (`./<Name>.module.css`). Top level is for shared pieces (primitives, chrome, anything two pages use); a section that belongs to one page lives in `src/components/pages/<page>/<Name>/` with the same folder shape (first used by `/review`). The `pages/` level is load-bearing: `src/components/review/` would be the same directory as the `Review` component on the case-insensitive macOS disk (git records whichever casing existed first), and the import then fails on the Linux CI runner. A section's client leaf is a second file in the section's folder, imported relatively. Top-level components never import from a page folder.
-- **Styling.** CSS Modules only — no inline `style={{}}`, no styled-jsx, no Tailwind. `src/app/globals.css` holds only design tokens, the reset, and the `.wrap` / `.section` / `.reveal` utilities. Everything else lives in the owning component's module. Two exceptions, both global because the markup is generated from markdown at build and can't carry hashed module classes: `src/styles/prose.css` (`.prose`, plus the `.prose--peek` compact variant) and `src/styles/diagram.css` (`dg-*`).
+- **Styling.** CSS Modules only — no inline `style={{}}`, no styled-jsx, no Tailwind. `src/app/globals.css` holds only design tokens, the reset, and the `.wrap` / `.section` / `.reveal` utilities. Everything else lives in the owning component's module. A section tightens `.section`'s padding by setting `--section-pad` / `--section-pad-phone` in its own module class (the home page runs at 78/54px), the same way `SectionHead` takes `--head-gap`: never a competing `padding` rule, which stylesheet order would settle. Two exceptions, both global because the markup is generated from markdown at build and can't carry hashed module classes: `src/styles/prose.css` (`.prose`, plus the `.prose--peek` compact variant) and `src/styles/diagram.css` (`dg-*`).
 - **Content.** All copy, links, and identity data live in `src/content/site.ts`. Components render content; they don't contain it.
 - **Server-first.** Components are React Server Components by default. Add `"use client"` only at interactive leaves (e.g. scroll reveal), never on whole sections.
 - **SEO surfaces.** When adding a route, update `src/app/sitemap.ts` and the Pages list in `src/app/llms.txt/route.ts`, and give the page its own `metadata` export with a canonical. Keep JSON-LD in `src/lib/schema.ts` in sync with content changes.
-- **Social cards.** A page that exports its own `openGraph` replaces the layout's wholesale, so it must list `images: [siteOgImage]` (`src/lib/urls.ts`) or it ships no image. The card type is `summary_large_image` everywhere (layout; articles set it too): X builds no card at all for `summary` pages — verified in its composer on 2026-10-16, where the home page and /blog showed no preview while the articles did. Don't "simplify" the type back, and keep twitter images as plain URL strings (matching the article pages, which are known to render).
+- **Social cards.** A page that exports its own `openGraph` replaces the layout's wholesale, so it must list `images: [siteOgImage]` (`src/lib/urls.ts`) or it ships no image. The home page is the one exception: it lists its own card, `homeOgImage` (`/images/home-card.png`, a finished PNG with no SVG source), in both `openGraph.images` and `twitter.images`; every other page keeps the site card. The card type is `summary_large_image` everywhere (layout; articles set it too): X builds no card at all for `summary` pages — verified in its composer on 2026-10-16, where the home page and /blog showed no preview while the articles did. Don't "simplify" the type back, and keep twitter images as plain URL strings (matching the article pages, which are known to render).
 - **Copy voice.** Outward-facing copy is written by Dragos's rules: short declarative sentences, no em-dash asides, no "not X but Y" constructions, no overexplaining. Never invent or rewrite copy on your own — take it verbatim from `src/content/` or from the prototypes in `../claude_websie/`. Real testimonial quotes are verbatim, always.
 
 # Recipes
@@ -47,16 +47,23 @@ className props didn't change — still have it.
 
 Section hrefs in content stay `/#contact` (they must work from every page).
 Render them with `HashLink` (Header, Hero), never a bare `Link` or `<a>`.
-It relativizes the href to `#contact` on the page it targets and falls back
-to `Link` elsewhere. Why: Next's router only performs a hash jump when the
-target's query string equals the current one, so a `Link` to `/#contact`
-on `/?fbclid=…` (Facebook, LinkedIn, any utm link) updates the URL and
-never scrolls: the button looks dead. A native `<a href="#…">` is not the
-fix either: its history entry carries no router state, so Back from a later
-client-side navigation shows the wrong page under the right URL (CaseNav's
-chips have this today). `HashLink` also handles the click while the URL
-already has the hash, which the router treats as a same-URL navigation and
-doesn't scroll.
+On the page it targets it renders the href as `#contact` and handles the
+click itself: `history.pushState` with the hash (Next patches pushState to
+carry its router state and resync its URL), then `scrollIntoView` on the
+target; while the URL already has the hash it only scrolls. Elsewhere it
+falls back to `Link`. Why not the router: it scrolls only on what it sees
+as a hash-only change against its own URL, and that drifts from the address
+bar. A `Link` to `/#contact` on `/?fbclid=…` (Facebook, LinkedIn, any utm
+link) differs in query, so it soft-navigates and never scrolls; after a
+native fragment jump (the skip link, a hand-edited URL) it still holds the
+previous hash, so a click back to that hash is a same-URL navigation and
+nothing moves. Either way the button looks dead. A native `<a href="#…">`
+is not the fix either: its history entry carries no router state, so Back
+from a later client-side navigation shows the wrong page under the right
+URL (CaseNav's chips have this today). Preview through Firebase's hosting
+emulator (`dbln-site-hosting` launch entry, clean URLs): a plain static
+server serves `/page.html`, the pathname never matches and every section
+link looks dead there.
 
 ## Adding a section to a page
 
@@ -138,12 +145,82 @@ To publish:
    Medium publications move the story to their own domain on acceptance, so
    list the publication URL. The old single `devto` field fails the build.
 
+## The home page
+
+Design: the approved homepage of 2026-11-02 (a standalone HTML handed over
+as the spec; its copy is now `src/content/site.ts`). Sections, in order:
+`Hero` (one CTA, the profile aside with `site.portrait`), `Review` (the
+engagement panel on one rail + "Review in context"), `Work`, `Testimonials`,
+`Writing`, then the shared `BookingBand`. The context entries link to their
+own page once it exists: Customer relations leads to
+`/customer-operations-review`; Finance leads to the booking section until
+its page exists (`TODO(finance)` in `site.ts`: flip the href, nothing else).
+The page's JSON-LD adds a `Service` node (`/#service`) built from the same
+content; `/llms.txt` derives its offer lines from `hero` and `review`.
+
+## The customer-operations review page (/customer-operations-review)
+
+Design: the approved reference page `dbln-review-customer-operations.html`
+(handed over 2026-11-03; a standalone HTML with its own template runtime,
+authoritative for copy, CSS values and interactions). Content:
+`src/content/customerOperations.ts`, typed by the last section of
+`types.ts`; sections in `src/components/pages/customer-operations/<Name>/`;
+the route composes them with the shared `BookingBand` and three JSON-LD
+objects (breadcrumb, `Service`, `FAQPage`) built from the same content.
+The page's `<title>` is a draft composed for production (the reference
+carried a design-reference title); the lede is the meta description.
+
+- **Anchors** come from `anchors` and `customerOperationsPath` in the
+  content file, rendered with `HashLink`/`PillLink`, as on /review.
+- **Everything is in the HTML**: the collapsed steps (native `<details>`
+  sharing one `name`, so one opens at a time), all five deliverable panels,
+  the three gate files of the checks editor and the closed answers. Toggled
+  with `hidden` / the `open` state, never conditionally rendered.
+- **The story rail** (`Story` + `StoryRail` client leaf) is native
+  horizontal scrolling with snap points; Back/Next step by measured card
+  offsets because the trigger card is narrower than the steps. The edge
+  fades are a mask whose stops (`--fade-left/right`) the leaf sets from the
+  scroll position; they fall in the rail's outer gutters (negative margin +
+  matching padding and scroll padding), so a snapped card's box, border
+  included, is never faded. The three illustrations are one sprite,
+  `public/images/customer-operations-story.png` (the reference's PNG,
+  quantised to 256 colours; the lossless original is 345 KB), shown with
+  `background-position`.
+- **The deliverable browser** (`DeliverableBrowser`) is one DOM for both
+  layouts: each row is a picker button plus its panel; the desktop grid
+  (`display: contents` rows, the panel spanning the right column) becomes a
+  +/− accordion under 600px, where the selection may also be empty. A
+  cross-reference opens its deliverable (and gate file) and hands focus to
+  that deliverable's button, since the button it was pressed in just hid.
+- **Shared pieces** that came with the page: `QuestionList` (promoted from
+  /review; `visibleCount`/`moreLabel` optional) and `BookingBand`
+  (promoted from the home page; see "Contact booking").
+- The quoted testimonial is a verbatim cut of the first one in `site.ts`;
+  `test/customer-operations.test.mjs` checks that and the page's links.
+
+
 ## Contact booking (Cal.com)
 
 The contact section (design: 3a in `../claude_websie/directions/brief.html`)
 is a server shell (`Contact`) slotting the heading into one client leaf
 (`BookingFlow`): format picker + optional note on the left, a paper card with
-the Cal.com inline embed (`@calcom/embed-react`) on the right.
+the Cal.com inline embed (`@calcom/embed-react`) on the right. It renders on
+/review and /work.
+
+The home page and /customer-operations-review use `BookingBand`
+(`src/components/BookingBand`: server shell + `CalendarGate` client leaf),
+with no situation picker: the "Show available times" button is the
+visitor's request that loads Cal — the same click-to-load boundary as
+below, and /privacy describes both. Each page passes its own Cal namespace
+(`home`, `customer-operations-review`; `BookingFlow` keeps `booking`, so
+none hears another's events; the `cal("on", …)` listeners are never
+removed, so a shared namespace would double-fire across a client-side
+navigation) and the band uses the shared theme in `src/lib/calTheme.ts`.
+Once the booker is up, Cal's own event details show (with the timezone
+selector) and the site-authored card header leaves the card; a landed
+booking shows Cal's own confirmation screen, not the 5a scheduled card.
+Plausible events: `Booking Calendar Opened` (no props; needs a goal in the
+dashboard) and `Booking Confirmed` with `format: "none"`.
 
 The Cal side is configuration the code depends on — breaking it fails
 silently:
@@ -553,7 +630,8 @@ small under the copyright in the footer. The copy is **a description of what
 the code does**, not boilerplate: it states that the site sets no cookies,
 that the only device storage is the booking picker's `sessionStorage` key,
 that Plausible is cookieless and EU-hosted, and that Cal.com is contacted
-only after a format pick. Change any of those behaviours and this copy is
+only after a format pick or the "Show available times" button (home page,
+/customer-operations-review). Change any of those behaviours and this copy is
 wrong — which is a compliance problem, not a stale-doc problem. Identity
 values interpolate from `site.ts`; bump `privacy.updated` (drives both the
 rendered date and the sitemap's `lastModified`) when the substance changes.

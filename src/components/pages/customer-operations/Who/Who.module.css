@@ -1,0 +1,262 @@
+/* 04 · Who runs it (design: R3 in the customer-operations reference, .who-*
+   rules). The card paper #fbfaf6, the wash #e8eee8 and the quiet grey
+   #62676a are the design's own values. Breakpoints: 700 (one column), 380
+   (tighter cards). */
+
+.section {
+  --section-pad: 88px;
+}
+
+.head {
+  --head-gap: 44px;
+}
+
+.top {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 18px;
+}
+
+/* ---------- The profile card ---------- */
+
+.profile {
+  padding: 22px;
+  background: #fbfaf6;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.identity {
+  display: flex;
+  gap: 17px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.photo {
+  display: block;
+  width: 78px;
+  height: 78px;
+  flex: 0 0 78px;
+  border-radius: 7px;
+  object-fit: cover;
+}
+
+.name {
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.role {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
+.location {
+  margin-top: 7px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: #62676a;
+}
+
+.bio {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.bio + p {
+  margin-top: 12px;
+}
+
+.commitment {
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.links {
+  display: flex;
+  gap: 17px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  font-size: 12px;
+}
+
+.links a,
+.all {
+  color: var(--teal-deep);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--teal-deep) 35%, transparent);
+  text-underline-offset: 4px;
+}
+
+/* ---------- The testimonial card ---------- */
+
+.label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: #62676a;
+}
+
+.testimonial {
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+  background: #e8eee8;
+  border-radius: 10px;
+}
+
+.testimonial .label {
+  margin-bottom: 18px;
+}
+
+.quote {
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+}
+
+.citation {
+  margin-top: auto;
+  padding-top: 18px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.citation a:hover {
+  color: var(--teal-deep);
+}
+
+.citation span {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 400;
+  color: #62676a;
+}
+
+/* ---------- Selected writing ---------- */
+
+.writing {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.writingHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.all {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+}
+
+.article {
+  display: block;
+  min-width: 0;
+}
+
+.articleTitle {
+  display: block;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.articleTitle::after {
+  content: " ↗";
+  color: var(--teal-deep);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.articleDesc {
+  display: block;
+  margin-top: 7px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.article:hover .articleTitle {
+  color: var(--teal-deep);
+}
+
+/* ---------- Breakpoints ---------- */
+
+@media (max-width: 700px) {
+  .section {
+    --section-pad: 64px;
+    --section-pad-phone: 64px;
+  }
+
+  .head {
+    --head-gap: 32px;
+  }
+
+  .top,
+  .pair {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .profile,
+  .testimonial {
+    padding: 20px;
+  }
+
+  .pair .article + .article {
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+  }
+}
+
+@media (max-width: 380px) {
+  .profile,
+  .testimonial {
+    padding: 18px;
+  }
+
+  .identity {
+    gap: 13px;
+  }
+
+  .photo {
+    width: 62px;
+    height: 62px;
+    flex-basis: 62px;
+  }
+
+  .name,
+  .quote {
+    font-size: 18px;
+  }
+}
+
+@media (pointer: coarse) {
+  .links a,
+  .all {
+    padding-block: 8px;
+  }
+}

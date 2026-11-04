@@ -1,0 +1,688 @@
+/* 03 · What you get (design: W2 in the customer-operations reference, the
+   .rd-* / .cd-* rules; light values of its light-dark() pairs). The
+   document and editor surfaces are the design's own palette, kept as
+   module variables. Breakpoints: 640 (head), 600 (the rows become an
+   accordion), 480 (the editor's file list wraps), 380 (one design column). */
+
+.section {
+  --section-pad-phone: 60px;
+  --d-paper: #fbfaf6;
+  --d-quiet: #62676a;
+  --d-wash: #e8eee8;
+  --d-fault-wash: #f4e6db;
+  --d-editor: #f1f3f1;
+  --d-editor-side: #e8ece8;
+  --d-editor-ink: #1f3528;
+  --d-editor-quiet: #536b5a;
+  --d-editor-key: #095c70;
+  --d-editor-string: #665320;
+  --d-diagram-fault: #f6e9e5;
+  --d-error: #a0332d;
+  --d-pass: #216745;
+}
+
+.head {
+  --head-gap: 36px;
+}
+
+/* ---------- The browser: picker + pane, one DOM for both layouts ---------- */
+
+/* Each row contributes its button to column 1 and (when open) its panel to
+   column 2, which spans every row; the sixth, flexible row takes the
+   panel's extra height so the five buttons stay a compact column. */
+.browser {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  grid-template-rows: repeat(5, auto) 1fr;
+  gap: 5px 22px;
+  align-items: start;
+}
+
+.row {
+  display: contents;
+}
+
+.choice {
+  grid-column: 1;
+  width: 100%;
+  padding: 13px 11px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.choice:hover {
+  background: var(--d-wash);
+}
+
+.choice[aria-expanded="true"] {
+  background: var(--d-wash);
+  border-color: var(--line);
+  color: var(--teal-deep);
+}
+
+.choiceTitle {
+  display: block;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.format {
+  display: block;
+  margin-top: 5px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--d-quiet);
+}
+
+.panel {
+  grid-column: 2;
+  grid-row: 1 / -1;
+  min-width: 0;
+}
+
+.paneHead {
+  padding: 10px 0 16px;
+}
+
+.paneTitle {
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.purpose {
+  margin-top: 7px;
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* ---------- Document pages ---------- */
+
+.paper {
+  background: var(--d-paper);
+  border: 1px solid var(--line);
+  padding: 22px;
+  min-width: 0;
+}
+
+.paper p {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.5;
+  letter-spacing: 0.03em;
+  color: var(--d-quiet);
+}
+
+.docTitle {
+  font-family: var(--serif);
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 1.17;
+  letter-spacing: -0.005em;
+  margin: 12px 0 14px;
+}
+
+/* The executive summary's slide. */
+.slide {
+  background: var(--d-wash);
+  border-color: transparent;
+  padding: 25px;
+}
+
+.slide .docTitle {
+  font-size: 28px;
+  margin: 15px 0 19px;
+  max-width: 22ch;
+}
+
+.summaryList {
+  padding-left: 17px;
+  display: grid;
+  gap: 7px;
+}
+
+.summaryList li {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* An inline cross-reference: "(G01)" opens the gate it names. */
+.xref {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--d-quiet);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--d-quiet) 35%, transparent);
+  text-underline-offset: 3px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.xref:hover {
+  text-decoration-color: var(--teal-deep);
+}
+
+.slideBottom {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.slideBottom p {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+/* Label / value rows under a finding ("Evidence", "Reproduce"). */
+.evidence {
+  margin-top: 17px;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  display: grid;
+  grid-template-columns: 73px minmax(0, 1fr);
+  gap: 10px 12px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* The dt/dd pair's wrapper takes no box of its own in the grid. */
+.pair {
+  display: contents;
+}
+
+.evidence dt {
+  color: var(--d-quiet);
+  font-size: 12px;
+}
+
+/* The design finding: its rows beside the architecture figure. */
+.designColumns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 246px), 1fr));
+  gap: 20px;
+  margin-top: 19px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  align-items: start;
+}
+
+.evidenceStack {
+  display: block;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.evidenceStack .pair {
+  display: block;
+}
+
+.evidenceStack dt {
+  margin-bottom: 5px;
+}
+
+.evidenceStack .pair + .pair {
+  margin-top: 15px;
+}
+
+.architecture {
+  display: block;
+  width: 246px;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.node {
+  fill: var(--d-wash);
+  stroke: var(--line);
+  stroke-width: 1.2;
+}
+
+.store {
+  fill: var(--d-paper);
+  stroke: var(--line);
+  stroke-width: 1.2;
+}
+
+.nodeTitle {
+  fill: var(--ink);
+  font: 500 12px var(--sans);
+}
+
+.nodeMeta {
+  fill: var(--d-quiet);
+  font: 400 11px var(--sans);
+}
+
+.edge {
+  fill: none;
+  stroke: var(--d-quiet);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.read {
+  stroke-dasharray: 3 3;
+}
+
+.faultFill {
+  fill: var(--d-diagram-fault);
+}
+
+.faultText {
+  fill: var(--d-error);
+  font: 400 11px var(--mono);
+}
+
+.faultArrow {
+  fill: none;
+  stroke: var(--d-error);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.boundary {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1.1;
+  stroke-dasharray: 4 4;
+}
+
+/* The roadmap: one open step on a dotted spine, the later items collapsed. */
+.roadmap {
+  list-style: none;
+}
+
+.roadmap > li {
+  position: relative;
+  border-left: 1px solid var(--line);
+  padding-left: 19px;
+  margin-left: 4px;
+}
+
+.roadmap > li::before {
+  content: "";
+  position: absolute;
+  left: -4px;
+  top: 19px;
+  z-index: 1;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--teal-deep);
+}
+
+.roadmap > li:first-child::before {
+  top: 7px;
+}
+
+.roadmap > li:last-child {
+  border-left-color: transparent;
+}
+
+.roadmap > li:last-child::after {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 0;
+  width: 1px;
+  height: 26px;
+  background: var(--line);
+}
+
+.roadmapStep {
+  border-bottom: 1px solid var(--line);
+}
+
+.roadmapHeading {
+  margin: 10px 0 14px;
+}
+
+.roadmapNext {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.roadmap > li:last-child .roadmapNext {
+  border-bottom: 0;
+}
+
+.roadmapBody {
+  padding-bottom: 19px;
+}
+
+/* ---------- The checks editor ---------- */
+
+.editor {
+  background: var(--d-editor);
+  border: 1px solid var(--line);
+  color: var(--d-editor-ink);
+  min-width: 0;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr);
+}
+
+.files {
+  background: var(--d-editor-side);
+  border-right: 1px solid var(--line);
+  padding: 12px 5px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.5;
+  min-width: 0;
+}
+
+.folder {
+  padding: 4px 5px;
+  color: var(--d-editor-quiet);
+}
+
+.file {
+  display: block;
+  width: 100%;
+  padding: 6px 5px 6px 12px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.file[aria-pressed="true"] {
+  background: var(--d-wash);
+  color: var(--teal-deep);
+}
+
+.fileStatic {
+  display: block;
+  padding: 5px 5px 5px 12px;
+  overflow-wrap: anywhere;
+  color: var(--d-editor-quiet);
+}
+
+.fileSupport {
+  border-top: 1px solid var(--line);
+  margin-top: 10px;
+  padding-top: 7px;
+}
+
+.codeArea {
+  min-width: 0;
+}
+
+.openFile {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  background: var(--d-paper);
+}
+
+.code {
+  display: block;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: 14px 12px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.65;
+  color: var(--d-editor-ink);
+}
+
+.code[hidden] {
+  display: none;
+}
+
+.key {
+  color: var(--d-editor-key);
+}
+
+.string {
+  color: var(--d-editor-string);
+}
+
+.comment {
+  color: var(--d-editor-quiet);
+}
+
+.terminal {
+  border-top: 1px solid var(--line);
+  padding: 12px 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.command {
+  overflow-wrap: anywhere;
+  margin-bottom: 9px;
+}
+
+.runLine {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 9px;
+}
+
+.runLine span:last-child {
+  overflow-wrap: anywhere;
+}
+
+.fail {
+  color: var(--d-error);
+}
+
+.pass {
+  color: var(--d-pass);
+}
+
+.failureDetail {
+  background: var(--d-fault-wash);
+  color: var(--d-editor-ink);
+  padding: 10px 11px;
+  margin-top: 11px;
+}
+
+.failureDetail strong {
+  font-weight: 500;
+  color: var(--d-error);
+}
+
+.checkNote {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin-top: 12px;
+}
+
+/* ---------- Breakpoints ---------- */
+
+@media (max-width: 640px) {
+  .head {
+    --head-gap: 24px;
+  }
+}
+
+/* The rows become an accordion: each button a hairline row with a +/−,
+   its panel opening underneath. */
+@media (max-width: 600px) {
+  .browser {
+    display: block;
+  }
+
+  .row {
+    display: block;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .row:first-child {
+    border-top: 1px solid var(--line);
+  }
+
+  .choice {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 14px;
+    gap: 5px 12px;
+    padding: 18px 0;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .choice:hover,
+  .choice[aria-expanded="true"] {
+    background: transparent;
+    color: inherit;
+  }
+
+  .choice::after {
+    content: "+";
+    grid-column: 2;
+    grid-row: 1;
+    color: var(--d-quiet);
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  .choice[aria-expanded="true"]::after {
+    content: "−";
+  }
+
+  .choice[aria-expanded="true"] .choiceTitle {
+    color: var(--teal-deep);
+  }
+
+  .choiceTitle {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .format {
+    grid-column: 1;
+    margin-top: 0;
+  }
+
+  .panel {
+    padding-bottom: 22px;
+  }
+
+  /* The row's button already shows the title. */
+  .paneHead {
+    padding: 0;
+  }
+
+  .paneTitle {
+    display: none;
+  }
+
+  .purpose {
+    margin: 0 0 14px;
+    font-size: 13px;
+  }
+
+  .paper {
+    padding: 19px;
+  }
+
+  .slide .docTitle {
+    font-size: 27px;
+  }
+
+  .evidence {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .evidence .pair + .pair {
+    margin-top: 7px;
+  }
+
+  .evidence .pair {
+    display: contents;
+  }
+
+  .evidence .pair + .pair dt {
+    margin-top: 7px;
+  }
+}
+
+/* The editor's file list runs above the code, wrapping. */
+@media (max-width: 480px) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    padding: 8px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .files > .folder {
+    width: 100%;
+    padding: 3px 4px;
+  }
+
+  .file {
+    width: auto;
+    padding: 7px 5px;
+  }
+
+  .fileSupport {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px 9px;
+    margin-top: 5px;
+    padding-top: 6px;
+  }
+
+  .fileSupport .folder,
+  .fileSupport .fileStatic {
+    padding: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .designColumns {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .paper {
+    padding: 19px 16px;
+  }
+}

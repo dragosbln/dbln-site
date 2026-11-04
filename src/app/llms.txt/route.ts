@@ -1,5 +1,10 @@
+import {
+  customerOperationsPath,
+  hero as customerOperationsHero,
+  questions as customerOperationsQuestions,
+} from "@/content/customerOperations";
 import { landing, questions, reviewPath } from "@/content/review";
-import { review, site } from "@/content/site";
+import { hero, review, site } from "@/content/site";
 import { caseStudies } from "@/content/work";
 import { getPosts } from "@/lib/posts";
 import { postUrl } from "@/lib/urls";
@@ -16,9 +21,20 @@ export function GET() {
 
   // Derived from content so a change to the offer or a new case study can't
   // leave this file — the primary AI-crawler surface — stale.
-  const deliverables = (
-    review.steps.find((step) => step.ordered)?.items ?? []
-  ).join(", ");
+  const { panel, context } = review;
+  // rich-text markers off the hero title ("*handle next.*")
+  const positioning = hero.title.replace(/\*/g, "");
+  const lenses = panel.lenses.items.join(" and ");
+  const deliverables = panel.receive.items.join(", ");
+  // a context with a page of its own links it; one without still leads to
+  // the booking section
+  const contexts = context.items
+    .map((item) => {
+      const desc = item.desc.replace(/\.$/, "");
+      const page = item.href.startsWith("/#") ? "" : `, see ${site.url}${item.href}`;
+      return `${item.name} (${desc}${page})`;
+    })
+    .join("; ");
   // short case names ("Equinet — by Mustad" → "Equinet"), matching CaseNav
   const caseNames = caseStudies.map((c) => c.name.split(/ — | · /)[0]).join(", ");
 
@@ -26,14 +42,17 @@ export function GET() {
 
 > ${site.role}. ${site.description}
 
+- ${positioning} ${hero.lede}
 - Based in ${site.location}; works remotely across EU and US time zones.
-- Offer: ${review.title} — an independent, fixed-scope review of LLM products. Deliverables: ${deliverables}.
+- Offer: ${review.title} — ${panel.scope.toLowerCase()}, ${panel.duration.toLowerCase()}. ${panel.bring.label}: ${panel.bring.text} ${panel.lenses.label}: ${lenses}. ${panel.receive.label}: ${deliverables}.
+- Review contexts: ${contexts}.
 - Engagements run through ${site.company}.
-- Contact: ${site.email}
+- Contact: ${site.email}, or book a 30-minute call at ${site.url}/#contact
 
 ## Pages
 
-- [Home](${site.url}/): positioning, the review offer, the method, selected work, testimonials, writing
+- [Home](${site.url}/): positioning, the engagement at a glance, selected work, testimonials, writing, booking
+- [${customerOperationsHero.pageTitle}](${site.url}${customerOperationsPath}): the review for customer-service AI: a review in practice (a fictional refund scenario, real failure patterns), how it runs in three phases, the five deliverables with illustrative excerpts, who runs it, ${customerOperationsQuestions.items.length} questions answered, booking
 - [${landing.title}](${site.url}${reviewPath}): the offer page in full: when you need it, how it runs stop by stop with a worked example, the five deliverables as sample pages, who runs it, the free first read, ${questions.items.length} questions answered
 - [Work](${site.url}/work): ${caseStudies.length} case studies in depth (situation, the expensive-to-reverse decision, approach, outcomes) — ${caseNames}
 - [Writing](${site.url}/blog): all articles; RSS at ${site.url}/feed.xml

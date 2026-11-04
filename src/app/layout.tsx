@@ -46,7 +46,8 @@ export const metadata: Metadata = {
     locale: "en_US",
     // Site-wide og:image (link scrapers show a generic stock photo without
     // one). NOTE: pages that export their own `openGraph` (/blog, /work,
-    // /privacy) replace this whole object and must list siteOgImage too.
+    // /privacy, the offer pages) replace this whole object and must list
+    // siteOgImage too; the home page lists its own card (homeOgImage).
     images: [siteOgImage],
   },
   // No title/description here: they would shadow every page's own
